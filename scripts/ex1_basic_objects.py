@@ -1,5 +1,6 @@
-"""
-geonum example script 1
+"""geonum example script 1
+
+Intorduction into base class GeoPoint and GeoVector3D
 """
 
 from geonum.base import GeoPoint

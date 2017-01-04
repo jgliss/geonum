@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Jul 04 07:50:36 2016
-
-@author: Jonas Gliß
-@email: jg@nilu.no
-@Copyright: Jonas Gliß
+"""Processing module of geonum library
 """
 from numpy import radians, cos, sin, arctan, pi, argmin, linspace,\
-    tan, ceil, hypot, vstack, nanmin, nanmax, where, sign, diff, logical_and
+    tan, ceil, hypot, vstack, nanmin, nanmax, where, sign, diff,\
+    logical_and, arange
     #gradient
 
 from scipy.ndimage import map_coordinates
@@ -21,8 +17,9 @@ from geonum.base import GeoPoint
 class ElevationProfile(object):
     """Class for calculating elevation profiles
     
-    The profile is calculated between two geo point objects using a provided
-    topographic data grid which must cover the range spanned by both points
+    The profile is calculated between two geo point objects using a 
+    provided topographic data grid which must cover the range spanned by 
+    both points
     """
     def __new__(cls, topo_data, observer, endpoint, resolution = 5.):
         """These objects strictly can only be created with the right input, 
@@ -143,24 +140,46 @@ class ElevationProfile(object):
         """
         return 1000 * tan(radians(elev_angle)) * self.dists + self.profile[0]\
                                                         + view_above_topo_m
-            
+    
+    def find_horizon_elev(self, elev_start = 0.0, elev_stop = 60.0,\
+                                              step_deg = 0.1, **kwargs):
+        """Find first elevation angle which does not intersect with topo
+        
+        :param float elev_start: start search elevation angle
+        :param float elev_stop: stop search elevation angle
+        :param float step_deg: angle step for search (coarser is faster)
+        :param **kwargs: additional keyword agruments passed to 
+            :func:`get_first_intersection`
+        """
+        elevs = arange(elev_start, elev_stop + step_deg, step_deg)
+        elev_sects = []
+        dists_sects = []
+        for elev in elevs:
+            dist, dist_err, intersect, view_elevations, _ =\
+                        self.get_first_intersection(elev, **kwargs)
+            if dist is None:
+                return elev, elev_sects, dists_sects
+            else:
+                dists_sects.append(dist), elev_sects.append(elev)
+        raise Exception("Unexpected exception..")
+        
     def get_first_intersection(self, elev_angle, view_above_topo_m = 1.5,\
                         min_dist = None, local_tolerance = 3, plot = False):
                                 
         """Finds first intersection of a viewing direction with topography
         
         Start point of the viewing vector is the observer position (or more
-        accurately, the center position of the closest topography tile in the
-        topography data set). The relative altitude of the start point with 
-        respect to the topography altitude at the observer position can be 
-        controlled on input (arg ``view_above_topo_m``) as well as the
-        elevation angle of the viewing direction. The azimuth angle 
+        accurately, the center position of the closest topography tile in 
+        the topography data set). The relative altitude of the start point 
+        with respect to the topography altitude at the observer position 
+        can be controlled on input (arg ``view_above_topo_m``) as well as 
+        the elevation angle of the viewing direction. The azimuth angle 
         corresponds to the profile azimuth (i.e. azimuth between observer 
         position and endpoint of this profile).
         
         The signal analysed for finding the intersection is a vector 
-        containing relative elevation positions of the viewing direction with
-        respect to the profile altitude::
+        containing relative elevation positions of the viewing direction 
+        with respect to the profile altitude::
         
             diff_signal = self.get_altitudes_view_dir - self.profile
             
@@ -227,11 +246,12 @@ class ElevationProfile(object):
            
         except IndexError as e:
             print ("No intersections could be detected, err: %s" %repr(e))
-
+        
+        ax = None
         if plot:
-            self._plot_intersect_search_result(view_elevations, dist)
+            ax = self._plot_intersect_search_result(view_elevations, dist)
             
-        return dist, dist_err, intersect, view_elevations
+        return dist, dist_err, intersect, view_elevations, ax
     
     def _plot_intersect_search_result(self, view_elevations, dist = None):
         ax = self.plot()
@@ -283,10 +303,11 @@ class ElevationProfile(object):
         if ax is None:
             fig, ax = subplots(1,1)
         ax.fill_between(self.dists, self.profile, facecolor="#994d00",\
-                                                                alpha = 0.20)
+                                                            alpha = 0.20)
         ax.set_xlabel("Distance [km]")
         ax.set_ylabel("Altitude [m]")
-        ax.set_ylim([self.min - .1*self.alt_range, self.max + .1*self.alt_range])
+        ax.set_ylim([self.min - .1 * self.alt_range,\
+                             self.max + .1 * self.alt_range])
         return ax
         
 class LineOnGrid(object):

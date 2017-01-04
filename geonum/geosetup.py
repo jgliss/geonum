@@ -14,17 +14,19 @@ from .topodata import TopoDataAccess, TopoData
 from .mapping import Map
 
 class GeoSetup(object):
-    """The GeoSetup class is a high level collection of GeoPoints and vectors"""
-    def __init__(self, points=[], vectors=[], lat_ll = None, lon_ll = None,\
-                            lat_tr = None, lon_tr = None, id = "MyGeoSetup",\
-                            topo_access_mode = "srtm", local_topo_path = None):
+    """The GeoSetup class represents acollection of GeoPoints and vectors
+    """
+    def __init__(self, points = [], vectors = [], lat_ll = None,\
+                     lon_ll = None, lat_tr = None, lon_tr = None,\
+                     id = "MyGeoSetup", topo_access_mode = "srtm",\
+                                             local_topo_path = None):
         """Init object
         
         
-        :param list points: list of :class:`GeoPoint` objects to be included in
-            this setup
-        :param list vectors: list of :class:`GeoVector3D` objects to be included in
-            this setup
+        :param list points: list of :class:`GeoPoint` objects to be 
+            included in this setup
+        :param list vectors: list of :class:`GeoVector3D` objects to be 
+            included in this setup
         :param float lat_ll (None): lower left latitude of regime
         :param float lon_ll (None): lower left longitude of regime
         :param float lat_tr (None): top right latitude of regime
@@ -149,13 +151,13 @@ class GeoSetup(object):
         try:
             return self.points["ll"]
         except AttributeError:
-            print "Lower left corner point not yet defined in GeoSetup class"
+            print "Lower left corner (GeoPoint) not yet defined in GeoSetup"
     
     @ll.setter
     def ll(self, value):
         if not isinstance(value, GeoPoint):
-            raise TypeError("Could not set lower left coordinate in GeoSetup: "
-                "need :class:`GeoPoint` object")
+            raise TypeError("Could not set lower left coordinate in "
+                "GeoSetup: need GeoPoint object")
         self.points["ll"] = value
         
     @property
@@ -164,14 +166,14 @@ class GeoSetup(object):
         try:
             return self.points["tr"]
         except AttributeError:
-            print "Lower left corner point not yet defined in GeoSetup class"
+            print "Top right corner (GeoPoint) not yet defined in GeoSetup"
             pass
     
     @tr.setter
     def tr(self, value):
         if not isinstance(value, GeoPoint):
-            raise TypeError("Could not set top right coordinate in GeoSetup: "
-                "need :class:`GeoPoint` object")
+            raise TypeError("Could not set top right coordinate in "
+                            "GeoSetup: need GeoPoint object")
         self.points["tr"] = value
         
     @property
@@ -263,7 +265,7 @@ class GeoSetup(object):
         """
         if not isinstance(vec, GeoVector3D):
             print ("Error adding GeoVector3D, wrong input type, need "
-                    ":class:`GeoVector3D` object, input type: " + type(vec))
+                  ":class:`GeoVector3D` object, input type: " + type(vec))
             return
         if vec.name in self.vectors:
             print ("Vector ID %s already exists in %s" %(vec.name, self))
@@ -310,8 +312,9 @@ class GeoSetup(object):
         
         .. note::
         
-            Existing points specifying the regime (i.e. lower left / top right 
-            corner) are not considered here
+            Existing points specifying the regime (i.e. lower left / top 
+            right corner) are not considered here
+            
         """
         lats, lons = [], []
         for id, p in self.points.iteritems():
@@ -329,18 +332,19 @@ class GeoSetup(object):
         """Set range of setup (lower left and upper right coordinates) 
         considering all points in this collection
         
-        :param float extend_km: extend range from the outermost points by this 
-            number in km
-        :param float to_square (True): extend the shorter base side to the size 
-            of the longer one (quadratic range)
+        :param float extend_km: extend range from the outermost points by 
+            this number in km
+        :param float to_square (True): extend the shorter base side to the 
+            size of the longer one (quadratic range)
         """
         lats, lons= self._all_lats_lons()
         if not len(lats) > 0:
             #print "Borders could not be initiated, no objects found..."
             return False
         lat_ll, lon_ll, lat_tr , lon_tr= nanmin(lats), nanmin(lons),\
-                                                    nanmax(lats), nanmax(lons)
-        pll, ptr = GeoPoint(lat_ll, lon_ll, 0.0), GeoPoint(lat_tr, lon_tr,0.0)
+                                            nanmax(lats), nanmax(lons)
+        pll, ptr = GeoPoint(lat_ll, lon_ll, 0.0), GeoPoint(lat_tr,\
+                                                            lon_tr, 0.0)
         if to_square:
             v = ptr - pll
             add = (abs(v.dx) - abs(v.dy)) / 2

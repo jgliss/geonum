@@ -207,9 +207,9 @@ class GeoPoint(object, LatLon):
             (to be used with dist_hor)
         :param float dist_hor: horizontal distance from this point in km 
             (to be used with azimuth)
-        :param float lon1: longitude of destination point, topo data will be 
-            retrieved between this point and destination point 
-            (to be used with lat1)
+        :param float lon1: longitude of destination point, topo data will 
+            be retrieved between this point and destination point (to be 
+            used with lat1)
         :param float lat1: latitude of destination point, topo data will be 
             retrieved between this point and destination point 
             (to be used with lon1)

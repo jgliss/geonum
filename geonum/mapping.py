@@ -1,26 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Plotting and mapping functionality
-
-Mapping functionality is represented by the :class:`Map` object which inherits
-and is initiated as :class:`mpl_toolkits.basemap.Basemap` (for details on how
-to set up a map, see `here <http://matplotlib.org/basemap/users/examples.html>`_).
-
-The :class:`Map` object can therefore be created exactly in the same way as 
-:class:`mpl_toolkits.basemap.Basemap` objects, e.g.::
-
-    
-
-.. note::
-
-    The library was initally developed for geographical setups on local scales 
-    (i.e. several 10 km grids) including handling of high resolution topography 
-    data handling and was not really tested to create maps on global scales.
-    In principle, this should work, though. See
-    
+Plotting and mapping functionality 
 """
 
-from numpy import round, log10, floor, meshgrid, arange, array, zeros, ceil, log2
+from numpy import round, log10, floor, meshgrid, arange, array, zeros,\
+                                                                ceil, log2
 from mpl_toolkits.basemap import Basemap
 from matplotlib.pyplot import subplots, rcParams, Polygon
 from random import randrange
@@ -40,23 +24,26 @@ from geonum.topodata import TopoData, TopoDataAccess
 from geonum.helpers import haversine_formula, shifted_color_map
 
 class Map(Basemap):
-    """Basemap object for plotting a map
+    """Basemap object for drawing and plotting (on) a geographic map
     
-    This object is initiated as :class:`mpl_toolkits.basemap.Basemap` and 
-    further functionality was added. These are mainly:
+    This object is initiated as `Basemap <http://matplotlib.org/basemap/
+    users/examples.html>`_ and can therefore be used as such. 
+    Added functionality mainly includes:
     
         1. Including topography data
         #. 2D and 3D plotting
         #. Handle of :class:`GeoVector3D` and :class:`GeoPoint` objects
         #. Some more high level functionality (i.e. draw text, points, 
             polygons or plot data onto map)
-        
+    
     .. note::
     
-        For those who are not familiar with object oriented programming. This 
-        object IS a Basemap object and can be used as such including all
-        functionality
-        
+        The mapping functionality was initally developed for geographical 
+        setups on local scales (i.e. several 10 km grids) including 
+        handling of high resolution topography data and was not tested to 
+        create large maps on global scales. In principle, this should work,
+        though.
+       
     """ 
     def __init__(self, *args, **kwargs):
         """Initialisation of the map object
@@ -70,9 +57,10 @@ class Map(Basemap):
             
         .. note::
         
-            Additional possible input in **kwargs compared to :class:`Basemap` 
-            objects is "topo_data" which will be set in case it is a valid input
-            (i.e. :class:`TopoData`) and will be used for plotting topography
+            Additional possible input in **kwargs wit to ``Basemap`` 
+            objects is "topo_data" which will be set in case it is a valid 
+            input (i.e. :class:`TopoData`) and will be used for plotting 
+            topography
         """
         super(Map, self).__init__(*args, **kwargs)
 
@@ -119,7 +107,7 @@ class Map(Basemap):
         ta = TopoDataAccess(mode, local_path)
         try:
             self.topo_data = ta.get_data(self.lat_ll, self.lon_ll,\
-                                                    self.lat_tr, self.lon_tr)
+                                         self.lat_tr, self.lon_tr)
             return self.topo_data
         except Exception as e:
             raise TopoAccessError(repr(e))
@@ -198,7 +186,8 @@ class Map(Basemap):
     def draw_topo_contour(self, include_seabed = 1, separation_levels = 500):
         """Draw topography contour lines
         
-         :param bool include_seabed: include seabed topography (default: True)
+         :param bool include_seabed: include seabed topography 
+             (default: True)
          :param int separation_levels: separation in m of contour lines
              (default: 500)
         """
@@ -243,20 +232,23 @@ class Map(Basemap):
     
     def draw_topo(self, insert_colorbar = False, include_seabed = True,\
                             max_grid_points = 500, cmap_div = "coolwarm",\
-                                cmap_seq = "Oranges", alpha = 0.5, ax = None):
+                            cmap_seq = "Oranges", alpha = 0.5, ax = None):
         """Draw topography into map
         
         :param bool insert_colorbar: draws a colorbar for altitude
             range (default: False)
-        :param bool include_seabed: include seabed topography (default: True)
-        :param int max_grid_points: resolution of displayed topo data points 
-            (makes it faster in interactive mode, default: 500)
-        :param str cmap_div: name of a diverging colormap (this one is used if
-            :arg:`include_seabed` is True, and the cmap is shifted such , that
-            white colors correspond to sea level altitude, default: "coolwarm")
-        :param str cmap_seq: name of a sequential colormap (this one is used if
-            :arg:`include_seabed` is False, default: "Oranges")
-        :param float alpha: Alpha value (transparency) of plotted topography
+        :param bool include_seabed: include seabed topography 
+            (default: True)
+        :param int max_grid_points: resolution of displayed topo data 
+            points (makes it faster in interactive mode, default: 500)
+        :param str cmap_div: name of a diverging colormap (this one is 
+            used if :arg:`include_seabed` is True, and the cmap is shifted 
+            such , that white colors correspond to sea level altitude, 
+            default: "coolwarm")
+        :param str cmap_seq: name of a sequential colormap (this one is 
+            used if :arg:`include_seabed` is False, default: "Oranges")
+        :param float alpha: Alpha value (transparency) of plotted 
+            topography
         :param ax: matplotlib axes object
         """
         try:  
@@ -279,24 +271,23 @@ class Map(Basemap):
             if levels_filled[0] < 0:          
                 shifted_cmap = shifted_color_map(z_min, z_max, cmap_div)
                 
-                CS2 = ax.contourf(x, y, z, levels_filled, cmap = shifted_cmap,\
-                                                extend = "both", alpha = alpha)
+                cs2 = ax.contourf(x, y, z, levels_filled, cmap =\
+                    shifted_cmap, extend = "both", alpha = alpha)
             elif levels_filled[0] >= 0:                
-                CS2 = ax.contourf(x, y, z, levels_filled, cmap = cmap_seq,\
-                                                alpha = 1.0, extend = "min")
-                self.contour_filled = CS2
+                cs2 = ax.contourf(x, y, z, levels_filled, cmap = cmap_seq,\
+                                              alpha = 1.0, extend = "min")
+                self.contour_filled = cs2
                     
             if insert_colorbar:              
-                self.insert_colorbar("topo", CS2, label = "Altitude [m]")
+                self.insert_colorbar("topo", cs2, label = "Altitude [m]")
         
         except Exception as e:
             raise
-            msg=("Could not draw topography in high res, using default etopo() "
-                "instead...")
+            msg=("Could not draw topography in high res, using default "
+                 "etopo() instead...")
             print msg + repr(e)
             self.etopo()
-            #self.map.fillcontinents(color=self.color_land,lake_color=self.color_water)
-    
+         
     def draw_topo_3d(self, num_ticks = 4, cmap = "Oranges", alpha = 0.5,\
                         linewidth = 0.5, edgecolors = "#708090", ax = None):
         """Draw topography into 3D axis
@@ -319,8 +310,8 @@ class Map(Basemap):
         x, y, z, z_min, z_max, z_order = self._prep_topo_data()
         tickformatter = "{:.2f}"    
         ax.plot_surface(x, y, z, rstride = 1, cstride = 1, cmap = cmap,\
-                alpha = alpha, linewidth = linewidth, edgecolors = edgecolors,
-                                    vmin = z_min, vmax = z_max, zorder = 1)
+                        alpha = alpha, linewidth = linewidth, edgecolors =\
+                        edgecolors, vmin = z_min, vmax = z_max, zorder = 1)
         #xlabels=ax.get_xticklabels()
         ax.set_xlabel("Lons")
         ax.set_ylabel("Lats")
