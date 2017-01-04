@@ -250,6 +250,8 @@ class ElevationProfile(object):
         ax = None
         if plot:
             ax = self._plot_intersect_search_result(view_elevations, dist)
+            ax.set_title("Azim: %.1f, Elev: %.1f, Intersect @ "
+                "dist=%.1f km" %(self.azimuth, elev_angle, dist))
             
         return dist, dist_err, intersect, view_elevations, ax
     
@@ -271,7 +273,17 @@ class ElevationProfile(object):
         """
         idx = argmin(abs(self.dists - dist))
         return self.profile[idx]
-     
+    
+    @property
+    def start_point(self):
+        """Return position of observer"""
+        return self.observer
+    
+    @property    
+    def azimuth(self):
+        """Return azimuth direction of profile (from observer)"""
+        return (self.endpoint - self.observer).azimuth
+        
     @property
     def min(self):
         """Return minimum altitude in profile"""
@@ -286,7 +298,7 @@ class ElevationProfile(object):
     def alt_range(self):
         """Return altitude range of profile
         """
-        return self.max-self.min
+        return self.max - self.min
         
     def __call__(self, dist):
         """Returns altitude at a certain distance

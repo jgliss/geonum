@@ -35,6 +35,9 @@ def run_ex4():
     ax.set_title("Elev horizon: %s" %elev)
     fig.savefig(join(save_path, "ex4_out_2_horizon_search.png"))
     
+    return elev_profile, s
+    
 if __name__ == "__main__":
-    run_ex4()
+    profile, s = run_ex4()
     show()
+    
