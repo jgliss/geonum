@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-The two fundamental base classes of geonum:
-
-    1. :class:`GeoPoint` specifies a coordinate geographical coordinate
-        (lon, lat, altitude)
-    #. :class:`GeoVector3D` specifies a vector (e.g. connection between 2
-        points)
+This modules includes the two base objects of geonum:
+    
+    1. :class:`GeoPoint` specifies a coordinate geographical coordinate 
+    (lon, lat, altitude)
+    
+    2. :class:`GeoVector3D` specifies a vector (e.g. connection between 2 
+    points)
         
 """
 from LatLon import LatLon, GeoVector
@@ -28,11 +29,13 @@ class GeoPoint(object, LatLon):
         :param float lon: longitude of point (decimal degrees)
         :param float altitude: elevation (above surface) of point in m
         :param str name: name (ID) of this point
-        :param str topo_access_mode: string specifying the current access mode
-            for topographic data (in v1, choose between "srtm" or "etopo1")
-        :param str topo_path: specify path where etopo1 data files are stored
-        :param TopoData topo_data: you can assign an existing topo dataset to
-            this point (can save time, e.g. for altitude access)
+        :param str topo_access_mode: string specifying the current access 
+            mode for topographic data (in v1, choose between "srtm" or 
+            "etopo1")
+        :param str topo_path: specify path where etopo1 data files are 
+            stored
+        :param TopoData topo_data: you can assign an existing topo dataset 
+            to this point (can save time, e.g. for altitude access)
         """
         #super(GeoPoint, self).__init__(lon, lat, name)
         LatLon.__init__(self, lat, lon, name)
@@ -52,8 +55,8 @@ class GeoPoint(object, LatLon):
         return self._topo_access.local_path    
     
     """PROCESSING"""  
-    def offset(self, azimuth, dist_hor, dist_vert = 0.0, ellipse = "WGS84",\
-                                                                    **kwargs):
+    def offset(self, azimuth, dist_hor, dist_vert = 0.0,\
+                                       ellipse = "WGS84", **kwargs):
         """Returns new GeoPoint at offset position
     
         :param float azimuth: azimuth direction angle (in decimal degrees, e.g.
@@ -61,9 +64,11 @@ class GeoPoint(object, LatLon):
         :param float dist_hor: horizontal offset to this point in km 
         :param float dist_vert: vertical offset to this point in m (positive
             if point is higher, negative, if it is lower)
-        :param float ellipse: geodetic system (ellipsoid), default is "WGS84", 
-            i.e. `World Geodetic System <https://confluence.qps.nl/pages/view\
-            page.action?pageId=29855173>`_)
+        :param float ellipse: geodetic system (ellipsoid), default is 
+            "WGS84", i.e. `World Geodetic System <https://confluence.qps.
+            nl/pages/view page.action?pageId=29855173>`_)
+        :param **kwargs: additional keyword arguments passed to init of new
+            :class:`GeoPoint` object (e.g. name = "blablub")
         :return: - new :class:`GeoPoint` at offset position
         """
         p = LatLon(self.lat.decimal_degree, self.lon.decimal_degree)
@@ -89,13 +94,14 @@ class GeoPoint(object, LatLon):
     def range_borders(self, *points):
         """Get geographical borders (lower left, top right) of this point
         
-        Additional points can be included as non keyword arguments, then the
-        range borders are determined under consideration of this points 
-        position and all other points. If no additional points are specified,
-        the range corners will be set in 1km diagonal distance to this point,
-        else, the extend will be set 10% of the points considered.
+        Additional points can be included as non keyword arguments. The
+        range borders are then determined under consideration of all
+        specified points. If no additional points are specified,
+        the range corners will be set corresponding to 1km diagonal 
+        distance to this point.
         
-        :param points: additional :class:`GeoPoint` objects to be considered
+        :param *points: additional :class:`GeoPoint` objects to be 
+            considered
         :returns:
             - :class:`GeoPoint`, lower left corner of regime
             - :class:`GeoPoint`, top right corner of regime
@@ -150,8 +156,8 @@ class GeoPoint(object, LatLon):
             - :class:`TopoData`, the topographic data
             - :class:`GeoPoint`, the second coordinate
           
-        The following input combinations work (and are preferentially processed
-        in the specified list order if multiple input is given):
+        The following input combinations work (and are preferentially 
+        processed in the specified list order if multiple input is given):
         
             1. specify endpoint using geo_point
             #. specify endpoint using azimuth and dist_hor

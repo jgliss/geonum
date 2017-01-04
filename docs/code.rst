@@ -10,8 +10,8 @@ Base classes
    :members:
    :undoc-members:
 
-The GeoSetup class (High level)
--------------------------------
+The GeoSetup class
+------------------
 
 .. automodule:: geonum.geosetup
    :members:
