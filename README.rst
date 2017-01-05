@@ -6,7 +6,7 @@ Topography access is supported for SRTM data, which is handled by the
 Requirements
 ------------
 
-It is strongly recommended to use the package manager `Anaconda <https://www.continuum.io/downloads>`_ since it includes many of the required dependencies and makes life easier when it comes to installation or upgrade of non-straight forward installations of additional requirements (e.g. opencv, basemap)
+It is recommended to use the package manager `Anaconda <https://www.continuum.io/downloads>`_ since it includes many of the required dependencies and makes life easier when it comes to installation or upgrade of non-straight forward installations of additional requirements (e.g. opencv, basemap)
 
   - numpy
   - matplotlib
@@ -21,8 +21,6 @@ It is strongly recommended to use the package manager `Anaconda <https://www.con
 
   - OpenCV (used for changing resolution of topographic elevation maps, for installation remarks, see `here <http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_setup/py_setup_in_windows/py_setup_in_windows.html>`_
   - netCDF4 (needed in case `Etopo1 <https://www.ngdc.noaa.gov/mgg/global/global.html>`_ data acess is required).
-
-
 
 
 Installation
