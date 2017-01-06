@@ -15,8 +15,10 @@
 import sys
 import os
 import shlex
-from geonum import __version__
-#__version__ = '1.0.0.test'
+
+with open(os.path.join("..", "VERSION.rst")) as f:
+    __version__ = f.readline()
+    f.close()
 
 try:
     from unittest.mock import MagicMock

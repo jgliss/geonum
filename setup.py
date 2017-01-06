@@ -9,10 +9,14 @@ from setuptools import setup, find_packages
 
 with open('README.rst') as file:
     readme = file.read()
-    
+
+with open("VERSION.rst") as f:
+    version = f.readline()
+    f.close()
+        
 setup(
     name        =   'geonum',
-    version     =   '1.0.0',
+    version     =   version,
     author      =   'Jonas Gliss',
     author_email=   'jg@nilu.no',
     license     =   'GPLv3',
