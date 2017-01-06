@@ -31,7 +31,12 @@ geonum can be installed from source by downloading and extracting the latest rel
   
 If the installation fails make sure, that all dependencies (see above) are installed correctly. Geonum was only tested for Python 2.7.
 
+Instructions and code documentation
+-----------------------------------
+
+The code documentation of pydoas is hosted on `Read The Docs <http://geonum.readthedocs.io/en/latest/index.html>`_
+
 Get started
 -----------
 
-After installation try running the example scripts, which also provides an easy start into the functionality of geonum.
+After installation try running the `example scripts <http://geonum.readthedocs.io/en/latest/examples.html>`_ in order to test the installation. The scripts are also meant to provide an easy start into the main features of geonum.
