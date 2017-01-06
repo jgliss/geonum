@@ -15,7 +15,7 @@
 import sys
 import os
 import shlex
-import geonum
+import geonum import __version__ as __version__
 
 try:
     from unittest.mock import MagicMock
