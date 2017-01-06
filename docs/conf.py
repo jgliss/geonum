@@ -15,8 +15,8 @@
 import sys
 import os
 import shlex
-#import geonum import __version__ as __version__
-__version__ = '1.0.0.test'
+from geonum import __version__
+#__version__ = '1.0.0.test'
 
 try:
     from unittest.mock import MagicMock
