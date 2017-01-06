@@ -22,7 +22,8 @@ setup(
     include_package_data    =   True,  
     install_requires        =   ["scipy",
                                  "LatLon",
-                                 "srtm.py"],
+                                 "srtm.py",
+                                 "sphinxcontrib-images"],
     extras_require={
         'cv2':  ["opencv-python>=2.4.11"],
         'netCDF4': ["docutils>=0.3"]},
