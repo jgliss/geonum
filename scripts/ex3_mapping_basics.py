@@ -8,14 +8,14 @@ Mapping and advanced functionality
 import geonum
 from numpy import mean
 from matplotlib.pyplot import close, subplots, show
-from os.path import join
+from os.path import join, exists
 from os import getcwd
 
 ### Set save directory for figures
 save_path = join(getcwd(), "scripts_out")
 
 close("all")
-
+exceptions = []
 def create_map_and_load_topodata():
     """Create and return map object around Guallatiri volcano"""
     lat0 = -18.48
@@ -68,7 +68,13 @@ def add_points_and_plot_map(basemap):
     basemap.ax.view_init(20, 240)
     
     # save the 3D figure
-    basemap.ax.figure.savefig(join(save_path, "ex3_out_1_map3D.png"))
+    print "Save path: %s (exists: %s)" %(save_path, exists(save_path))
+    
+    try:
+        basemap.ax.figure.savefig(join(save_path, "ex3_out_1_map3D.png"))
+    except Exception as e:
+        exceptions.append("Failed to save first plot...%s" %repr(e))
+        
 
     fig, ax = subplots(1,1)
     
@@ -84,9 +90,14 @@ def add_points_and_plot_map(basemap):
     
     # You can include a polygon connecting different points
     basemap.add_polygon_2d([summit, p2, p1], fc = "r", alpha = 0.2)
-    basemap.ax.figure.savefig(join(save_path, "ex3_out_2_map2D.png"))
+    try:
+        basemap.ax.figure.savefig(join(save_path, "ex3_out_2_map2D.png"))
+    except:
+        exceptions.append("Failed to save second plot... %s" %repr(e))
 
     show()
+    for e in exceptions:
+        print e
 
 if __name__ == "__main__":
     m = create_map_and_load_topodata()
