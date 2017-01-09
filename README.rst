@@ -34,7 +34,7 @@ If the installation fails make sure, that all dependencies (see above) are insta
 Instructions and code documentation
 -----------------------------------
 
-The code documentation of pydoas is hosted on `Read The Docs <http://geonum.readthedocs.io/en/latest/index.html>`_
+The code documentation of geonum is hosted on `Read The Docs <http://geonum.readthedocs.io/en/latest/index.html>`_
 
 Get started
 -----------
