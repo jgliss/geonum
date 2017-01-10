@@ -171,8 +171,8 @@ class Etopo1Access(TopoFile):
         self.file_name = file_name
 
         self.supported_topo_files = ["ETOPO1_Ice_g_gmt4.grd",
-                                     "ETOPO1_Ice_c_gmt4.grd"]
-        
+                                     "ETOPO1_Bed_g_gmt4.grd"]
+    
         self._check_topo_path(local_path) #checks input and if applicable adds to database
         if local_path is None or not exists(local_path):
             from geonum import LOCAL_TOPO_PATH
