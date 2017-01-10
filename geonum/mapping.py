@@ -3,10 +3,11 @@
 Plotting and mapping functionality 
 """
 
-from numpy import round, log10, floor, meshgrid, arange, array, zeros,\
-                                                                ceil, log2
+from numpy import round, log10, floor, meshgrid, arange, array, zeros, ceil,\
+    log2, nanmax, nanmin
 from mpl_toolkits.basemap import Basemap
 from matplotlib.pyplot import subplots, rcParams, Polygon
+import matplotlib.cm as colormaps
 from random import randrange
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 import mpl_toolkits.mplot3d.art3d as a3d
@@ -180,7 +181,7 @@ class Map(Basemap):
                     x = pyrDown(x)
                     y = pyrDown(y)
                     z = pyrDown(z)            
-
+        print z_min, z_max
         return (x, y, z, z_min, z_max, z_order)
             
     def draw_topo_contour(self, include_seabed = 1, separation_levels = 500):
@@ -231,8 +232,8 @@ class Map(Basemap):
         return 0
     
     def draw_topo(self, insert_colorbar = False, include_seabed = True,\
-                            max_grid_points = 500, cmap_div = "coolwarm",\
-                            cmap_seq = "Oranges", alpha = 0.5, ax = None):
+                    max_grid_points = 500, cmap_div = colormaps.coolwarm,\
+                    cmap_seq = colormaps.Oranges, alpha = 0.5, ax = None):
         """Draw topography into map
         
         :param bool insert_colorbar: draws a colorbar for altitude

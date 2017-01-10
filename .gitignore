@@ -89,4 +89,4 @@ ENV/
 .ropeproject
 
 # Topography data files
-local_topo_data/*.grd
+geonum/local_topo_data/*.grd

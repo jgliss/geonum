@@ -24,6 +24,7 @@ setup(
     package_dir =   {'geonum'     :   'geonum'},
     packages    =   find_packages(exclude=['contrib', 'docs', 'tests*']),
     include_package_data    =   True,  
+    package_data=   {'geonum'     :   ['local_topo_data/*.rst']},
     install_requires        =   ["scipy",
                                  "LatLon",
                                  "srtm.py",

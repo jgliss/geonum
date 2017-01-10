@@ -17,7 +17,7 @@ Created on Mon Jul 04 08:13:44 2016
 from numpy import argmin, mod, ceil, log2, poly1d, polyfit,\
     arange, linspace, empty, nan, asarray, nanmax, nanmin, isnan
 
-from os.path import basename, exists, join, dirname
+from os.path import basename, exists, join, dirname, normpath
 from os import listdir
 import srtm
 from LatLon import LatLon
@@ -153,7 +153,7 @@ class Etopo1Access(TopoFile):
     "ETOPO1_Ice_g_gmt4.grd" (grid registered) can be downloaded 
     `here <https://www.ngdc.noaa.gov/mgg/global/global.html>`_
     """
-    def __init__(self, local_path, file_name = "ETOPO1_Ice_g_gmt4.grd"):
+    def __init__(self, local_path = None, file_name = "ETOPO1_Ice_g_gmt4.grd"):
         """Class initialisation
         
         :param str local_path: directory where Etopo data files are stored
@@ -173,37 +173,91 @@ class Etopo1Access(TopoFile):
         self.supported_topo_files = ["ETOPO1_Ice_g_gmt4.grd",
                                      "ETOPO1_Ice_c_gmt4.grd"]
         
+        self._check_topo_path(local_path) #checks input and if applicable adds to database
+        if local_path is None or not exists(local_path):
+            from geonum import LOCAL_TOPO_PATH
+            self.local_path = LOCAL_TOPO_PATH
+        
         # make sure the file is supported
         if not file_name in self.supported_topo_files:
             # this function only returns valid file names, else None
-            self.file_name = self._search_topo_file()
+            self._search_topo_file() #searches current local_path for valid file
+        if not exists(self.file_path):
+            self.search_topo_file_database()
+        
         # check if file exists
         if not exists(join(self.local_path, self.file_name)):
             raise TopoAccessError("File %s could not be found in local "
-                "topo directory: " %(self.file_name, self.local_path))
+                "topo directory: %s" %(self.file_name, self.local_path))
+    
+    def _check_topo_path(self, path):
+        """Check if path exists and if it is already included in database"""
+        if path is None or not exists(path):
+            #print "Error checking topopath %s: path does not exist" %path
+            return 
+        if not path in self._get_all_local_topo_paths():
+            from geonum import LOCAL_TOPO_PATH
+            with open(join(LOCAL_TOPO_PATH, "LOCAL_TOPO_PATHS.txt"), "a") as f:
+                f.write("\n" + path  + "\n")
+                print ("Adding new default local topo data path to "
+                    "file LOCAL_TOPO_DATA.txt: %s" %path)
+            f.close()
             
+
+    
+    def _get_all_local_topo_paths(self):
+        """Get all search paths for topography files"""
+        from geonum import LOCAL_TOPO_PATH
+        paths = [LOCAL_TOPO_PATH]
+        with open(join(LOCAL_TOPO_PATH, "LOCAL_TOPO_PATHS.txt"), "r") as f:
+            lines = f.readlines()
+            for line in lines:
+                p = line.split("\n")[0]
+                if exists(p):
+                    paths.append(normpath(p))
+        f.close()
+        return paths
         
-    def _search_topo_file(self):
+    def _check_local_topo_path(self, path):
+        """Checks if local topo path exists and is part of database"""
+        if path is None or not exists(path):
+            return False
+        
+    def _search_topo_file(self, path = None):
         """Checks if a valid etopo data file can be found in local folder
         
         Searches in ``self.local_path`` for any of the file names specified 
         in ``supported_topo_files``
         
         """
-        fnames = listdir(self.local_path)
+        if path is None:
+            path = self.local_path
+        print "Searching valid topo file in folder: %s" %path
+        fnames = listdir(path)
         for name in fnames:
             if name in self.supported_topo_files:
-                return name
+                self.topo_file = name
+                self.local_path = path
+                print "Found match, setting current filepath: %s" %self.file_path
+                return True
+        return False
         
     def _find_supported_files(self):
         """Look for all supported files in ``self.local_path```and return list"""
         files = listdir(self.local_path)
-        lst=[]
+        lst = []
         for name in files:
             if name in self.supported_topo_files:
                 lst.append(name)
         return lst
-        
+    
+    def search_topo_file_database(self):
+        """Checks if a valid topo file can be found in database"""
+        all_paths = self._get_all_local_topo_paths()
+        for path in all_paths:
+            if self._search_topo_file(path):
+                return True
+        return False
     @property
     def file_path(self):
         """Return full file path of current topography file"""
@@ -419,10 +473,10 @@ class TopoDataAccess(object):
         if not mode in self.modes:
             raise InvalidTopoMode("Mode %s not supported...\nSupported modes:"
                 "%s\nCurrent mode: %s " %(mode, self.modes, self.mode))
-        if not exists(self.local_path):
-            raise IOError("Could not change to mode Etopo1, local path to "
-                "topography dataset not set, please download")
         if mode == "etopo1":
+            if self.local_path is None or not exists(self.local_path):
+                raise IOError("Could not change to mode Etopo1, local path to "
+                    "topography dataset not set, please download")
             tf = Etopo1Access(self.local_path)
             if tf.file_path is not None:
                 self.mode = mode
@@ -626,6 +680,16 @@ class TopoData(object):
         """Tuple (lat, lon) with center coordinates of data"""
         return (self.lats[0] + self.delta_lat / 2.,\
                 self.lons[0] + self.delta_lon / 2.)
+    
+    def plot_2d(self, ax = None):
+        """Plot 2D basemap of topodata"""
+        from geonum.mapping import Map
+        latc, lonc = self.center_coordinates
+        m = Map(self.lon0, self.lat0, self.lon1, self.lat1, projection =\
+                                "merc", lat_0 = latc, lon_0 = lonc, ax = ax)
+        m.set_topo_data(self)
+        m.draw_topo(insert_colorbar = True)
+        return m
         
     def plot_3d(self, ax = None):
         """Creates 3D surface plot of data
