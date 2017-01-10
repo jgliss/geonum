@@ -419,6 +419,9 @@ class TopoDataAccess(object):
         if not mode in self.modes:
             raise InvalidTopoMode("Mode %s not supported...\nSupported modes:"
                 "%s\nCurrent mode: %s " %(mode, self.modes, self.mode))
+        if not exists(self.local_path):
+            raise IOError("Could not change to mode Etopo1, local path to "
+                "topography dataset not set, please download")
         if mode == "etopo1":
             tf = Etopo1Access(self.local_path)
             if tf.file_path is not None:
@@ -637,7 +640,7 @@ class TopoData(object):
         m = Map(self.lon0, self.lat0, self.lon1, self.lat1, projection =\
                                 "merc", lat_0 = latc, lon_0 = lonc, ax = ax)
         m.set_topo_data(self)
-        m.draw_topo3D()
+        m.draw_topo_3d()
         return m
         
     def includes_coordinate(self, lat = None, lon = None):
