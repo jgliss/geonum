@@ -47,9 +47,16 @@ In order to use topography data from the Etopo1 dataset, please download and unz
 Tested and supported are the following two files (grid registered):
 
   1. Ice surface: ETOPO1_Ice_g_gmt4.grd (download `here <https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/netcdf/ETOPO1_Ice_g_gmt4.grd.gz>`_)
-  2. Bedrock: ETOPO1_Bed_g_gmt4.grd (download `here<https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/bedrock/grid_registered/netcdf/ETOPO1_Bed_g_gmt4.grd.gz>`_)
+  2. Bedrock: ETOPO1_Bed_g_gmt4.grd (download `here <https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/bedrock/grid_registered/netcdf/ETOPO1_Bed_g_gmt4.grd.gz>`_)
   
 The local installation folder can be accessed via::
 
   import geonum
-  print geonum._LIBDIR
+  print geonum.LOCAL_TOPO_PATH
+  
+If a valid data file is stored in this folder, it will be detected automatically. It is also possible to store the topodata at another location (e.g. <data_path>). In this case, the local path to the folder containing the topograph files needs to be provided, e.g.::
+
+  import geonum
+  access = geonum.topodata.TopoDataAccess(mode = "etopo1", local_path = <data_path>)
+  
+If the path is valid, it will be added to the installation file *LOCAL_TOPO_PATHS.txt*
