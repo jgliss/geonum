@@ -756,7 +756,6 @@ def delete_all_local_srtm_files():
 #==============================================================================
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
-    print "Bla"
     topopath = r'D:/Dropbox/Python27/jgliss/modules_priv/pygeomapping/topodata/'
     
     etopo_cell = "ETOPO1_Ice_c_gmt4.grd"

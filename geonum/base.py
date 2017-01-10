@@ -345,7 +345,6 @@ class GeoPoint(object, LatLon):
                 fs = 12
             #zt=self.altitude*1000. + dz_text
             zt = self.altitude + dz_text
-            print "Draw text "+ self.name + " at:"
             map.draw_text_3d(self.longitude, self.latitude, zt, self.name,\
                                                     color="k", fontsize = fs)
             
@@ -661,8 +660,6 @@ class GeoVector3D(object, GeoVector):
             #. ``self.anchor`` must be set with a :class:`Geopoint` instance
             
         """
-        print self.name
-        print self.type()
         map.draw_geo_vector_3d(self, **kwargs)
         if add_anchor:
             self.anchor.plot(map, add_name = True, dz_text = self.dz * .1)

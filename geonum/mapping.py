@@ -181,7 +181,6 @@ class Map(Basemap):
                     x = pyrDown(x)
                     y = pyrDown(y)
                     z = pyrDown(z)            
-        print z_min, z_max
         return (x, y, z, z_min, z_max, z_order)
             
     def draw_topo_contour(self, include_seabed = 1, separation_levels = 500):
@@ -207,12 +206,14 @@ class Map(Basemap):
                             colors = self.default_colors["contour_lines"])
         CS1.levels = [self._convert_float(val) for val in CS1.levels]
         
-        fmt = '%r m'
-        if rcParams["text.usetex"]:
-             fmt = r'%r m'
+#==============================================================================
+#         fmt = '%r m'
+#         if rcParams["text.usetex"]:
+#              fmt = r'%r m'
+#==============================================================================
              
-        self.ax.clabel(CS1, CS1.levels, inline = True, fmt = fmt,\
-                                                        fontsize = 9)
+        self.ax.clabel(CS1, CS1.levels, inline = True)#, fmt = fmt,\
+                                                       # fontsize = 9)
         self.contour_lines = CS1   
             
     def _convert_float(self, val):

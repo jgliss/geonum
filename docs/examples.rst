@@ -67,3 +67,17 @@ Example 4 - Elevation profiles and topographic analysis
   :title:
   
   Example 4, Fig. 2: Result from horizon search routine for profile shown in Fig. 1
+  
+Example 5 - Topography data access
+----------------------------------
+
+**Code** 
+
+.. literalinclude:: ../scripts/ex5_topodata.py
+
+**Output figures**
+
+.. thumbnail::  ../scripts/scripts_out/ex5_out_1_oslo_map.png
+  :title:
+  
+  Example 5, Fig. 1: Overview map of Oslo area, Norway (SRTM dataset has some gaps here)
