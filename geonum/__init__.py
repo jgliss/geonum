@@ -12,8 +12,3 @@ from .topodata import TopoData, TopoDataAccess
 from .processing import LineOnGrid, ElevationProfile  
 from .mapping import Map
 import helpers
-
-if not exists(join(LOCAL_TOPO_PATH, "LOCAL_TOPO_PATHS.txt")):
-    f = open(join(LOCAL_TOPO_PATH, "LOCAL_TOPO_PATHS.txt"), "w")
-    f.close()
-    del f

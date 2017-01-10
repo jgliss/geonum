@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from os.path import join
 from setuptools import setup, find_packages
 
 # Utility function to read the README file.
@@ -13,7 +14,9 @@ with open('README.rst') as file:
 with open("VERSION.rst") as f:
     version = f.readline()
     f.close()
-        
+ 
+with open(join("geonum","local_topo_data", "LOCAL_TOPO_PATHS.txt"), 'w'): pass
+       
 setup(
     name        =   'geonum',
     version     =   version,
@@ -24,7 +27,8 @@ setup(
     package_dir =   {'geonum'     :   'geonum'},
     packages    =   find_packages(exclude=['contrib', 'docs', 'tests*']),
     include_package_data    =   True,  
-    package_data=   {'geonum'     :   ['local_topo_data/*.rst']},
+    package_data=   {'geonum'     :   ['local_topo_data/*.rst',
+                                       'local_topo_data/*.txt']},
     install_requires        =   ["scipy",
                                  "LatLon",
                                  "srtm.py",
