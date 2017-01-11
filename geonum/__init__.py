@@ -1,4 +1,4 @@
-from os.path import abspath, dirname, join, exists
+from os.path import abspath, dirname, join
 from pkg_resources import get_distribution
 
 __version__ = get_distribution('geonum').version
