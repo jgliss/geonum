@@ -144,14 +144,11 @@ class TopoFile(object):
                 lons_all[idx_lons[0]:idx_lons[1]+1], idx_lats, idx_lons)
         
 class Etopo1Access(TopoFile):
-    """A class representing netCDF4 data access of
-    `etopo1 <https://www.ngdc.noaa.gov/mgg/global/global.html>`_
-    data. The files can be downloaded following the provided link and need to
-    be decompressed and stored on the local machine. Please specify the 
-    location of the data file on creation of this class (using input parameter
-    local_path). For instance the Ice shield version of the data set
-    "ETOPO1_Ice_g_gmt4.grd" (grid registered) can be downloaded 
-    `here <https://www.ngdc.noaa.gov/mgg/global/global.html>`_
+    """A class representing netCDF4 data access of Etopo1 data
+    
+    See `here <https://github.com/jgliss/geonum#supported-etopo1-files>`_ for
+    instructions on the data access.
+    
     """
     def __init__(self, local_path = None, file_name = "ETOPO1_Ice_g_gmt4.grd"):
         """Class initialisation

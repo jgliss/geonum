@@ -9,7 +9,7 @@ Requirements
 It is recommended to use the package manager `Anaconda <https://www.continuum.io/downloads>`_ since it includes many of the required dependencies and makes life easier when it comes to installation or upgrade of non-straight forward installations of additional requirements (e.g. opencv, basemap)
 
   - numpy
-  - matplotlib
+  - matplotlib >= 1.4.3
   - matplotlib `basemap <https://pypi.python.org/pypi/basemap/1.0.7>`_ (*installation of this module may not be straight forward - especially on Windows machines -, please follow the instructions provided on the web page*) 
   - `LatLon <https://pypi.python.org/pypi/LatLon>`_
   
@@ -25,11 +25,12 @@ It is recommended to use the package manager `Anaconda <https://www.continuum.io
 
 Installation
 ------------
+
 geonum can be installed from source by downloading and extracting the latest release. After navigating to the source folder (where the setup.py file is located), call::
 
   python setup.py install
   
-If the installation fails make sure, that all dependencies (see above) are installed correctly. Geonum was only tested for Python 2.7.
+If the installation fails make sure, that all dependencies (see above) are installed correctly. geonum is tested for Python 2.7.
 
 Instructions and code documentation
 -----------------------------------
