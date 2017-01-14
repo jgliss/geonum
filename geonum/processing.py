@@ -3,7 +3,7 @@
 """
 from numpy import radians, cos, sin, arctan, pi, argmin, linspace,\
     tan, ceil, hypot, vstack, nanmin, nanmax, where, sign, diff,\
-    logical_and, arange
+    logical_and, arange, nan
     #gradient
 
 from scipy.ndimage import map_coordinates
@@ -250,8 +250,10 @@ class ElevationProfile(object):
         ax = None
         if plot:
             ax = self._plot_intersect_search_result(view_elevations, dist)
+            if dist == None:
+                dist = nan
             ax.set_title("Azim: %.1f, Elev: %.1f, Intersect @ "
-                "dist=%.1f km" %(self.azimuth, elev_angle, dist))
+                "dist =%.1f km" %(self.azimuth, elev_angle, dist))
             
         return dist, dist_err, intersect, view_elevations, ax
     
