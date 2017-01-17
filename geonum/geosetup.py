@@ -363,12 +363,12 @@ class GeoSetup(object):
         if to_square:
             v = ptr - pll
             add = (abs(v.dx) - abs(v.dy)) / 2
-            if add > 0:
+            if add > 0: #E/W extend (dx) is smaller than N/S extend (dy)
                 pll = pll.offset(azimuth = 180, dist_hor = add)
                 ptr = ptr.offset(azimuth = 0, dist_hor = add)
             else:
-                pll = pll.offset(azimuth = 180, dist_hor = -add)
-                ptr = ptr.offset(azimuth = 0, dist_hor = -add)
+                pll = pll.offset(azimuth = 270, dist_hor = -add)
+                ptr = ptr.offset(azimuth = 90, dist_hor = -add)
                  
         self.set_geo_point("ll", pll.offset(azimuth = -135, dist_hor =\
                                                 float(extend_km), name="ll"))
