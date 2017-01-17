@@ -220,7 +220,22 @@ class GeoSetup(object):
         for arg in args:
             self.add_geo_point(arg)
     
-                
+    def has_point(self, name):
+        """Checks if point with input name exists
+        
+        :param str key: name of point
+        :return: bool
+        """
+        if self.points.has_key(name):
+            return True
+        return False
+    
+    def has_vector(self, name):
+        """Checks if vector with input name exists"""
+        if self.vectors.has_key(name):
+            return True
+        return False
+        
     def add_geo_point(self, pt):
         """Add :class:`GeoPoint` to this collection
         
@@ -228,7 +243,7 @@ class GeoSetup(object):
         """
         try:
             if pt.name in self.points:
-                print ("Point ID %s already exists in %s" %(pt.id, self))
+                print ("Point ID %s already exists in GeoSetup" %(pt.name))
                 pt2 = self.points[pt.name]
                 if pt.almost_equal(pt2) and pt.altitude == pt2.altitude:
                     print "Point already exists"
