@@ -510,6 +510,29 @@ class Map(Basemap):
         return self.draw_line_2d(vec.name, a.latitude, a.longitude,\
                                     pf.latitude, pf.longitude, **kwargs)
     
+    def add_geo_points_3d(self, pts, marker = "x", color = "b",\
+                                    connect = True, connect_style = "--"):
+        """Draws a list of :class:`GeoPoint` objects into the map
+        
+        :param list pts: geopoint objects
+        :param color: color of points (passed to plot function, default: "b")
+        :param marker: marker of points (default: "x")
+        :param connect: if True, points the points are connected with each 
+            other
+        :param str connect_style: line style of connection
+        """
+        xs, ys, zs = [], [], []
+        for p in pts:
+            try:
+                px, py= self(p.lon.decimal_degree,p.lat.decimal_degree)
+                xs.append(px), ys.append(py), zs.append(p.altitude)
+                self.draw_geo_point_3d(p, marker = marker, s= 20, c = color)
+            except:
+                print "Failed to add %s to map" %p
+        if connect:
+            self.ax.plot(xs, ys, zs, ls = connect_style, c = color,\
+                                                lw = 2, zorder = 100000)
+                                                
     def draw_geo_point_3d(self, p, ax = None, **kwargs):
         """Draw a GeoPoint into 3D basemap
         
