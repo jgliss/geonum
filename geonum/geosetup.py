@@ -470,8 +470,8 @@ class GeoSetup(object):
 
         return m
                 
-    def plot_3d(self, draw_all_points = True, draw_all_vectors = True, *args,\
-                                                                    **kwargs):
+    def plot_3d(self, draw_all_points = True, draw_all_vectors = True,\
+                                    cmap_topo = "Oranges", *args, **kwargs):
         """Make a 3D plot of the current setup
 
         :param bool draw_all_points (True): if true, all points are included
@@ -487,7 +487,7 @@ class GeoSetup(object):
             - :class:`geonum.mapping.Map` object
         """
         m = self.create_map(*args, **kwargs)
-        m.draw_topo_3d()
+        m.draw_topo_3d(cmap = cmap_topo)
         if draw_all_points:
             zr = self.topo_data.alt_range * 0.05
             alts = []
