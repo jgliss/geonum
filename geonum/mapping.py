@@ -4,9 +4,9 @@ Plotting and mapping functionality
 """
 
 from numpy import round, log10, floor, meshgrid, arange, array, zeros, ceil,\
-    log2, nanmax, nanmin
+    log2, min, max
 from mpl_toolkits.basemap import Basemap
-from matplotlib.pyplot import subplots, rcParams, Polygon
+from matplotlib.pyplot import subplots, Polygon
 import matplotlib.cm as colormaps
 from random import randrange
 from mpl_toolkits.mplot3d.axes3d import Axes3D
@@ -510,8 +510,8 @@ class Map(Basemap):
         return self.draw_line_2d(vec.name, a.latitude, a.longitude,\
                                     pf.latitude, pf.longitude, **kwargs)
     
-    def add_geo_points_3d(self, pts, marker = "x", color = "b",\
-                                    connect = True, connect_style = "--"):
+    def add_geo_points_3d(self, pts, distances = None, marker = "x",\
+            color = "b", connect = True, connect_style = "--"):
         """Draws a list of :class:`GeoPoint` objects into the map
         
         :param list pts: geopoint objects
@@ -529,9 +529,15 @@ class Map(Basemap):
                 self.draw_geo_point_3d(p, marker = marker, s= 20, c = color)
             except:
                 print "Failed to add %s to map" %p
-        if connect:
+        if distances is not None and len(distances) == len(pts):
+            dz = (max(zs) - min(zs))*0.05
+            sc = self.ax.scatter(xs, ys, zs + dz, zdir='z', s = 20,\
+                    c = distances, cmap = "Oranges", zorder = 100000)
+            zlabel = "Distance [%km]"
+            self.insert_colorbar("dists", sc, label = zlabel)
+        elif connect:
             self.ax.plot(xs, ys, zs, ls = connect_style, c = color,\
-                                                lw = 2, zorder = 100000)
+                                                lw = 2, zorder = 100000)   
                                                 
     def draw_geo_point_3d(self, p, ax = None, **kwargs):
         """Draw a GeoPoint into 3D basemap
@@ -728,7 +734,7 @@ class Map(Basemap):
         return t
     
     def draw_data_scatter_2d(self, data = None, lons = None, lats = None,
-                             unit = None, data_id = "n/d", ax = None, **kwargs):
+                        unit = None, data_id = "n/d", ax = None, **kwargs):
         """Draw data into map
         
         If input is unspecified, a random test data set will be created and
