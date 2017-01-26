@@ -3,7 +3,7 @@
 """
 from numpy import radians, cos, sin, arctan, pi, argmin, linspace,\
     tan, ceil, hypot, vstack, nanmin, nanmax, where, sign, diff,\
-    logical_and, arange, nan
+    logical_and, arange, nan, gradient, rad2deg
     #gradient
 
 from scipy.ndimage import map_coordinates
@@ -77,6 +77,13 @@ class ElevationProfile(object):
         """Returns the azimuth angle of the profile"""
         return (self._endpoint_topogrid - self._observer_topogrid).azimuth
     
+#==============================================================================
+#     @property    
+#     def azimuth(self):
+#         """Return azimuth direction of profile (from observer)"""
+#         return (self.endpoint - self.observer).azimuth
+#==============================================================================
+        
     @property
     def resolution(self):
         """Get profile x (distance) resolution (averaged from distance array)
@@ -87,6 +94,44 @@ class ElevationProfile(object):
             
         """
         return abs((self.dists[1:] - self.dists[:-1]).mean())
+    
+    @property
+    def gradient(self):
+        """Return gradient of profile
+        
+        Uses numpy function ``gradient``
+        """
+        return gradient(self.profile)
+    
+    @property
+    def slope(self):
+        """Returns slope of profile 
+        
+        Determines dx and dy arrays and returns slope vector::
+        
+            slope = dy / dx = gradient(self.profile) / 
+                (gradient(self.dists) * 1000.0)
+            
+        """
+        return gradient(self.profile) / (gradient(self.dists) * 1000)
+    
+    def slope_angles(self, decimal_degrees=True):
+        """Returns slope angle of profile (in each sample point)
+        
+        :param bool decimal_degrees: rad or degrees (default True)
+        """
+        a = tan(self.slope)
+        if decimal_degrees:
+            a = rad2deg(a)
+        return a
+        
+    def slope_angle(self, dist):
+        """Returns slope angle of profile at input distance
+        
+        :param float dist: distance in km
+        """
+        idx = argmin(abs(self.dists - dist))
+        return self.slope_angles()[idx]
         
     def det_profile(self, resolution = 5.):
         """Determines the elevation profile
@@ -280,11 +325,6 @@ class ElevationProfile(object):
     def start_point(self):
         """Return position of observer"""
         return self.observer
-    
-    @property    
-    def azimuth(self):
-        """Return azimuth direction of profile (from observer)"""
-        return (self.endpoint - self.observer).azimuth
         
     @property
     def min(self):
