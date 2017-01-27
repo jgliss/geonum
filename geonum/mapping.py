@@ -4,7 +4,7 @@ Plotting and mapping functionality
 """
 
 from numpy import round, log10, floor, meshgrid, arange, array, zeros, ceil,\
-    log2, min, max
+    log2, asarray
 from mpl_toolkits.basemap import Basemap
 from matplotlib.pyplot import subplots, Polygon
 import matplotlib.cm as colormaps
@@ -510,8 +510,8 @@ class Map(Basemap):
         return self.draw_line_2d(vec.name, a.latitude, a.longitude,\
                                     pf.latitude, pf.longitude, **kwargs)
     
-    def add_geo_points_3d(self, pts, distances = None, marker = "x",\
-            color = "b", connect = True, connect_style = "--"):
+    def add_geo_points_3d(self, pts, distances=None, marker="x", color="b", 
+                          connect=True, connect_style="--", alt_offset_m=0):
         """Draws a list of :class:`GeoPoint` objects into the map
         
         :param list pts: geopoint objects
@@ -526,23 +526,26 @@ class Map(Basemap):
             try:
                 px, py= self(p.lon.decimal_degree,p.lat.decimal_degree)
                 xs.append(px), ys.append(py), zs.append(p.altitude)
-                self.draw_geo_point_3d(p, marker = marker, s= 20, c = color)
+                self.draw_geo_point_3d(p, alt_offset_m = alt_offset_m, 
+                                       marker = marker, s= 20, c = color)
             except:
                 print "Failed to add %s to map" %p
         if distances is not None and len(distances) == len(pts):
-            dz = (max(zs) - min(zs))*0.05
-            sc = self.ax.scatter(xs, ys, zs + dz, zdir='z', s = 20,\
-                    c = distances, cmap = "Oranges", zorder = 100000)
+            sc = self.ax.scatter(xs, ys, asarray(zs) + alt_offset_m, zdir='z', 
+                                 s=20, c=distances, cmap="Oranges", 
+                                 zorder=100000)
             zlabel = "Distance [%km]"
             self.insert_colorbar("dists", sc, label = zlabel)
         elif connect:
-            self.ax.plot(xs, ys, zs, ls = connect_style, c = color,\
-                                                lw = 2, zorder = 100000)   
+            self.ax.plot(xs, ys, asarray(zs) + alt_offset_m, ls=connect_style, c=color,
+                                                lw=2, zorder=100000)   
                                                 
-    def draw_geo_point_3d(self, p, ax = None, **kwargs):
+    def draw_geo_point_3d(self, p, ax = None, alt_offset_m = 0.0, **kwargs):
         """Draw a GeoPoint into 3D basemap
         
         :param GeoPoint p: the actual point        
+        :param ax: matplotlib axes object (3d axis)
+        :param float alt_offset_m: plot point with altitude offset, default 0
         :param **kwargs: passed to matplotlib plotting function
         
         .. note::
@@ -562,8 +565,8 @@ class Map(Basemap):
         if not isinstance(self.ax, Axes3D):
             raise ValueError("Need :class:`Axes3D` object as input...")
         x0, y0 = self(p.longitude, p.latitude)
-        z0 = p.altitude#*1000
-        handle = ax.scatter(x0, y0, z0, zorder = 99999, **kwargs)
+        z0 = p.altitude + alt_offset_m#*1000
+        handle = ax.scatter(x0, y0, z0, zorder = 100000, **kwargs)
         self.points[p.name] = handle
         return handle
                                  
