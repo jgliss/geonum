@@ -5,7 +5,12 @@ Plotting and mapping functionality
 
 from numpy import round, log10, floor, meshgrid, arange, array, zeros, ceil,\
     log2, asarray
-from mpl_toolkits.basemap import Basemap
+try:
+    from mpl_toolkits.basemap import Basemap
+except:
+    from importlib import import_module
+    Basemap = import_module("mpl_toolkits.basemap")
+    
 from matplotlib.pyplot import subplots, Polygon
 import matplotlib.cm as colormaps
 from random import randrange
