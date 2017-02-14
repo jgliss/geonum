@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Access and handling of topography data
 

@@ -1,16 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Plotting and mapping functionality 
-"""
-
 from numpy import round, log10, floor, meshgrid, arange, array, zeros, ceil,\
     log2, asarray
-try:
-    from mpl_toolkits.basemap import Basemap
-except:
-    from importlib import import_module
-    Basemap = import_module("mpl_toolkits.basemap")
-    
+
+from mpl_toolkits.basemap import Basemap
 from matplotlib.pyplot import subplots, Polygon
 import matplotlib.cm as colormaps
 from random import randrange
@@ -25,9 +16,9 @@ except:
     CV2_AVAILABLE = 0
 
 #from geonum.base import GeoPoint, GeoVector3D
-from geonum.topodata import TopoAccessError
-from geonum.topodata import TopoData, TopoDataAccess
-from geonum.helpers import haversine_formula, shifted_color_map
+from .topodata import TopoAccessError
+from .topodata import TopoData, TopoDataAccess
+from .helpers import haversine_formula, shifted_color_map
 
 class Map(Basemap):
     """Basemap object for drawing and plotting (on) a geographic map

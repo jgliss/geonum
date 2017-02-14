@@ -31,7 +31,7 @@ Topography data (Access and Handling)
    :members:
    :undoc-members:
 
-   Helper methods
+Helper methods
 --------------
 
 .. automodule:: geonum.helpers
