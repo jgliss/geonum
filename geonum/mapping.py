@@ -107,7 +107,7 @@ class Map(Basemap):
         """Geonum wrapper for topography access"""
         ta = TopoDataAccess(mode, local_path)
         try:
-            self.topo_data = ta.get_data(self.lat_ll, self.lon_ll,\
+            self.topo_data = ta.get_data(self.lat_ll, self.lon_ll,
                                          self.lat_tr, self.lon_tr)
             return self.topo_data
         except Exception as e:
@@ -142,11 +142,10 @@ class Map(Basemap):
         
     def fill_map(self):
         """Fill the map with default colors"""
-        self.drawmapboundary(fill_color = self.color_water)
-        self.fillcontinents(color = self.color_land, lake_color =\
-                                                        self.color_water)
+        self.drawmapboundary(fill_color=self.color_water)
+        self.fillcontinents(color=self.color_land, lake_color=self.color_water)
     
-    def _prep_topo_data(self, grid_points = 100):
+    def _prep_topo_data(self, grid_points=100):
         """Prepare topography data for map
         
         This function prepares high resolution topography for plotting, i.e.
@@ -183,7 +182,7 @@ class Map(Basemap):
                     z = pyrDown(z)            
         return (x, y, z, z_min, z_max, z_order)
             
-    def draw_topo_contour(self, include_seabed = 1, separation_levels = 500):
+    def draw_topo_contour(self, include_seabed=1, separation_levels=500):
         """Draw topography contour lines
         
          :param bool include_seabed: include seabed topography 
@@ -202,18 +201,11 @@ class Map(Basemap):
         else:
             levels_contour = arange(0, max_c, separation_levels)
         
-        CS1 = self.contour(x, y, z, levels_contour, linewidths = 0.5,\
-                            colors = self.default_colors["contour_lines"])
+        CS1 = self.contour(x, y, z, levels_contour, linewidths=0.5,
+                           colors=self.default_colors["contour_lines"])
         CS1.levels = [self._convert_float(val) for val in CS1.levels]
-        
-#==============================================================================
-#         fmt = '%r m'
-#         if rcParams["text.usetex"]:
-#              fmt = r'%r m'
-#==============================================================================
              
-        self.ax.clabel(CS1, CS1.levels, inline = True)#, fmt = fmt,\
-                                                       # fontsize = 9)
+        self.ax.clabel(CS1, CS1.levels, inline=True)
         self.contour_lines = CS1   
             
     def _convert_float(self, val):
@@ -232,9 +224,9 @@ class Map(Basemap):
             return 1
         return 0
     
-    def draw_topo(self, insert_colorbar = False, include_seabed = True,\
-                    max_grid_points = 500, cmap_div = colormaps.coolwarm,\
-                    cmap_seq = colormaps.Oranges, alpha = 0.5, ax = None):
+    def draw_topo(self, insert_colorbar=False, include_seabed=True,
+                    max_grid_points=500, cmap_div=colormaps.coolwarm,
+                    cmap_seq=colormaps.Oranges, alpha=0.5, ax=None):
         """Draw topography into map
         
         :param bool insert_colorbar: draws a colorbar for altitude
@@ -257,11 +249,12 @@ class Map(Basemap):
             if ax is None:
                 ax = self.ax
             if ax is None:
-                fig, ax = subplots(1, 1, figsize = (16,10))
+                fig, ax = subplots(1, 1, figsize=(16,10))
                 self.ax = ax
     
-            x, y, z, z_min, z_max, z_order = self._prep_topo_data(\
-                                        grid_points = max_grid_points)
+            x, y, z, z_min, z_max, z_order =\
+                self._prep_topo_data(grid_points=max_grid_points)
+                
             if z_min > 0:
                 include_seabed = 1
             z_step = (z_max - z_min) / 1000. 
@@ -273,15 +266,16 @@ class Map(Basemap):
             if levels_filled[0] < 0:          
                 shifted_cmap = shifted_color_map(z_min, z_max, cmap_div)
                 
-                cs2 = ax.contourf(x, y, z, levels_filled, cmap =\
-                    shifted_cmap, extend = "both", alpha = alpha)
+                cs2 = ax.contourf(x, y, z, levels_filled, cmap=shifted_cmap,
+                                  extend="both", alpha=alpha)
+                                  
             elif levels_filled[0] >= 0:                
-                cs2 = ax.contourf(x, y, z, levels_filled, cmap = cmap_seq,\
-                                              alpha = 1.0, extend = "min")
+                cs2 = ax.contourf(x, y, z, levels_filled, cmap=cmap_seq,
+                                  alpha=1.0, extend="min")
                 self.contour_filled = cs2
                     
             if insert_colorbar:              
-                self.insert_colorbar("topo", cs2, label = "Altitude [m]")
+                self.insert_colorbar("topo", cs2, label="Altitude [m]")
         
         except Exception as e:
             raise
@@ -290,8 +284,8 @@ class Map(Basemap):
             print msg + repr(e)
             self.etopo()
          
-    def draw_topo_3d(self, num_ticks = 4, cmap = "Oranges", alpha = 0.5,\
-                        linewidth = 0.5, edgecolors = "#708090", ax = None):
+    def draw_topo_3d(self, num_ticks=4, cmap="Oranges", alpha=0.5,
+                     linewidth=0.5, edgecolors="#708090", ax=None):
         """Draw topography into 3D axis
         
         :param num_ticks: number of lon / lat axis ticks (default: 4)
@@ -311,18 +305,18 @@ class Map(Basemap):
             
         x, y, z, z_min, z_max, z_order = self._prep_topo_data()
         tickformatter = "{:.2f}"    
-        ax.plot_surface(x, y, z, rstride = 1, cstride = 1, cmap = cmap,\
-                        alpha = alpha, linewidth = linewidth, edgecolors =\
-                        edgecolors, vmin = z_min, vmax = z_max, zorder = 1)
+        ax.plot_surface(x, y, z, rstride=1, cstride=1, cmap=cmap,
+                        alpha=alpha, linewidth=linewidth, edgecolors=edgecolors
+                        , vmin=z_min, vmax=z_max, zorder=1)
         #xlabels=ax.get_xticklabels()
         ax.set_xlabel("Lons")
         ax.set_ylabel("Lats")
         ax.set_zlabel("Altitude [m]")
-        lonStep, latStep = self.delta_lon * .33, self.delta_lat * .33
+        lon_step, lat_step = self.delta_lon * .33, self.delta_lat * .33
         lon_tick_array, lat_tick_array=[], []
         for k in range(num_ticks):
-            lon_tick_array.append(self.lon_ll + lonStep * k)
-            lat_tick_array.append(self.lat_ll + latStep * k)
+            lon_tick_array.append(self.lon_ll + lon_step * k)
+            lat_tick_array.append(self.lat_ll + lat_step * k)
         #lon_tick_array, lat_tick_array = self._prep_coord_ticks()
         lon_coords=[]
         lon_labels=[]
@@ -387,7 +381,7 @@ class Map(Basemap):
                         "removed" %i)
         self.fig.canvas.draw()
     
-    def _prep_coord_ticks(self, lon_tick = None, lat_tick = None):
+    def _prep_coord_ticks(self, lon_tick=None, lat_tick=None):
         """Prepare coordinate ticks for parallels and meridians
         
         :param float lon_tick: longitude separation (in decimal degrees).
@@ -402,12 +396,14 @@ class Map(Basemap):
             potLat = floor(log10(self.delta_lat))
             lat_tick = floor(self.delta_lat / 10**potLat) * 10**potLat / 3
             
-        lon_tick_array = arange(lon_tick * int((self.lon_ll - self.delta_lon\
-            * 0.3) / lon_tick), lon_tick * int((self.lon_tr + self.delta_lon\
-            * 0.3) / lon_tick), lon_tick)
-        lat_tick_array = arange(lat_tick * int((self.lat_ll - self.delta_lat\
-            * 0.3) / lat_tick), lat_tick * int((self.lat_tr + self.delta_lat\
-            * 0.3) / lat_tick), lat_tick)
+        lon_tick_array = arange(lon_tick * int((self.lon_ll - self.delta_lon 
+                                * 0.3) / lon_tick), lon_tick * int((self.lon_tr 
+                                + self.delta_lon * 0.3) / lon_tick), lon_tick)
+                                
+        lat_tick_array = arange(lat_tick * int((self.lat_ll - self.delta_lat 
+                                * 0.3) / lat_tick), lat_tick * int((self.lat_tr 
+                                + self.delta_lat * 0.3) / lat_tick), lat_tick)
+                                
         return lon_tick_array, lat_tick_array
     
     def _len_diag(self):
@@ -415,8 +411,8 @@ class Map(Basemap):
         return self.haversine(self.lon_ll,self.lat_ll,self.lon_tr,self.lat_tr)
     
         
-    def draw_coordinates(self, lat_tick = None, lon_tick = None,\
-                    labelslon = [0,0,0,1], labelslat = [1,0,0,0], **kwargs):
+    def draw_coordinates(self, lat_tick=None, lon_tick=None,
+                         labelslon=[0,0,0,1], labelslat=[1,0,0,0], **kwargs):
         """Draws meridians and parallels 
         
         :param float lat_tick: latitude separation (in decimal degrees)
@@ -431,18 +427,18 @@ class Map(Basemap):
         if not "fmt" in kwargs:
             digs = '%d' %(3 - int(floor(log10(self._len_diag()))))
             kwargs["fmt"] = "%." + digs + "f"
-        lon_tick_array, lat_tick_array = self._prep_coord_ticks(lon_tick,\
-                                                                    lat_tick)
-        meridians = self.drawmeridians(lon_tick_array, labels = labelslon,\
-                                                                    **kwargs)
+        lon_tick_array, lat_tick_array = self._prep_coord_ticks(lon_tick,
+                                                                lat_tick)
+        meridians = self.drawmeridians(lon_tick_array, labels=labelslon,
+                                       **kwargs)
         for m in meridians:
             try:
                 meridians[m][1][0].set_rotation(30)
             except:
                 pass
         self.meridians = meridians
-        self.parallels = self.drawparallels(lat_tick_array, labels =\
-                                                        labelslat, **kwargs)
+        self.parallels = self.drawparallels(lat_tick_array, labels=labelslat, 
+                                            **kwargs)
         
     def remove_coordinates(self):
         """Remove drawn parallels and meridians"""
@@ -453,19 +449,19 @@ class Map(Basemap):
                         try:
                             item[0].remove()
                         except:
-                            print "Object " + str(item) + " could not be removed"
+                            print "Object %s could not be removed" %item
         self.fig.canvas.draw()
     
-    def legend(self, ax = None, **kwargs):
+    def legend(self, ax=None, **kwargs):
         """Insert a legend"""
         if ax is None:
             ax = self.ax
         if not "fontsize" in kwargs:
             kwargs["fontsize"] = 10
-        ax.legend(loc = "best", fancybox = True, framealpha = 0.4, **kwargs)\
-                                                                .draggable()
+        ax.legend(loc="best", fancybox=True, framealpha=0.4, **kwargs)\
+            .draggable()
                                                                 
-    def draw_geo_point_2d(self, p, addName = False, ax = None, **kwargs):
+    def draw_geo_point_2d(self, p, addName=False, ax=None, **kwargs):
         """Draw a GeoPoint into 2D basemap
         
         :param GeoPoint p: the actual point        
@@ -507,8 +503,8 @@ class Map(Basemap):
         pf = a + vec
         x0, y0 = self(a.longitude, a.latitude)
         x1, y1 = self(pf.longitude, pf.latitude)
-        return self.draw_line_2d(vec.name, a.latitude, a.longitude,\
-                                    pf.latitude, pf.longitude, **kwargs)
+        return self.draw_line_2d(vec.name, a.latitude, a.longitude,
+                                 pf.latitude, pf.longitude, **kwargs)
     
     def add_geo_points_3d(self, pts, distances=None, marker="x", color="b", 
                           connect=True, connect_style="--", alt_offset_m=0):
@@ -526,21 +522,21 @@ class Map(Basemap):
             try:
                 px, py= self(p.lon.decimal_degree,p.lat.decimal_degree)
                 xs.append(px), ys.append(py), zs.append(p.altitude)
-                self.draw_geo_point_3d(p, alt_offset_m = alt_offset_m, 
-                                       marker = marker, s= 20, c = color)
+                self.draw_geo_point_3d(p, alt_offset_m=alt_offset_m, 
+                                       marker=marker, s=20, c=color)
             except:
                 print "Failed to add %s to map" %p
         if distances is not None and len(distances) == len(pts):
-            sc = self.ax.scatter(xs, ys, asarray(zs) + alt_offset_m, zdir='z', 
+            sc = self.ax.scatter(xs, ys, asarray(zs)+alt_offset_m, zdir='z', 
                                  s=20, c=distances, cmap="Oranges", 
                                  zorder=100000)
             zlabel = "Distance [%km]"
-            self.insert_colorbar("dists", sc, label = zlabel)
+            self.insert_colorbar("dists", sc, label=zlabel)
         elif connect:
-            self.ax.plot(xs, ys, asarray(zs) + alt_offset_m, ls=connect_style, c=color,
-                                                lw=2, zorder=100000)   
+            self.ax.plot(xs, ys, asarray(zs)+alt_offset_m, ls=connect_style, 
+                         c=color, lw=2, zorder=100000)   
                                                 
-    def draw_geo_point_3d(self, p, ax = None, alt_offset_m = 0.0, **kwargs):
+    def draw_geo_point_3d(self, p, ax=None, alt_offset_m=0.0, **kwargs):
         """Draw a GeoPoint into 3D basemap
         
         :param GeoPoint p: the actual point        
@@ -566,11 +562,11 @@ class Map(Basemap):
             raise ValueError("Need :class:`Axes3D` object as input...")
         x0, y0 = self(p.longitude, p.latitude)
         z0 = p.altitude + alt_offset_m#*1000
-        handle = ax.scatter(x0, y0, z0, zorder = 100000, **kwargs)
+        handle = ax.scatter(x0, y0, z0, zorder=100000, **kwargs)
         self.points[p.name] = handle
         return handle
                                  
-    def draw_geo_vector_3d(self, vec, ax = None,  **kwargs):
+    def draw_geo_vector_3d(self, vec, ax=None,  **kwargs):
         """Draw a :class:`GeoVector3D` into 3D map
         
         :param GeoVector3D vec: the vector 
@@ -610,7 +606,7 @@ class Map(Basemap):
             print vec.anchor.type()
             raise
     
-    def add_polygon_2d(self, points=[], poly_id="undefined", ax =None, **kwargs):
+    def add_polygon_2d(self, points=[], poly_id="undefined", ax=None, **kwargs):
         """Add a polygon specified by list of input points
         
         :param list points: list with :class:`GeoPoint` objects
@@ -630,7 +626,7 @@ class Map(Basemap):
         polygon = Polygon(coords, **kwargs)
         ax.add_patch(polygon)
         
-    def add_polygon_3d(self, points=[], poly_id="undefined", ax = None, **kwargs):
+    def add_polygon_3d(self, points=[], poly_id="undefined", ax=None, **kwargs):
         """Add a polygon specified by list of input points 
         
         :param list points: list with :class:`GeoPoint` objects
@@ -648,8 +644,8 @@ class Map(Basemap):
             ys.append(y)
             zs.append(p.altitude)#*1000)
         coords = [zip(xs, ys, zs)]
-        polyColl = a3d.Poly3DCollection(coords, **kwargs)
-        ax.add_collection3d(polyColl)
+        poly_coll = a3d.Poly3DCollection(coords, **kwargs)
+        ax.add_collection3d(poly_coll)
            
     def draw_line_2d(self,line_id, lat0, lon0, lat1, lon1, **kwargs):
         """Draw a line between 2 geo coordinates
@@ -665,7 +661,7 @@ class Map(Basemap):
         self.lines[line_id] = line
         return line
     
-    def write_point_name_2d(self, p, dist = 0, angle = 0, ax = None, **kwargs):
+    def write_point_name_2d(self, p, dist=0, angle=0, ax=None, **kwargs):
         """Annotate name of point to point in map
         
         :param GeoPoint p: the point
@@ -676,12 +672,12 @@ class Map(Basemap):
         if dist == 0:
             self.draw_text_2d(p.longitude, p.latitude, p.name, ax, **kwargs) 
         else:
-            pt = p.offset(azimuth = angle, dist_hor = dist)
-            self.annotate_text_2d(pt.longitude, pt.latitude, p.name,\
-                                    p.longitude, p.latitude, ax, **kwargs)
+            pt = p.offset(azimuth=angle, dist_hor=dist)
+            self.annotate_text_2d(pt.longitude, pt.latitude, p.name,
+                                  p.longitude, p.latitude, ax, **kwargs)
     
-    def annotate_text_2d(self, lon_text, lat_text, text, lon_point, lat_point,\
-                                                    ax = None, **kwargs):
+    def annotate_text_2d(self, lon_text, lat_text, text, lon_point, lat_point,
+                         ax=None, **kwargs):
         """Annotate text to a certain position in a 2D basemap
         
         :param float lon_text: longitude coordinate of text position
@@ -696,14 +692,15 @@ class Map(Basemap):
             ax = self.ax
         x_text, y_text = self(lon_text, lat_text)  
         x_point, y_point = self(lon_point, lat_point)
-        t = ax.annotate(text, xy = (x_point, y_point), xytext = (x_text,\
-            y_text), arrowprops = dict(arrowstyle = "->", connectionstyle=\
-                "arc,angleA=10,armA=20,rad=6", shrinkA = 2.0, shrinkB = 10),\
-                                                                    **kwargs)
+        t = ax.annotate(text, xy=(x_point, y_point), xytext=(x_text, y_text), 
+                        arrowprops=dict(arrowstyle="->", connectionstyle=
+                        "arc,angleA=10,armA=20,rad=6", shrinkA=2.0, 
+                        shrinkB=10), **kwargs)
+                        
         self.texts[text] = t
         return t
             
-    def draw_text_2d(self, lon, lat, text, ax = None, **kwargs):
+    def draw_text_2d(self, lon, lat, text, ax=None, **kwargs):
         """Draw a text into a 2D map
                 
         :param float lon: longitude of text
@@ -718,7 +715,7 @@ class Map(Basemap):
         self.texts[text] = t
         return t
     
-    def draw_text_3d(self, lon, lat, alt, text, ax = None, **kwargs):
+    def draw_text_3d(self, lon, lat, alt, text, ax=None, **kwargs):
         """Draw a text into a 3D map
         
         :param float lon: longitude of text
@@ -732,12 +729,12 @@ class Map(Basemap):
                 raise TypeError("No 3D Axes object available...")
             ax = self.ax
         x, y = self(lon, lat)  
-        t = ax.text(x, y, alt, text, zorder = 1e6, **kwargs)
+        t = ax.text(x, y, alt, text, zorder=1e6, **kwargs)
         self.texts[text] = t
         return t
     
-    def draw_data_scatter_2d(self, data = None, lons = None, lats = None,
-                        unit = None, data_id = "n/d", ax = None, **kwargs):
+    def draw_data_scatter_2d(self, data=None, lons=None, lats=None,
+                             unit=None, data_id="n/d", ax=None, **kwargs):
         """Draw data into map
         
         If input is unspecified, a random test data set will be created and
@@ -769,13 +766,12 @@ class Map(Basemap):
     
         x, y = self(lons, lats)
         z = array(data)
-        sc = ax.scatter(x, y, c = z, **kwargs)
+        sc = ax.scatter(x, y, c=z, **kwargs)
         zlabel = "%s [%s]" %(data_id, unit)
-        self.insert_colorbar(data_id, sc, label = zlabel)
+        self.insert_colorbar(data_id, sc, label=zlabel)
         self.plotted_data[data_id] = sc
 
-    def insert_colorbar(self, obj_id, obj, label = "undefined", ax = None,\
-                                                                    **kwargs):
+    def insert_colorbar(self, obj_id, obj, label=None, ax=None, **kwargs):
         """Insert a colorbar into the map
         
         :param obj_id: save ID
@@ -786,8 +782,9 @@ class Map(Basemap):
         """
         if ax is None:
             ax = self.ax
-        cb = self.fig.colorbar(obj, shrink = 0.95, ax = ax, **kwargs)
-        cb.set_label(label, fontsize = 16)
+        cb = self.fig.colorbar(obj, shrink=0.95, ax=ax, **kwargs)
+        if isinstance(label, str):
+            cb.set_label(label, fontsize=16)
         self.colorbars[obj_id] = cb
         ax.figure.canvas.draw()
         
@@ -846,10 +843,10 @@ class Map(Basemap):
         return (lat_center, lon_center)
         
     """Other stuff"""
-    def make_random_data(self,total_number = 200, value_range = [-100, 100, 1]):
+    def make_random_data(self,total_number=200, value_range=[-100, 100, 1]):
         """Create random data in the current regime"""
-        lons, lats, data = zeros(total_number), zeros(total_number),\
-                                                        zeros(total_number)
+        lons, lats = zeros(total_number), zeros(total_number)
+        data = zeros(total_number)
         for k in range(total_number):
             lons[k] = 0.1 * randrange(self.lon_ll * 10, self.lon_tr * 10, 1)
             lats[k] = 0.1 * randrange(self.lat_ll * 10, self.lat_tr * 10, 1)

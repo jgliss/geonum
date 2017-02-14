@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Jul 04 08:13:44 2016
-
-@author: Jonas Gliß
-@email: jg@nilu.no
-@Copyright: Jonas Gliß
+Access and handling of topography data
 
 .. note::
 
@@ -19,6 +15,7 @@ from numpy import argmin, mod, ceil, log2, poly1d, polyfit,\
 
 from os.path import basename, exists, join, dirname, normpath
 from os import listdir
+from warnings import warn
 import srtm
 from LatLon import LatLon
 
@@ -42,7 +39,7 @@ class TopoFile(object):
     topo_id = None
     
     @abstractmethod
-    def get_data(self, lat0, lon0, lat1 = None, lon1 = None):
+    def get_data(self, lat0, lon0, lat1=None, lon1=None):
         """Declaration of data access method 
         It is obligatory to implement this method into inhereted classes
         """
@@ -64,8 +61,8 @@ class TopoFile(object):
         lats, lons = asarray([lat0, lat1]), asarray([lon0, lon1])
         return nanmin(lats), nanmin(lons), nanmax(lats), nanmax(lons)
         
-    def _init_lons_lats(self, lats_all, lons_all, lat0, lon0,\
-                                            lat1 = None, lon1 = None):
+    def _init_lons_lats(self, lats_all, lons_all, lat0, lon0, lat1=None, 
+                        lon1=None):
         """Get all latitudes and longitudes on a topodata grid 
         
         :param array lats_all: numpy array with all latitudes of the topo data 
@@ -80,7 +77,6 @@ class TopoFile(object):
             - ndarray, latitudes
             - ndarray, longitudes
         """
-        print lat0, lon0, lat1, lon1
         if any([x is None for x in [lat1, lon1]]):
             lat1, lon1 = lat0, lon0
         if lon0 > lon1:
@@ -92,28 +88,28 @@ class TopoFile(object):
         idx_lats = [argmin(abs(lats_all - lat0)), argmin(abs(lats_all - lat1))]
         #Make sure that the retrieved indices actually INCLUDE the input ranges
         if idx_lons[0] == 0 and lons_all[0] > lon0:
-            print ("Error: Lon0 smaller than range covered by file, using first"
+            warn("Error: Lon0 smaller than range covered by file, using first"
                 " available index in topodata..")
             lon0 = lons_all[0]
             idx_lons[0] = 0
         elif lons_all[idx_lons[0]] > lon0:
             idx_lons[0] -= 1
         if idx_lons[1] == len(lons_all) - 1 and lons_all[-1] < lon1:
-            print ("Error: Lon1 larger than range covered by file, using last"
+            warn("Error: Lon1 larger than range covered by file, using last"
                 " available index in topodata..")
             lon1 = lons_all[-1]
             idx_lons[1] = len(lons_all) - 1
         elif lons_all[idx_lons[1]] < lon1:
             idx_lons[1] += 1
         if idx_lats[0] == 0 and lats_all[0] > lat0:
-            print ("Error: Lat0 smaller than range covered by file, using first"
+            warn("Error: Lat0 smaller than range covered by file, using first"
                 " available index in topodata..")
             lat0 = lats_all[0]
             idx_lats[0] = 0
         elif lats_all[idx_lats[0]] > lat0:
             idx_lats[0] -= 1
         if idx_lats[1] == len(lats_all) - 1 and lats_all[-1] < lat1:
-            print ("Error: Lat1 larger than range covered by file, using last"
+            warn("Error: Lat1 larger than range covered by file, using last"
                 " available index in topodata..")
             lat1 = lats_all[-1]
             idx_lats[1] = len(lats_all) - 1
@@ -137,11 +133,13 @@ class TopoFile(object):
             else:
                 raise ValueError("Fatal error, odd length of longitude array")
         if idx_lats[0] > idx_lats[1]:
-            return (lats_all[idx_lats[1] : idx_lats[0]+1],\
-                lons_all[idx_lons[0] : idx_lons[1] + 1], idx_lats, idx_lons)
+            return (lats_all[idx_lats[1] : idx_lats[0] + 1], 
+                    lons_all[idx_lons[0] : idx_lons[1] + 1],
+                    idx_lats, idx_lons)
         else:
-            return (lats_all[idx_lats[0] : idx_lats[1]+1],\
-                lons_all[idx_lons[0]:idx_lons[1]+1], idx_lats, idx_lons)
+            return (lats_all[idx_lats[0] : idx_lats[1] + 1],
+                    lons_all[idx_lons[0] : idx_lons[1] + 1],
+                    idx_lats, idx_lons)
         
 class Etopo1Access(TopoFile):
     """A class representing netCDF4 data access of Etopo1 data
@@ -150,7 +148,7 @@ class Etopo1Access(TopoFile):
     instructions on the data access.
     
     """
-    def __init__(self, local_path = None, file_name = "ETOPO1_Ice_g_gmt4.grd"):
+    def __init__(self, local_path=None, file_name="ETOPO1_Ice_g_gmt4.grd"):
         """Class initialisation
         
         :param str local_path: directory where Etopo data files are stored
@@ -158,7 +156,7 @@ class Etopo1Access(TopoFile):
         
         """
         if not NETCDF_AVAILABLE:
-            print ("Etopo1 file could not be initiated, netCDF4 library not "
+            warn("Etopo1 file could not be initiated, netCDF4 library not "
                 "installed...")
             return None
             
@@ -190,13 +188,12 @@ class Etopo1Access(TopoFile):
     def _check_topo_path(self, path):
         """Check if path exists and if it is already included in database"""
         if path is None or not exists(path):
-            #print "Error checking topopath %s: path does not exist" %path
             return 
         if not path in self._get_all_local_topo_paths():
             from geonum import LOCAL_TOPO_PATH
             with open(join(LOCAL_TOPO_PATH, "LOCAL_TOPO_PATHS.txt"), "a") as f:
                 f.write("\n" + path  + "\n")
-                print ("Adding new default local topo data path to "
+                print("Adding new default local topo data path to "
                     "file LOCAL_TOPO_DATA.txt: %s" %path)
             f.close()
             
@@ -229,13 +226,14 @@ class Etopo1Access(TopoFile):
         """
         if path is None:
             path = self.local_path
-        print "Searching valid topo file in folder: %s" %path
+        print("Searching valid topo file in folder: %s" %path)
         fnames = listdir(path)
         for name in fnames:
             if name in self.supported_topo_files:
                 self.topo_file = name
                 self.local_path = path
-                print "Found match, setting current filepath: %s" %self.file_path
+                print("Found match, setting current filepath: %s" 
+                %self.file_path)
                 return True
         return False
         
@@ -255,6 +253,7 @@ class Etopo1Access(TopoFile):
             if self._search_topo_file(path):
                 return True
         return False
+        
     @property
     def file_path(self):
         """Return full file path of current topography file"""
@@ -276,7 +275,7 @@ class Etopo1Access(TopoFile):
         self.local_path = dirname(full_path)
         self.file_name = basename(full_path)
     
-    def get_data(self, lat0, lon0, lat1 = None, lon1 = None):
+    def get_data(self, lat0, lon0, lat1=None, lon1=None):
         """Retrieve data from topography file 
         
         :param float lon0: start longitude for data extraction
@@ -293,8 +292,10 @@ class Etopo1Access(TopoFile):
         
             
         """
-        print ("Trying topo data access Etopo1 within borders (Lon0 | Lat0), : "
-            "(Lon1 | Lat1): (%s | %s), (%s | %s)" %(lat0, lon0, lat1, lon1))
+#==============================================================================
+#         print ("Trying topo data access Etopo1 within borders (Lon0 | Lat0), : "
+#             "(Lon1 | Lat1): (%s | %s), (%s | %s)" %(lat0, lon0, lat1, lon1))
+#==============================================================================
         
         etopo1 = Dataset(self.file_path)
 
@@ -302,14 +303,15 @@ class Etopo1Access(TopoFile):
         lons = etopo1.variables["x"][:]
         lats = etopo1.variables["y"][:]
         
-        lats, lons, idx_lats, idx_lons = self._init_lons_lats(lats, lons, lat0,\
-                                                            lon0, lat1, lon1)
+        lats, lons, idx_lats, idx_lons = self._init_lons_lats(lats, lons, lat0,
+                                                              lon0, lat1, lon1)
 
-        vals = asarray(etopo1.variables["z"][idx_lats[0] : idx_lats[1] + 1,\
-                                idx_lons[0] : idx_lons[1] + 1], dtype = float)
+        vals = asarray(etopo1.variables["z"][idx_lats[0] : idx_lats[1] + 1,
+                                             idx_lons[0] : idx_lons[1] + 1], 
+                                             dtype = float)
         etopo1.close()
 
-        return TopoData(lats, lons, vals, data_id = self.topo_id)
+        return TopoData(lats, lons, vals, data_id=self.topo_id)
          
 class SRTMAccess(TopoFile):
     """Class for SRTM topographic data access (uses 
@@ -354,7 +356,7 @@ class SRTMAccess(TopoFile):
         return True
 
         
-    def get_data(self, lat0, lon0, lat1 = None, lon1 = None):
+    def get_data(self, lat0, lon0, lat1=None, lon1=None):
         """Data access wrapper for SRTM module
         
         Retrieves SRTM data in the speciefied input range.
@@ -372,8 +374,7 @@ class SRTMAccess(TopoFile):
             - ndarray, array containing corresponding longitudes
         
         """
-        print ("Trying topo data access SRTM: %s|%s - %s|%s " %(lat0, lon0,\
-                                                                lat1, lon1))
+        print("Retrieving SRTM data (this might take a while) ... ")
         # create GeoElevationData object for data access
         dat = srtm.get_data()
         # check if second input point is specified and set equal first point if
@@ -389,21 +390,21 @@ class SRTMAccess(TopoFile):
             raise SRTMNotCoveredError("Destination point not covered by SRTM ("
                 "Lat | Lon): (%s | %s)" %(lat0, lon0))
         # prepare borders of covered lon / lat regime
-        lat_ll, lon_ll, lat_tr,lon_tr = self._prep_borders(lat0, lon0, lat1,\
-                                                                        lon1)
+        lat_ll, lon_ll, lat_tr,lon_tr = self._prep_borders(lat0, lon0,
+                                                           lat1, lon1)
         # get SRTM file for lower left corner of regime
         f_ll = dat.get_file(lat_ll, lon_ll)
         # get SRTM file for top right corner of regime
         f_tr = dat.get_file(lat_tr, lon_tr)
         # create array of longitude values for regime
-        lons_all = linspace(f_ll.longitude, f_tr.longitude + 1,\
-                                                        f_ll.square_side)
+        lons_all = linspace(f_ll.longitude, f_tr.longitude + 1,
+                            f_ll.square_side)
         # create array of latitude values for regime
-        lats_all = linspace(f_ll.latitude, f_tr.latitude + 1,\
-                                                        f_ll.square_side)
+        lats_all = linspace(f_ll.latitude, f_tr.latitude + 1,
+                            f_ll.square_side)
         #prepare coordinates
-        lats, lons, _, _= self._init_lons_lats(lats_all, lons_all, lat0,\
-                                                            lon0, lat1, lon1)
+        lats, lons, _, _= self._init_lons_lats(lats_all, lons_all,
+                                               lat0, lon0, lat1, lon1)
         # Init data array 
         vals = empty((len(lats), len(lons))) * nan
         #loop over all coordinates and try access the elevation data
@@ -412,7 +413,7 @@ class SRTMAccess(TopoFile):
                 #print "Lat: %s, Lon: %s" % (lats[i], lons[j])
                 vals[i, j] = dat.get_elevation(lats[i], lons[j])
     
-        return TopoData(lats, lons, vals, data_id = self.topo_id)
+        return TopoData(lats, lons, vals, data_id=self.topo_id)
         
 class TopoDataAccess(object):
     """Class for topo data access management from different topo datasets
@@ -429,7 +430,7 @@ class TopoDataAccess(object):
     
     Default access mode is SRTM. 
     """
-    def __init__(self, mode = "srtm", local_path = ""):
+    def __init__(self, mode="srtm", local_path=""):
         """Class initialisation
         
         :param str mode: choose between one of the supported data
@@ -450,9 +451,9 @@ class TopoDataAccess(object):
         but without a file specification)
         """
         self.mode = "srtm"
-        self.topoFile = SRTMAccess()
+        self.topo_file = SRTMAccess()
     
-    def set_mode(self, mode = "srtm", local_path = None):
+    def set_mode(self, mode="srtm", local_path=None):
         """Change the current topography mode 
         
         :param str mode: the new mode
@@ -464,7 +465,7 @@ class TopoDataAccess(object):
             file cannot be found at ``self.local_path``
         """
         if local_path is not None and exists(local_path):
-            print "Updating local topography access path..."
+            print("Updating local topography access path...")
             self.local_path = local_path
         
         if not mode in self.modes:
@@ -477,7 +478,7 @@ class TopoDataAccess(object):
             tf = Etopo1Access(self.local_path)
             if tf.file_path is not None:
                 self.mode = mode
-                self.topoFile = tf
+                self.topo_file = tf
                 return
             self.init_default_mode()
             raise TopoAccessError("Could not access Etopo1 data on local "
@@ -485,7 +486,7 @@ class TopoDataAccess(object):
         
         self.init_default_mode() #which means SRTM
     
-    def get_data(self, lat0, lon0, lat1 = None, lon1 = None):
+    def get_data(self, lat0, lon0, lat1=None, lon1=None):
         """Retrieve data from topography file and, if applicable, increase the 
         resolution by upscaling (Gaussian pyramide approach) and interpolation
         
@@ -510,7 +511,7 @@ class TopoDataAccess(object):
         except Exception, e:
             raise TopoAccessError(repr(e))
         try:
-            topo_data = self.topoFile.get_data(lat0, lon0, lat1, lon1)
+            topo_data = self.topo_file.get_data(lat0, lon0, lat1, lon1)
         except Exception, e:
             print ("Topo retrieval failed using mode " + str(self.mode) +
                                 ", try extracting data from Etopo1 dataset")
@@ -522,7 +523,7 @@ class TopoDataAccess(object):
                 raise TopoAccessError(msg)
 
             try:
-                topo_data = self.topoFile.get_data(lat0, lon0, lat1, lon1)
+                topo_data = self.topo_file.get_data(lat0, lon0, lat1, lon1)
                 
             except Exception, err:
                 msg = "Error loading topodata: %s\n%s" %(msg, repr(err))
@@ -546,7 +547,7 @@ class TopoData(object):
         topographic data 
         
     """
-    def __init__(self, lats, lons, data, data_id = ""):
+    def __init__(self, lats, lons, data, data_id=""):
         """Class initialisation
         
         :param ndarray lats: numpy array with latitude coordinates of the 
@@ -612,7 +613,7 @@ class TopoData(object):
         r_lat = (p0 - LatLon(self.lats[x_lat + 1], self.lons[x_lon])).magnitude
         return (r_lat, r_lon)
         
-    def increase_grid_resolution(self, res = 0.2, polyorder = 2):
+    def increase_grid_resolution(self, res=0.2, polyorde=2):
         """Gaussian pyramide based upscaling of topographic grid
         
         This function checks the current topographic resolution in the center
@@ -653,7 +654,7 @@ class TopoData(object):
                 + str(dist) + "km\nDesired resolution: %s km" %(dist, res))
             return self
         fac = int(ceil(log2(res_fac))) #the corresponding up-factor for the scale space
-        print "Increasing spatial topography resolution by factor " + str(2**fac)
+        print("Increasing spatial topography resolution by factor %s" %(2**fac))
         for k in range(fac):
             vals = pyrUp(vals)
         p_lons = poly1d(polyfit(arange(len(lons)), lons, 2))
@@ -675,20 +676,20 @@ class TopoData(object):
     @property
     def center_coordinates(self):
         """Tuple (lat, lon) with center coordinates of data"""
-        return (self.lats[0] + self.delta_lat / 2.,\
+        return (self.lats[0] + self.delta_lat / 2.,
                 self.lons[0] + self.delta_lon / 2.)
     
-    def plot_2d(self, ax = None):
+    def plot_2d(self, ax=None):
         """Plot 2D basemap of topodata"""
         from geonum.mapping import Map
         latc, lonc = self.center_coordinates
-        m = Map(self.lon0, self.lat0, self.lon1, self.lat1, projection =\
-                                "merc", lat_0 = latc, lon_0 = lonc, ax = ax)
+        m = Map(self.lon0, self.lat0, self.lon1, self.lat1,
+                projection="merc", lat_0=latc, lon_0=lonc, ax=ax)
         m.set_topo_data(self)
-        m.draw_topo(insert_colorbar = True)
+        m.draw_topo(insert_colorbar=True)
         return m
         
-    def plot_3d(self, ax = None):
+    def plot_3d(self, ax=None):
         """Creates 3D surface plot of data
         
         :param Axes3D ax (None): 3D axes object
@@ -698,16 +699,17 @@ class TopoData(object):
         """
         from geonum.mapping import Map
         latc, lonc = self.center_coordinates
-        m = Map(self.lon0, self.lat0, self.lon1, self.lat1, projection =\
-                                "merc", lat_0 = latc, lon_0 = lonc, ax = ax)
+        m = Map(self.lon0, self.lat0, self.lon1, self.lat1, 
+                projection="merc", lat_0=latc, lon_0=lonc, ax=ax)
         m.set_topo_data(self)
         m.draw_topo_3d()
         return m
         
-    def includes_coordinate(self, lat = None, lon = None):
+    def includes_coordinate(self, lat=None, lon=None):
         """Checks if input coordinates are covered by this dataset"""
-        if not (self.lat0 <= lat <= self.lat1 and self.lon0 <= lon <= self.lon1):
-            print "Input coordinates out of topo data range..."
+        if not (self.lat0 <= lat <= self.lat1 and 
+                self.lon0 <= lon <= self.lon1):
+            print("Input coordinates out of topo data range...")
             return False
         return True
     

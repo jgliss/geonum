@@ -37,3 +37,11 @@ Plotting (creating 2D and 3D Basemaps)
 .. automodule:: geonum.mapping
    :members:
    :undoc-members:
+   
+   
+Helper methods
+--------------
+
+.. automodule:: geonum.helpers
+   :members:
+   :undoc-members:

@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 Helper methods for geonum library
----------------------------------
 """
 
 from numpy import radians, cos, arcsin, sin, sqrt, array, linspace, hstack
 import matplotlib.cm as colormaps
 import matplotlib.colors as colors
 
-def haversine_formula(lon0, lat0, lon1, lat1, radius = 6371.0):
+def haversine_formula(lon0, lat0, lon1, lat1, radius=6371.0):
     """Haversine formula
     
     Approximate horizontal distance between 2 points assuming a spherical 
@@ -32,7 +31,7 @@ def haversine_formula(lon0, lat0, lon1, lat1, radius = 6371.0):
  
     return radius * c
 
-def approximate_connection_vector(lon0, lat0, lon1, lat1, len_lat_km = 111.20):
+def approximate_connection_vector(lon0, lat0, lon1, lat1, len_lat_km=111.20):
     """Returns approximate connection vector between two points
     
     :param float lon0: longitude of first point in decimal degrees
@@ -49,27 +48,28 @@ def approximate_connection_vector(lon0, lat0, lon1, lat1, len_lat_km = 111.20):
     dy = len_lat_km * (lat1 - lat0)
     return array((dx,dy))
     
-def shifted_color_map(vmin, vmax, cmap = None):
-    '''Thanks to Paul H (http://stackoverflow.com/users/1552748/paul-h) 
-    who wrote this function, found here:
+def shifted_color_map(vmin, vmax, cmap=None):
+    """Shift center of a diverging colormap to value 0
     
-    http://stackoverflow.com/questions/7404116/defining-the-midpoint-of-a-colormap-in-matplotlib
+    .. note::
+    
+        This method was found `here <http://stackoverflow.com/questions/
+        7404116/defining-the-midpoint-of-a-colormap-in-matplotlib>`_ 
+        (last access: 17/01/2017). Thanks to `Paul H <http://stackoverflow.com/
+        users/1552748/paul-h>`_ who provided it.
     
     Function to offset the "center" of a colormap. Useful for
-    data with a negative min and positive max and you want the
-    middle of the colormap's dynamic range to be at zero
-
-    Input
-    -----
-      cmap : The matplotlib colormap to be altered
-
-      midpoint : The new center of the colormap. Defaults to 
-          0.5 (no shift). Should be between 0.0 and 1.0. In
-          general, this should be  1 - vmax/(vmax + abs(vmin))
-          For example if your data range from -15.0 to +5.0 and
-          you want the center of the colormap at 0.0, `midpoint`
-          should be set to  1 - 5/(5 + 15)) or 0.75
-    '''
+    data with a negative min and positive max and if you want the
+    middle of the colormap's dynamic range to be at zero level
+    
+    :param vmin: lower end of data value range
+    :param vmax: upper end of data value range
+    :param cmap: colormap (if None, use default cmap: seismic)
+    
+    :return: 
+        - shifted colormap
+        
+    """
     #midpoint = 1 - abs(im.max())/(abs(im.max()) + abs(im.min()))
     if cmap is None:
         cmap = colormaps.seismic

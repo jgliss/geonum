@@ -13,15 +13,16 @@ from LatLon import LatLon, GeoVector
 from numpy import radians, cos, sin, degrees, sqrt,tan, isnan, arctan2,\
     asarray, nanmin, nanmax
 from copy import deepcopy
-from geonum.topodata import TopoDataAccess, TopoData
+from warnings import warn
+from .topodata import TopoDataAccess, TopoData
     
 class GeoPoint(object, LatLon):
     """The Geopoint object represents a point on an ellipsoid (e.g. earth) 
     including elevation information. It inherits from :class:`LatLon` object 
     from the :mod:`LatLon` library.
     """
-    def __init__(self, lat = 0.0, lon = 0.0, altitude = None, name = "n/d",\
-                topo_access_mode = "srtm", topo_path = None, topo_data = None):
+    def __init__(self, lat=0.0, lon=0.0, altitude=None, name="n/d",
+                 topo_access_mode="srtm", topo_path=None, topo_data=None):
                         
         """Class initialisation
         
@@ -42,8 +43,8 @@ class GeoPoint(object, LatLon):
         self.altitude = altitude #altitude in m
         self.altitude_err = 0.0
         
-        self._topo_access = TopoDataAccess(mode = topo_access_mode,\
-                                            local_path = topo_path)
+        self._topo_access = TopoDataAccess(mode=topo_access_mode,
+                                           local_path=topo_path)
         self.topo_data = None 
         self.set_topo_data(topo_data)
         if self.altitude is None or isnan(self.altitude):
@@ -55,8 +56,8 @@ class GeoPoint(object, LatLon):
         return self._topo_access.local_path    
     
     """PROCESSING"""  
-    def offset(self, azimuth, dist_hor, dist_vert = 0.0,\
-                                       ellipse = "WGS84", **kwargs):
+    def offset(self, azimuth, dist_hor, dist_vert=0.0, ellipse="WGS84", 
+               **kwargs):
         """Returns new GeoPoint at offset position
     
         :param float azimuth: azimuth direction angle (in decimal degrees, e.g.
@@ -73,8 +74,8 @@ class GeoPoint(object, LatLon):
         """
         p = LatLon(self.lat.decimal_degree, self.lon.decimal_degree)
         p1 = p.offset(azimuth, dist_hor, ellipse)
-        return GeoPoint(p1.lat.decimal_degree, p1.lon.decimal_degree,\
-                                        self.altitude + dist_vert, **kwargs)
+        return GeoPoint(p1.lat.decimal_degree, p1.lon.decimal_degree,
+                        self.altitude + dist_vert, **kwargs)
     
     def set_topo_data(self, topo_data):
         """Assign topographic data to this point
@@ -117,19 +118,18 @@ class GeoPoint(object, LatLon):
         if not len(lats) > 0:
             #print "Borders could not be initiated, no objects found..."
             return False
-        lat_ll, lon_ll, lat_tr , lon_tr = nanmin(lats), nanmin(lons),\
-                                                    nanmax(lats), nanmax(lons)
+        lat_ll, lon_ll, lat_tr , lon_tr = (nanmin(lats), nanmin(lons), 
+                                           nanmax(lats), nanmax(lons))
         pll, ptr = GeoPoint(lat_ll, lon_ll, 0.0), GeoPoint(lat_tr, lon_tr, 0.0)
         extend_km = (pll - ptr).magnitude * 0.1
         if extend_km == 0:
             extend_km = 1
-        ll = pll.offset(azimuth = -135, dist_hor = float(extend_km),\
-                                                                name = "ll")
-        tr = ptr.offset(azimuth = 45, dist_hor = float(extend_km), name = "tr")
+        ll = pll.offset(azimuth=-135, dist_hor=float(extend_km), name="ll")
+        tr = ptr.offset(azimuth=45, dist_hor=float(extend_km), name="tr")
         return  ll, tr        
         
-    def get_topo_data(self, geo_point = None, azimuth = None, dist_hor = None,\
-                                                    lon1 = None, lat1 = None):
+    def get_topo_data(self, geo_point=None, azimuth=None, dist_hor=None,
+                      lon1=None, lat1=None):
         """Retrieve topographic data grid spanned by this and another point
         
         The second coordinate can be specified in several different ways 
@@ -183,7 +183,7 @@ class GeoPoint(object, LatLon):
             print ("Topo data avaialable in geo point %s")
         return self.topo_data, pf
     
-    def check_topo(self, lat1 = None, lon1 = None):
+    def check_topo(self, lat1=None, lon1=None):
         """Check if topography is available between this point and another
         
         :param float lat1: latitude of end point, if None, only the 
@@ -196,13 +196,15 @@ class GeoPoint(object, LatLon):
             lat1, lon1 = self.latitude, self.longitude
         if self.topo_data is None:
             return False
-        if not (self.topo_data.includes_coordinate(self.latitude,\
-            self.longitude) and self.topo_data.includes_coordinate(lat1, lon1)):
+        if not (self.topo_data.includes_coordinate(self.latitude, 
+                                                   self.longitude) 
+            and self.topo_data.includes_coordinate(lat1, lon1)):
             return False
         return True
         
-    def get_elevation_profile(self, geo_point = None, azimuth = None,\
-                dist_hor = None, lon1 = None, lat1 = None, resolution = 5.):
+    def get_elevation_profile(self, geo_point=None, azimuth=None, 
+                              dist_hor=None, lon1=None, lat1=None, 
+                              resolution=5.):
         """Estimates the elevation profile for a given viewing direction up
         to a given distance from the coordinates of this point. For input 
         possibilities see docs of :func:`get_topo_data`.
@@ -236,7 +238,7 @@ class GeoPoint(object, LatLon):
         """
         from geonum.processing import ElevationProfile
         data, pf = self.get_topo_data(geo_point, azimuth, dist_hor, lon1, lat1)
-        return ElevationProfile(data, self, pf, resolution = resolution)
+        return ElevationProfile(data, self, pf, resolution=resolution)
         
     def get_altitude(self):
         """Estimate the altitude (+/- uncertainty) of this point 
@@ -254,30 +256,28 @@ class GeoPoint(object, LatLon):
             - int, float
         
         """
-        print ("Try retrieving altitude for point %s (lat, lon): %s, %s" 
-                                %(self.name, self.latitude, self.longitude))
-        log = ""
+#==============================================================================
+#         print ("Try retrieving altitude for point %s (lat, lon): %s, %s" 
+#                                 %(self.name, self.latitude, self.longitude))
+#==============================================================================
         try:
             #the data access class already catches access failure and in case,
             #tries to  access etopo1 data
-            data = self._topo_access.get_data(self.latitude,\
-                                                        self.longitude)
+            data = self._topo_access.get_data(self.latitude,
+                                              self.longitude)
             z = data(self.latitude, self.longitude)# / 1000.
             z_err = (data.data.max() - data.data.min()) #/ 1000.'
-            print "Retrieved altitude: %s +/- %s m" %(z, z_err)
-        except Exception as e:
-            log = repr(e)
-            print "Setting altitude to 0.0 m"
-            z, z_err = 0.0, 99999999999
-        finally:
-            if len(log) > 0:
-                print "Important remarks:\n" + log
+#            print "Retrieved altitude: %s +/- %s m" %(z, z_err)
+        except:
+            warn("Altitude could not be retrieved...setting altitude to 0.0 m")
+            z, z_err = 0.0, 99999999999.9
+    
         self.altitude, self.altitude_err = z, z_err
         
         return z, z_err
     
     """HELPERS, IO stuff, etc"""
-    def update_topo_access(self, mode, local_path = None):
+    def update_topo_access(self, mode, local_path=None):
         """Update topo access mode
         
         :param str mode: valid access mode (e.g. "srtm", "etopo1")        
@@ -286,7 +286,7 @@ class GeoPoint(object, LatLon):
         """
         if local_path is None:
             local_path = self._topo_access.local_path
-        self._topo_access = TopoDataAccess(mode = mode, local_path = local_path)
+        self._topo_access = TopoDataAccess(mode=mode, local_path=local_path)
         
     @property
     def topo_access_mode(self):
@@ -304,8 +304,8 @@ class GeoPoint(object, LatLon):
         return self.lat.decimal_degree
         
     """Plotting etc..."""
-    def plot_2d(self, map, add_name = False, dist_text = 0.5,\
-                                        angle_text = -45, **kwargs):
+    def plot_2d(self, map, add_name=False, dist_text=0.5, angle_text=-45, 
+                **kwargs):
         """Plot this point into existing 2D basemap
                 
         :param map basemap: Basemap object (drawn in an Axes3D object)
@@ -323,7 +323,7 @@ class GeoPoint(object, LatLon):
         if add_name:
             map.write_point_name_2d(self, dist_text, angle_text)
                                                     
-    def plot_3d(self, map, add_name = False, dz_text = 0.0, **kwargs):
+    def plot_3d(self, map, add_name=False, dz_text=0.0, **kwargs):
         """Plot this point into existing 3D basemap
                 
         :param map basemap: Basemap object (drawn in an Axes3D object)
@@ -345,8 +345,8 @@ class GeoPoint(object, LatLon):
                 fs = 12
             #zt=self.altitude*1000. + dz_text
             zt = self.altitude + dz_text
-            map.draw_text_3d(self.longitude, self.latitude, zt, self.name,\
-                                                    color="k", fontsize = fs)
+            map.draw_text_3d(self.longitude, self.latitude, zt, self.name,
+                             color="k", fontsize=fs)
             
     """PRIVATE METHODS"""  
     def _load_topo_data(self, lat0, lon0, lat1, lon1):
@@ -415,8 +415,8 @@ class GeoPoint(object, LatLon):
         heading = inv['heading_reverse']
         distance = inv['distance']
         name=str(other.name + "->" + self.name)
-        return GeoVector3D(dz = 0.0, azimuth = heading, dist_hor = distance,\
-                                                anchor = other, name = name)
+        return GeoVector3D(dz=0.0, azimuth=heading, dist_hor=distance,
+                           anchor=other, name=name)
     
     def _sub_geo_point(self, other):
         """Called when subtracting a LatLon object from self"""
@@ -425,8 +425,8 @@ class GeoPoint(object, LatLon):
         distance = inv['distance']
         name = str(other.name + "->" + self.name)
         dz = self.altitude - other.altitude
-        return GeoVector3D(dz = dz, azimuth = heading, dist_hor = distance,\
-                                                anchor = other, name = name)
+        return GeoVector3D(dz=dz, azimuth=heading, dist_hor=distance,
+                           anchor=other, name=name)
         
     """Redfined magic methods initially implemented for :class:`LatLon` object
     """    
@@ -435,8 +435,8 @@ class GeoPoint(object, LatLon):
         
         :param other: another :class:`GeoPoint` object
         """
-        if self.lat == other.lat and self.lon == other.lon and\
-                                        self.altitude == other.altitude:
+        if (self.lat == other.lat and self.lon == other.lon 
+            and self.altitude == other.altitude):
             return True
         return False
         
@@ -459,13 +459,13 @@ class GeoPoint(object, LatLon):
     
     def __str__(self):
         """String formatting"""
-        return 'GeoPoint %s\nLat: %s, Lon: %s, Alt: %s m\n' %(self.name,\
-                                self.latitude, self.longitude, self.altitude)
+        return ("GeoPoint %s\nLat: %s, Lon: %s, Alt: %s m\n" 
+                %(self.name, self.latitude, self.longitude, self.altitude))
     
     def __repr__(self):
         """Obj. representation"""
-        return '%s, %s, Alt. %s m' %(self.lat.__repr__(), self.lon.__repr__(),\
-                                                                self.altitude)
+        return ("%s, %s, Alt. %s m" 
+                %(self.lat.__repr__(), self.lon.__repr__(), self.altitude))
     
     def __complex__(self):
         """Complex representation of lat and lon"""
@@ -501,8 +501,8 @@ class GeoVector3D(object, GeoVector):
  
     """
             
-    def __init__(self, dx = None, dy = None, dz = None, azimuth = None,\
-            dist_hor = None, elevation = None, anchor = None, name = "n/d"):
+    def __init__(self, dx=None, dy=None, dz=None, azimuth=None, dist_hor=None, 
+                 elevation=None, anchor=None, name="n/d"):
         """Class initialisation
         
         :param float dx: longitudinal length in km
@@ -643,11 +643,11 @@ class GeoVector3D(object, GeoVector):
         
     def _geom_hor(self):
         """Returns horizontal heading and horizontal magnitude"""
-        return (degrees(arctan2(self.dx, self.dy)),\
-                            sqrt(self.dx**2 + self.dy**2))
+        return (degrees(arctan2(self.dx, self.dy)),
+                sqrt(self.dx**2 + self.dy**2))
         
     """Plotting etc..."""
-    def plot(self, map, add_anchor = False, **kwargs):
+    def plot(self, map, add_anchor=False, **kwargs):
         """Plot this vector into existing basemap
         
         :param Map map: map object
@@ -662,7 +662,7 @@ class GeoVector3D(object, GeoVector):
         """
         map.draw_geo_vector_3d(self, **kwargs)
         if add_anchor:
-            self.anchor.plot(map, add_name = True, dz_text = self.dz * .1)
+            self.anchor.plot(map, add_name=True, dz_text=self.dz*.1)
         
     """Redifining magic methods from base class :class:`GeoVector` object for
     3D calcs
@@ -690,8 +690,8 @@ class GeoVector3D(object, GeoVector):
         
         :param GeoVector3D other: another geo vector  
         """
-        return GeoVector3D(self.dx + other.dx, self.dy + other.dy,\
-                                                    self.dz + other.dz)
+        return GeoVector3D(self.dx + other.dx, self.dy + other.dy,
+                           self.dz + other.dz)
 
     def __str__(self):
         """String representation"""

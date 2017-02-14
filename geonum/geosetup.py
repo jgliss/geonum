@@ -16,10 +16,9 @@ from .mapping import Map
 class GeoSetup(object):
     """The GeoSetup class represents acollection of GeoPoints and vectors
     """
-    def __init__(self, points = [], vectors = [], lat_ll = None,\
-                     lon_ll = None, lat_tr = None, lon_tr = None,\
-                     id = "MyGeoSetup", topo_access_mode = "srtm",\
-                                             local_topo_path = None):
+    def __init__(self, points=[], vectors=[], lat_ll=None, lon_ll=None, 
+                 lat_tr=None, lon_tr=None, id="MyGeoSetup", 
+                 topo_access_mode="srtm", local_topo_path=None):
         """Init object
         
         
@@ -69,8 +68,8 @@ class GeoSetup(object):
         self.set_borders_from_points()
         #temporary creation of points ll and tr in case there is some valid input
         try:
-            self.new_geo_point(lat_ll, lon_ll, name = "ll")
-            self.new_geo_point(lat_tr, lon_tr, name = "tr")
+            self.new_geo_point(lat_ll, lon_ll, name="ll")
+            self.new_geo_point(lat_tr, lon_tr, name="tr")
         except (TypeError, ValueError):
             pass
       
@@ -82,14 +81,14 @@ class GeoSetup(object):
     
     def create_test_data(self):
         """Create exemplary test data set"""
-        source = GeoPoint(37.751005,  14.993435, name = "Etna")
-        instrument = GeoPoint(37.765755,  15.016696, name = "Observatory")
+        source = GeoPoint(37.751005,  14.993435, name="Etna")
+        instrument = GeoPoint(37.765755,  15.016696, name="Observatory")
         self.add_geo_points(source, instrument)
         self.set_borders_from_points()
-        plume = GeoVector3D(azimuth = 83, dist_hor = self.magnitude,\
-                        elevation = 0, anchor = source, name = "plume")
-        view_dir = GeoVector3D(azimuth = 160, dist_hor = self.magnitude,\
-                        elevation = 8, anchor = instrument, name = "cfov")
+        plume = GeoVector3D(azimuth=83, dist_hor = self.magnitude,
+                            elevation=0, anchor=source, name="plume")
+        view_dir = GeoVector3D(azimuth=160, dist_hor=self.magnitude,
+                               elevation=8, anchor=instrument, name="cfov")
                                 
         self.add_geo_vectors(plume, view_dir)
         
@@ -110,10 +109,10 @@ class GeoSetup(object):
         if p is None:
             return
         if not exists(p):
-            raise IOError("Path ", p, " could not be set")
+            raise IOError("Path %s could not be set" %p)
         self.topo_access.local_path = p
     
-    def change_topo_mode(self, new_mode = "srtm", local_path = None):
+    def change_topo_mode(self, new_mode="srtm", local_path=None):
         """Change the current mode for topography data retrieval and optionally
         change the local topo data path at the same time
         
@@ -140,8 +139,10 @@ class GeoSetup(object):
         """
         if not self.points.has_key("ll"):
             self.set_borders_from_points()
-        self.topo_data = self.topo_access.get_data(self.ll.latitude,\
-            self.ll.longitude, self.tr.latitude, self.tr.longitude)
+        self.topo_data = self.topo_access.get_data(self.ll.latitude,
+                                                   self.ll.longitude,
+                                                   self.tr.latitude,
+                                                   self.tr.longitude)
         for p in self.points.values():
             p.set_topo_data(self.topo_data)
         
@@ -209,8 +210,8 @@ class GeoSetup(object):
     @property
     def center_coordinates(self):
         """Lat / Lon coordinates of center of data"""
-        return self.lat_ll + (self.delta_lat) / 2.,\
-                        self.lon_ll + self.delta_lon / 2.
+        return (self.lat_ll + self.delta_lat / 2., 
+                self.lon_ll + self.delta_lon / 2.)
         
     def add_geo_points(self, *args):
         """Add multiple GeoPoints to the collection
@@ -280,13 +281,13 @@ class GeoSetup(object):
         """
         if not isinstance(vec, GeoVector3D):
             print ("Error adding GeoVector3D, wrong input type, need "
-                  ":class:`GeoVector3D` object, input type: " + type(vec))
+                  ":class:`GeoVector3D` object, input type: %s" %type(vec))
             return
         if vec.name in self.vectors:
             print ("Vector ID %s already exists in %s" %(vec.name, self))
             vec2 = self.vectors[vec.name]
-            if vec2.almost_equals(vec) and vec2.dz == vec.dz and\
-                                                vec.anchor == vec2.anchor:
+            if (vec2.almost_equals(vec) and vec2.dz == vec.dz 
+                and vec.anchor == vec2.anchor):
                 print "Vector already exists"
                 return 
             print "Updating name of existing vector to: %s_old" %vec.name
@@ -343,7 +344,7 @@ class GeoSetup(object):
         """Returns dimension (in km) of area covered by this setup"""
         return (self.tr - self.ll).norm
         
-    def set_borders_from_points(self, extend_km = 1, to_square = True):
+    def set_borders_from_points(self, extend_km=1, to_square=True):
         """Set range of setup (lower left and upper right coordinates) 
         considering all points in this collection
         
@@ -356,10 +357,12 @@ class GeoSetup(object):
         if not len(lats) > 0:
             #print "Borders could not be initiated, no objects found..."
             return False
-        lat_ll, lon_ll, lat_tr , lon_tr= nanmin(lats), nanmin(lons),\
-                                            nanmax(lats), nanmax(lons)
-        pll, ptr = GeoPoint(lat_ll, lon_ll, 0.0), GeoPoint(lat_tr,\
-                                                            lon_tr, 0.0)
+        
+        lat_ll, lon_ll, lat_tr , lon_tr = (nanmin(lats), nanmin(lons),
+                                           nanmax(lats), nanmax(lons))
+                                           
+        pll, ptr = GeoPoint(lat_ll, lon_ll, 0.0), GeoPoint(lat_tr, lon_tr, 0.0)
+        
         if to_square:
             v = ptr - pll
             add = (abs(v.dx) - abs(v.dy)) / 2
@@ -370,10 +373,13 @@ class GeoSetup(object):
                 pll = pll.offset(azimuth = 270, dist_hor = -add)
                 ptr = ptr.offset(azimuth = 90, dist_hor = -add)
                  
-        self.set_geo_point("ll", pll.offset(azimuth = -135, dist_hor =\
-                                                float(extend_km), name="ll"))
-        self.set_geo_point("tr", ptr.offset(azimuth = 45, dist_hor =\
-                                                float(extend_km), name="tr"))
+        self.set_geo_point("ll", pll.offset(azimuth=-135, 
+                                            dist_hor=float(extend_km),
+                                            name="ll"))
+        
+        self.set_geo_point("tr", ptr.offset(azimuth=45,
+                                            dist_hor=float(extend_km),
+                                            name="tr"))
         return True
    
     def create_map(self, *args, **kwargs):     
@@ -393,7 +399,7 @@ class GeoSetup(object):
         m.set_topo_data(self.topo_data)
         return m
     
-    def points_close(self, p, radius = None):
+    def points_close(self, p, radius=None):
         """Finds all GeoPoints which are within a certain radius around another
         point
         
@@ -415,9 +421,9 @@ class GeoSetup(object):
                                                 %(len(ids), radius, p.name))
         return ids
         
-    def plot_2d(self, draw_all_points = True, draw_all_vectors = True,\
-            draw_topo = True, draw_coastline = True, draw_mapscale = True,\
-                                        draw_legend = True, *args, **kwargs):
+    def plot_2d(self, draw_all_points=True, draw_all_vectors=True,
+                draw_topo=True, draw_coastline=True, draw_mapscale=True,
+                draw_legend=True, *args, **kwargs):
         """High level plottting function to draw an overview map
         
         :param bool draw_all_points (True): if true, all points are included
@@ -470,8 +476,8 @@ class GeoSetup(object):
 
         return m
                 
-    def plot_3d(self, draw_all_points = True, draw_all_vectors = True,\
-                                    cmap_topo = "Oranges", *args, **kwargs):
+    def plot_3d(self, draw_all_points=True, draw_all_vectors=True, 
+                cmap_topo="Oranges", *args, **kwargs):
         """Make a 3D plot of the current setup
 
         :param bool draw_all_points (True): if true, all points are included

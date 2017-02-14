@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Processing module of geonum library
+"""
+Processing module of geonum library
 """
 from numpy import radians, cos, sin, arctan, pi, argmin, linspace,\
     tan, ceil, hypot, vstack, nanmin, nanmax, where, sign, diff,\
@@ -21,7 +22,7 @@ class ElevationProfile(object):
     provided topographic data grid which must cover the range spanned by 
     both points
     """
-    def __new__(cls, topo_data, observer, endpoint, resolution = 5.):
+    def __new__(cls, topo_data, observer, endpoint, resolution=5.):
         """These objects strictly can only be created with the right input, 
         
         For input specs see __init__ method
@@ -34,13 +35,13 @@ class ElevationProfile(object):
                 raise ValueError ("ElevationProfile instance could not be "
                     "created\nWrong input type: observer/endpoint, need GeoPoint "
                     "or LatLon object...")
-            elif not topo_data.includes_coordinate(p.lat.decimal_degree,\
-                                                    p.lon.decimal_degree):
+            elif not topo_data.includes_coordinate(p.lat.decimal_degree,
+                                                   p.lon.decimal_degree):
                 raise ValueError ("ElevationProfile instance could not be "
                     "created\nWrong input point not covered by input topodata")
         
-        return super(ElevationProfile, cls).__new__(cls, topo_data, observer,\
-                                        endpoint, resolution)
+        return super(ElevationProfile, cls).__new__(cls, topo_data, observer,
+                                                    endpoint, resolution)
         
     def __init__(self, topo_data, observer, endpoint, resolution):
         """Initiate and determine elevation profile
@@ -76,13 +77,6 @@ class ElevationProfile(object):
     def azimuth(self):
         """Returns the azimuth angle of the profile"""
         return (self._endpoint_topogrid - self._observer_topogrid).azimuth
-    
-#==============================================================================
-#     @property    
-#     def azimuth(self):
-#         """Return azimuth direction of profile (from observer)"""
-#         return (self.endpoint - self.observer).azimuth
-#==============================================================================
         
     @property
     def resolution(self):
@@ -133,7 +127,7 @@ class ElevationProfile(object):
         idx = argmin(abs(self.dists - dist))
         return self.slope_angles()[idx]
         
-    def det_profile(self, resolution = 5.):
+    def det_profile(self, resolution=5.):
         """Determines the elevation profile
         
         Searches the closest tiles in the topo data grid for both observer and
@@ -167,7 +161,7 @@ class ElevationProfile(object):
         self.dists = dists
         self.profile = z
      
-    def get_altitudes_view_dir(self, elev_angle, view_above_topo_m = 1.5):
+    def get_altitudes_view_dir(self, elev_angle, view_above_topo_m=1.5):
         """Get vector containing altitudes for a viewing direction 
         
         The viewing direction is specified by the azimuth angle of the 
@@ -183,11 +177,11 @@ class ElevationProfile(object):
             - vector with altitude values (same length as ``self.profile``)
             
         """
-        return 1000 * tan(radians(elev_angle)) * self.dists + self.profile[0]\
-                                                        + view_above_topo_m
+        return (1000 * tan(radians(elev_angle)) * self.dists + 
+                self.profile[0] + view_above_topo_m)
     
-    def find_horizon_elev(self, elev_start = 0.0, elev_stop = 60.0,\
-                                              step_deg = 0.1, **kwargs):
+    def find_horizon_elev(self, elev_start=0.0, elev_stop=60.0, step_deg=0.1,
+                          **kwargs):
         """Find first elevation angle which does not intersect with topo
         
         :param float elev_start: start search elevation angle
@@ -208,8 +202,8 @@ class ElevationProfile(object):
                 dists_sects.append(dist), elev_sects.append(elev)
         raise Exception("Unexpected exception..")
         
-    def get_first_intersection(self, elev_angle, view_above_topo_m = 1.5,\
-                        min_dist = None, local_tolerance = 3, plot = False):
+    def get_first_intersection(self, elev_angle, view_above_topo_m=1.5,
+                               min_dist=None, local_tolerance=3, plot=False):
                                 
         """Finds first intersection of a viewing direction with topography
         
@@ -249,8 +243,8 @@ class ElevationProfile(object):
         if min_dist == None:
             min_dist = self.dist_hor*.01
         max_diff = self.resolution * 1000 
-        view_elevations = self.get_altitudes_view_dir(elev_angle,\
-                                                        view_above_topo_m)
+        view_elevations = self.get_altitudes_view_dir(elev_angle,
+                                                      view_above_topo_m)
         
         #: determine the difference signal
         diff_signal = view_elevations - self.profile 
@@ -302,14 +296,14 @@ class ElevationProfile(object):
             
         return dist, dist_err, intersect, view_elevations, ax
     
-    def _plot_intersect_search_result(self, view_elevations, dist = None):
+    def _plot_intersect_search_result(self, view_elevations, dist=None):
         ax = self.plot()
         ax.plot(self.dists, view_elevations, label = "Viewing direction")
         try:
             ax.axvline(dist, ls = "--", label = "Intersection")
         except:
             pass
-        ax.legend(loc = "best", fancybox = True, framealpha = 0.4)
+        ax.legend(loc="best", fancybox=True, framealpha=0.4)
         return ax
         
         
@@ -356,17 +350,17 @@ class ElevationProfile(object):
         """
         if ax is None:
             fig, ax = subplots(1,1)
-        ax.fill_between(self.dists, self.profile, facecolor="#994d00",\
-                                                            alpha = 0.20)
+        ax.fill_between(self.dists, self.profile, facecolor="#994d00",
+                        alpha=0.20)
         ax.set_xlabel("Distance [km]")
         ax.set_ylabel("Altitude [m]")
-        ax.set_ylim([self.min - .1 * self.alt_range,\
-                             self.max + .1 * self.alt_range])
+        ax.set_ylim([self.min - .1 * self.alt_range, 
+                     self.max + .1 * self.alt_range])
         return ax
         
 class LineOnGrid(object):
     """A class representing a line on a discrete grid"""
-    def __init__(self, x0, y0, x1, y1, id = ""):
+    def __init__(self, x0, y0, x1, y1, id=""):
         """Class initialisation
         
         :param int x0: start x coordinate
@@ -430,7 +424,7 @@ class LineOnGrid(object):
         
     """Plotting / visualisation etc...
     """
-    def plot_line_on_grid(self, array, ax = None, **kwargs):
+    def plot_line_on_grid(self, array, ax=None, **kwargs):
         """Plot this line on an input array using imshow
         
         :param ndarray array: the data array
@@ -440,17 +434,17 @@ class LineOnGrid(object):
         if ax is None:
             fig, ax = subplots(1,1)
         
-        im = ax.imshow(array, cmap="gray", interpolation='none',\
-            origin="upper", **kwargs)
-        fig.colorbar(im, ax = ax, shrink = 0.9)
-        ax.plot([self.start[0], self.stop[0]], [self.start[1], self.stop[1]],\
-                                                                        'co-')
+        im = ax.imshow(array, cmap="gray", interpolation='none', 
+                       origin="upper", **kwargs)
+        fig.colorbar(im, ax=ax, shrink=0.9)
+        ax.plot([self.start[0], self.stop[0]], [self.start[1], self.stop[1]],
+                'co-')
             
         ax.set_xlim([0, array.shape[1] - 1])
         ax.set_ylim([array.shape[0] - 1, 0])
         return ax
     
-    def plot_line_profile(self, array, ax = None, **kwargs):
+    def plot_line_profile(self, array, ax=None, **kwargs):
         """Plot the line profile 
         
         :param ndarray array: the data array
@@ -467,7 +461,7 @@ class LineOnGrid(object):
         ax.set_title("Line profile")
         return ax
     
-    def plot(self, array, fig_width = 12):
+    def plot(self, array, fig_width=12):
         """High level plot function, calls:
         
             1. :func:`plot_line_on_grid`
@@ -482,7 +476,7 @@ class LineOnGrid(object):
         dx, dy = self._delx_dely()
         if dx > dy:
             r = float(dy) / dx
-            h = int(fig_width*r*2.5)
+            h = int(fig_width * r * 2.5)
             fig, axes = subplots(2,1, figsize=(fig_width, h))
         else:
             fig, axes=subplots(1,2, figsize = (18, 6))
@@ -493,9 +487,9 @@ class LineOnGrid(object):
     """'Private' functions"""
     def _delx_dely(self):
         """Returns length of x and y range"""
-        return abs(self.stop[0] - self.start[0]), abs(self.stop[1] -\
-                                                            self.start[1])
-        
+        return (abs(self.stop[0] - self.start[0]),
+                abs(self.stop[1] - self.start[1]))
+                        
     def _det_normal_vec(self):
         """Determines the normal vector of the line"""
         delx, dely = self._delx_dely()
