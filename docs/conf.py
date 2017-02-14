@@ -15,7 +15,6 @@
 import sys
 import os
 import shlex
-from mpl_toolkits.basemap import Basemap
 
 with open(os.path.join("..", "VERSION.rst")) as f:
     __version__ = f.readline()
