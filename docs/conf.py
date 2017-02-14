@@ -15,6 +15,7 @@
 import sys
 import os
 import shlex
+from mpl_toolkits.basemap import Basemap
 
 with open(os.path.join("..", "VERSION.rst")) as f:
     __version__ = f.readline()
@@ -32,7 +33,6 @@ class Mock(MagicMock):
 
 MOCK_MODULES = [
     'mpl_toolkits.basemap',
-    'basemap'
 ]
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 # If extensions (or modules to document with autodoc) are in another directory,
