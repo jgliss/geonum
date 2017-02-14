@@ -1,1 +1,2 @@
 sphinxcontrib-images
+mpl_toolkits.basemap
