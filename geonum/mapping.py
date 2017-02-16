@@ -7,7 +7,7 @@ import matplotlib.cm as colormaps
 from random import randrange
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 import mpl_toolkits.mplot3d.art3d as a3d
-from matplotlib.pyplot import figure
+from matplotlib.pyplot import figure, draw
 
 try:
     from cv2 import pyrDown
@@ -18,7 +18,7 @@ except:
 #from geonum.base import GeoPoint, GeoVector3D
 from .topodata import TopoAccessError
 from .topodata import TopoData, TopoDataAccess
-from .helpers import haversine_formula, shifted_color_map
+from .helpers import haversine_formula, shifted_color_map, exponent
 
 class Map(Basemap):
     """Basemap object for drawing and plotting (on) a geographic map
@@ -220,7 +220,82 @@ class Map(Basemap):
             return 1
         return 0
     
+    def set_ticks_topo_colorbar(self, start, stop, step):
+        """Update ticks of topo colorbar"""
+        cb = self.colorbars["topo"]
+        ticks = arange(start, stop, step)
+        cb.set_ticks(ticks)
+        draw()
+        
     def draw_topo(self, insert_colorbar=False, include_seabed=True,
+                    max_grid_points=500, cmap_div=colormaps.coolwarm,
+                    cmap_seq=colormaps.Oranges, alpha=0.5, ax=None):
+        """Draw topography into map
+        
+        :param bool insert_colorbar: draws a colorbar for altitude
+            range (default: False)
+        :param bool include_seabed: include seabed topography 
+            (default: True)
+        :param int max_grid_points: resolution of displayed topo data 
+            points (makes it faster in interactive mode, default: 500)
+        :param str cmap_div: name of a diverging colormap (this one is 
+            used if :arg:`include_seabed` is True, and the cmap is shifted 
+            such , that white colors correspond to sea level altitude, 
+            default: "coolwarm")
+        :param str cmap_seq: name of a sequential colormap (this one is 
+            used if :arg:`include_seabed` is False, default: "Oranges")
+        :param float alpha: Alpha value (transparency) of plotted 
+            topography
+        :param ax: matplotlib axes object
+        """
+        try:  
+            if ax is None:
+                ax = self.ax
+            if ax is None:
+                fig, ax = subplots(1, 1, figsize=(16,10))
+                self.ax = ax
+    
+            x, y, z, z_min, z_max, z_order =\
+                self._prep_topo_data(grid_points=max_grid_points)
+                
+            
+            delz = z_max - z_min #in m
+            exp = exponent(delz) - 1
+            start_alt = round((z_min - delz*0.1)*10**(-exp))*10**exp
+            stop_alt = round((z_max + delz*0.1)*10**(-exp))*10**exp
+            if z_min > 0:
+                include_seabed = 1
+                
+            if not include_seabed:
+                start_alt = 0
+            
+            z_step = (stop_alt - start_alt) / 1000. 
+            levels_filled = arange(start_alt, stop_alt, z_step)
+            
+            if levels_filled[0] < 0:          
+                shifted_cmap = shifted_color_map(z_min, z_max, cmap_div)
+                
+                cs2 = ax.contourf(x, y, z, levels_filled, cmap=shifted_cmap,
+                                  extend="both", alpha=alpha)
+                                  
+            elif levels_filled[0] >= 0:        
+                cs2 = ax.contourf(x, y, z, levels_filled, cmap=cmap_seq,
+                                  alpha=1.0, extend="min")
+                self.contour_filled = cs2
+                    
+            if insert_colorbar:              
+                self.insert_colorbar("topo", cs2, label="Altitude [m]")
+                exp = exponent(delz)
+                step = round(delz*10**(-exp))*10**(exp-1)
+                self.set_ticks_topo_colorbar(start_alt, stop_alt, step)
+        except Exception as e:
+            raise
+            msg=("Could not draw topography in high res, using default "
+                 "etopo() instead...")
+            print msg + repr(e)
+            self.etopo()
+            
+    def draw_topo_old(self, insert_colorbar=False, include_seabed=True,
                     max_grid_points=500, cmap_div=colormaps.coolwarm,
                     cmap_seq=colormaps.Oranges, alpha=0.5, ax=None):
         """Draw topography into map
@@ -253,6 +328,7 @@ class Map(Basemap):
                 
             if z_min > 0:
                 include_seabed = 1
+                
             z_step = (z_max - z_min) / 1000. 
             
             if include_seabed:
@@ -265,7 +341,8 @@ class Map(Basemap):
                 cs2 = ax.contourf(x, y, z, levels_filled, cmap=shifted_cmap,
                                   extend="both", alpha=alpha)
                                   
-            elif levels_filled[0] >= 0:                
+            elif levels_filled[0] >= 0:        
+                print "HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEERE"
                 cs2 = ax.contourf(x, y, z, levels_filled, cmap=cmap_seq,
                                   alpha=1.0, extend="min")
                 self.contour_filled = cs2
@@ -343,11 +420,13 @@ class Map(Basemap):
         :param kwargs: key word arguments for :func:`drawmapscale` (missing
             ones will be set automatically)
         """
-        l = self._len_diag()      
+        l = self._len_diag()  
+        exp = exponent(l)
+        l = round(l * 10**(-exp))*10**(exp)/5.0
         lat_center, lon_center = self.get_map_center()
         str_format = '%d'
         if not "length" in kwargs:
-            kwargs["length"] = floor(l) / 5
+            kwargs["length"] = l
         if l < 40:
             str_format = '%.1f'
         if not "fontsize" in kwargs:
@@ -389,8 +468,8 @@ class Map(Basemap):
             pot_lon = floor(log10(self.delta_lon))
             lon_tick = floor(self.delta_lon / 10**pot_lon) * 10**pot_lon / 4
         if lat_tick is None:
-            potLat = floor(log10(self.delta_lat))
-            lat_tick = floor(self.delta_lat / 10**potLat) * 10**potLat / 3
+            pot_lat = floor(log10(self.delta_lat))
+            lat_tick = floor(self.delta_lat / 10**pot_lat) * 10**pot_lat / 3
             
         lon_tick_array = arange(lon_tick * int((self.lon_ll - self.delta_lon 
                                 * 0.3) / lon_tick), lon_tick * int((self.lon_tr 
@@ -421,7 +500,7 @@ class Map(Basemap):
         if not "color" in kwargs:
             kwargs["color"] = "gray"
         if not "fmt" in kwargs:
-            digs = '%d' %(3 - int(floor(log10(self._len_diag()))))
+            digs = '%d' %(4 - int(floor(log10(self._len_diag()))))
             kwargs["fmt"] = "%." + digs + "f"
         lon_tick_array, lat_tick_array = self._prep_coord_ticks(lon_tick,
                                                                 lat_tick)
@@ -429,7 +508,7 @@ class Map(Basemap):
                                        **kwargs)
         for m in meridians:
             try:
-                meridians[m][1][0].set_rotation(30)
+                meridians[m][1][0].set_rotation(25)
             except:
                 pass
         self.meridians = meridians
@@ -454,10 +533,10 @@ class Map(Basemap):
             ax = self.ax
         if not "fontsize" in kwargs:
             kwargs["fontsize"] = 10
-        ax.legend(loc="best", fancybox=True, framealpha=0.4, **kwargs)\
+        ax.legend(loc="best", fancybox=True, framealpha=0.7, **kwargs)\
             .draggable()
                                                                 
-    def draw_geo_point_2d(self, p, addName=False, ax=None, **kwargs):
+    def draw_geo_point_2d(self, p, add_name=False, ax=None, **kwargs):
         """Draw a GeoPoint into 2D basemap
         
         :param GeoPoint p: the actual point        
@@ -468,12 +547,13 @@ class Map(Basemap):
             ax = self.ax
         if not "marker" in kwargs:
             kwargs["marker"] = "^"
-        if not any([x in kwargs for x in ["c", "color"]]):
+        if not "c" in kwargs:
             kwargs["c"]="lime"
         x, y = self(p.longitude, p.latitude) #maps the geo coordinates to figure coordinates
+                
         handle = ax.plot(x, y, **kwargs) 
         self.points[p.name] = handle
-        if addName:
+        if add_name:
             self.write_point_name_2d(p)
         return handle
     

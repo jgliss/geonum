@@ -16,12 +16,13 @@ save_path = join(getcwd(), "scripts_out")
 
 close("all")
 exceptions = []
+
 def create_map_and_load_topodata():
     """Create and return map object around Guallatiri volcano"""
     lat0 = -18.48
-    lon0 = -69.14
+    lon0 = -69.15
     lat1 = -18.39  
-    lon1 = -69.06
+    lon1 = -69.05
     
     lat_center = mean([lat0, lat1])
     lon_center = mean([lon0, lon1])
@@ -52,7 +53,7 @@ def add_points_and_plot_map(basemap):
     # create two geopoints, one for a tough guy aiming to save the world from 2 
     # threats, the other one one of the 2 threats, probably the worse one
     # (without altitude spec -> is retrieved automatically from topo data)
-    p1 = geonum.GeoPoint(-18.47, -69.12, name = "Observer")
+    p1 = geonum.GeoPoint(-18.45, -69.12, name = "Observer")
     p2 = geonum.GeoPoint(-18.40, -69.12, name = "Llamas")
     
     
@@ -62,10 +63,11 @@ def add_points_and_plot_map(basemap):
     p2.plot_3d(basemap, add_name = True, dz_text = 50)
     
     # You can include a polygon connecting different points
-    basemap.add_polygon_3d([summit, p2, p1])
+    basemap.add_polygon_3d([summit, p2, p1], color="lime")
     
     # just some little adjustment of the 3D viewing direction
     basemap.ax.view_init(20, 240)
+    
     
     # save the 3D figure
     print "Save path: %s (exists: %s)" %(save_path, exists(save_path))
@@ -80,16 +82,19 @@ def add_points_and_plot_map(basemap):
     
     # update the axes object in the map
     basemap.ax = ax
-    basemap.draw_topo() # draws 2D map
+    basemap.draw_topo() # draws topography into 2D map
+    basemap.draw_topo_contour()
+    
     basemap.draw_coordinates()
+    basemap.draw_mapscale_auto()
     p1.plot_2d(basemap, add_name = True)
     p2.plot_2d(basemap, add_name = True)
     
-    summit.plot_2d(basemap, add_name = True, dist_text = 1.0,alpha = 0.2,\
-                                                       angle_text = 170)
+    summit.plot_2d(basemap, add_name=True, dist_text=1.0, alpha=0.2,
+                   angle_text=170, c="y")
     
     # You can include a polygon connecting different points
-    basemap.add_polygon_2d([summit, p2, p1], fc = "r", alpha = 0.2)
+    basemap.add_polygon_2d([summit, p2, p1], fc = "lime", alpha = 0.2)
     try:
         basemap.ax.figure.savefig(join(save_path, "ex3_out_2_map2D.png"))
     except:
