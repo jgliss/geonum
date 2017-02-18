@@ -22,11 +22,14 @@ It is recommended to use the package manager `Anaconda <https://www.continuum.io
   - OpenCV (used for changing resolution of topographic elevation maps, for installation remarks, see `here <http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_setup/py_setup_in_windows/py_setup_in_windows.html>`_)
   - netCDF4 (needed in case `Etopo1 <https://www.ngdc.noaa.gov/mgg/global/global.html>`_ data acess is required).
 
-
 Installation
 ------------
 
-geonum can be installed from source by downloading and extracting the latest release. After navigating to the source folder (where the setup.py file is located), call::
+geonum can be installed from PyPi using::
+
+  pip install geonum
+  
+or from source by downloading and extracting the latest release. After navigating to the source folder (where the setup.py file is located) call::
 
   python setup.py install
   
