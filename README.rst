@@ -25,7 +25,7 @@ It is recommended to use the package manager `Anaconda <https://www.continuum.io
 Installation
 ------------
 
-geonum can be installed from PyPi using::
+geonum can be installed from `PyPi <https://pypi.python.org/pypi/geonum>`_ using::
 
   pip install geonum
   
@@ -50,8 +50,8 @@ Supported Etopo1 files
 In order to use topography data from the Etopo1 dataset, please download and unzip one of the following files to the package folder *geonum/local_topo_data/*.
 Tested and supported are the following two files (grid registered):
 
-  1. Ice surface: ETOPO1_Ice_g_gmt4.grd (download `here <https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/netcdf/ETOPO1_Ice_g_gmt4.grd.gz>`_)
-  2. Bedrock: ETOPO1_Bed_g_gmt4.grd (download `here <https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/bedrock/grid_registered/netcdf/ETOPO1_Bed_g_gmt4.grd.gz>`_)
+  1. Ice surface: ETOPO1_Ice_g_gmt4.grd (download `here <https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/netcdf/ETOPO1_Ice_g_gmt4.grd.gz>`__)
+  2. Bedrock: ETOPO1_Bed_g_gmt4.grd (download `here <https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/bedrock/grid_registered/netcdf/ETOPO1_Bed_g_gmt4.grd.gz>`__)
   
 The local installation folder can be accessed via::
 
