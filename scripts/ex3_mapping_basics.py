@@ -2,7 +2,8 @@
 """
 geonum example script 3
 
-Mapping and advanced functionality
+Creating basemaps including topographic data and some further features 
+(i.e. draw stuff into a map)
 """
 
 import geonum
@@ -19,20 +20,24 @@ exceptions = []
 
 def create_map_and_load_topodata():
     """Create and return map object around Guallatiri volcano"""
+    # coordinate range of map
     lat0 = -18.48
     lon0 = -69.15
     lat1 = -18.39  
     lon1 = -69.05
     
+    # trivial ...
     lat_center = mean([lat0, lat1])
     lon_center = mean([lon0, lon1])
     
-    m = geonum.mapping.Map(projection = "lcc", llcrnrlat = lat0, llcrnrlon =\
-            lon0, urcrnrlat = lat1, urcrnrlon = lon1, lat_0 = lat_center,\
-            lon_0 = lon_center)
+    # Create a map object - the Map class is initialised as Basemap object
+    # and is extended by some features
+    m = geonum.mapping.Map(projection="lcc", llcrnrlat=lat0, 
+                           llcrnrlon=lon0, urcrnrlat=lat1, urcrnrlon=lon1, 
+                           lat_0=lat_center, lon_0=lon_center)
     
     # Compared to a normal Basemap object, a geonum Map can directly access 
-    # SRTM topo data
+    # and include SRTM topographic data
     m.load_topo_data("srtm")
     
     return m
@@ -41,26 +46,27 @@ def add_points_and_plot_map(basemap):
     """Add some points and plot in 2d and 3d"""
     basemap.draw_topo_3d()
     
-    # create a geopoint for the summit region (here, altitude is set manually)
-    summit = geonum.GeoPoint(-18.423672, -69.090369, 6071.0, name = "summit")
+    # create a geopoint for Guallatiri summit region 
+    # (here, altitude is set manually)
+    summit = geonum.GeoPoint(lat=-18.423672, lon=-69.090369,
+                             altitude=6071.0, name="Guallatiri")
     
     # draw this point and a text into the map
     basemap.draw_geo_point_3d(summit)
-    basemap.draw_text_3d(-69.090369, -18.423672, 6100.0,\
-                "Guallatiri summit", color = "k")
-    basemap.ax.set_title("Guallatiri volcano")
+    basemap.draw_text_3d(lon=-69.090369, lat=-18.423672, alt=6100.0,
+                         text="Guallatiri", color="k")
+    basemap.ax.set_title("Overview map Guallatiri volcano")
     
-    # create two geopoints, one for a tough guy aiming to save the world from 2 
-    # threats, the other one one of the 2 threats, probably the worse one
-    # (without altitude spec -> is retrieved automatically from topo data)
-    p1 = geonum.GeoPoint(-18.45, -69.12, name = "Observer")
-    p2 = geonum.GeoPoint(-18.40, -69.12, name = "Llamas")
+    # create two more objects (without specifying altitude -> is retrieved 
+    # automatically from topo data)
+    p1 = geonum.GeoPoint(-18.45, -69.12, name="Tourist (breathing hard)")
+    p2 = geonum.GeoPoint(-18.40, -69.12, name="Llamas")
     
     
-    # points can also be drawn directly into the map (here including the name which
-    # is placed 50 m above the topographic altitude of Scientist)
-    p1.plot_3d(basemap, add_name = True, dz_text = 50)
-    p2.plot_3d(basemap, add_name = True, dz_text = 50)
+    # points can also be drawn directly into the map (here including the 
+    # name which is placed 50 m above the topographic altitude of Tourist)
+    p1.plot_3d(basemap, add_name=True, dz_text=50)
+    p2.plot_3d(basemap, add_name=True, dz_text=50)
     
     # You can include a polygon connecting different points
     basemap.add_polygon_3d([summit, p2, p1], color="lime")
@@ -87,14 +93,15 @@ def add_points_and_plot_map(basemap):
     
     basemap.draw_coordinates()
     basemap.draw_mapscale_auto()
-    p1.plot_2d(basemap, add_name = True)
-    p2.plot_2d(basemap, add_name = True)
+    p1.plot_2d(basemap, add_name=True)
+    p2.plot_2d(basemap, add_name=True)
     
     summit.plot_2d(basemap, add_name=True, dist_text=1.0, alpha=0.2,
                    angle_text=170, c="y")
     
-    # You can include a polygon connecting different points
-    basemap.add_polygon_2d([summit, p2, p1], fc = "lime", alpha = 0.2)
+    # You can include a polygon connecting different points (for whatever
+    # reason)
+    basemap.add_polygon_2d([summit, p2, p1], fc="lime", alpha=0.2)
     try:
         basemap.ax.figure.savefig(join(save_path, "ex3_out_2_map2D.png"))
     except:

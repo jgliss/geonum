@@ -1,6 +1,7 @@
-"""geonum example script 4
+"""geonum example script 5
 
-Elevation profiles and directional topographic analysis
+Low level access to topographic data (here SRTM) using the example of 
+Oslo (Norway)
 """
 import geonum
 from matplotlib.pyplot import show
@@ -21,8 +22,8 @@ if __name__ == "__main__":
     basemap.ax.set_title("SRTM topo data Oslo")
     basemap.draw_mapscale_auto()
     
-    my_flat = geonum.base.GeoPoint(59.919386, 10.714970, name =\
-                                            "the author lives here")
+    my_flat = geonum.base.GeoPoint(59.919386, 10.714970,
+                                   name="the author lives here")
     my_flat.plot_2d(basemap, add_name=True)
     basemap.ax.figure.savefig(join(save_path, "ex5_out_1_oslo_map.png"))
     show()
