@@ -12,3 +12,4 @@ from .topodata import TopoData, TopoDataAccess
 from .processing import LineOnGrid, ElevationProfile  
 from .mapping import Map
 import helpers
+import atmosphere

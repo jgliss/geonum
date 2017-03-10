@@ -6,6 +6,14 @@
 Welcome to geonum's documentation!
 ===================================
 
+Official code documentation web page of geonum. 
+
+.. thumbnail::  _graphics/topo_lines_guallatiri.png
+  :width: 600px
+  :title:
+  
+  Automatic retrieval of topographic distances (example showing Guallatiri volcano, Chile)
+  
 **Contents:**
 
 .. toctree::

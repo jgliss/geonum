@@ -31,6 +31,13 @@ Topography data (Access and Handling)
    :members:
    :undoc-members:
 
+Atmospheric calculations
+------------------------
+
+.. automodule:: geonum.atmosphere
+   :members:
+   :undoc-members:
+   
 Helper methods
 --------------
 
