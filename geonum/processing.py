@@ -194,8 +194,11 @@ class ElevationProfile(object):
         elev_sects = []
         dists_sects = []
         for elev in elevs:
-            dist, dist_err, intersect, view_elevations, _ =\
-                        self.get_first_intersection(elev, **kwargs)
+            (dist, 
+             dist_err, 
+             intersect, 
+             view_elevations, 
+             _) = self.get_first_intersection(elev, **kwargs)
             if dist is None:
                 return elev, elev_sects, dists_sects
             else:
