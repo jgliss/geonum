@@ -29,13 +29,11 @@ setup(
     include_package_data    =   True,  
     package_data=   {'geonum'     :   ['local_topo_data/*.rst',
                                        'local_topo_data/*.txt']},
-    install_requires        =   ["scipy",
-                                 "LatLon",
-                                 "srtm.py",
-                                 "sphinxcontrib-images"],
+    install_requires        =   ["LatLon",
+                                 "srtm.py"],
     extras_require={
         'cv2':  ["opencv-python>=2.4.11"],
-        'netCDF4': ["docutils>=0.3"]},
+        'netCDF4': ["netCDF4>=1.1.8"]},
 
     classifiers=[
         # How mature is this project? Common values are
