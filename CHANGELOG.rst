@@ -16,4 +16,9 @@ release (version 1.0.0)
 1. Removed scipy from requirements in setup.py since it often causes problems when installing via pip
 
 2. Cleared up requirements in setup.py
+
+18/04/2017
+==========
+
+1. Slight improvements regarding flexibility when performing 3D plots
     

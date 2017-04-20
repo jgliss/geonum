@@ -477,23 +477,47 @@ class GeoSetup(object):
         return m
                 
     def plot_3d(self, draw_all_points=True, draw_all_vectors=True, 
-                cmap_topo="Oranges", *args, **kwargs):
+                cmap_topo="Oranges", contour_color="#708090", 
+                contour_lw=0.2, contour_antialiased=True, *args, **kwargs):
         """Make a 3D plot of the current setup
-
-        :param bool draw_all_points (True): if true, all points are included
-        :param bool draw_all_vectors (True): if true, all vectors (with anchor) 
-            are included
-        :param *args: additional non-keyword parameters (passed to `basemap 
+        
+        Parameters
+        ----------
+        draw_all_points : bool
+            if True, all current GeoPoint objects are plotted, defaults to 
+            True
+        draw_all_vectors : bool
+            if True, all current GeoVector3D objects are plotted, defaults to
+            True
+        cmap : str
+            string ID of the colormap used to plot the topographic data, 
+            defaults to "Oranges"
+        contour_color : str
+            string specifying color of contour lines colors of contour lines 
+            (default: "#708090")
+        contour_antialiased : bool
+            apply antialiasing to surface plot of topography, defaults to False
+        contour_lw : 
+            width of drawn contour lines, defaults to 0.5, use 0 if you do not 
+            want contour lines inserted
+        *args : 
+            additional non-keyword parameters (passed to `basemap 
             <http://matplotlib.org/basemap/api/basemap_api.html#mpl
             _toolkits.basemap.Basemap>`_)
-        :param **kwargs: additional keyword parameters (passed to `basemap 
+        **kwargs : 
+            additional keyword parameters (passed to `basemap 
             <http://matplotlib.org/basemap/api/basemap_api.html#mpl
             _toolkits.basemap.Basemap>`_)
-        :return: 
-            - :class:`geonum.mapping.Map` object
+        
+        Returns
+        -------
+        Map
+            plotted 3D basemap
         """
         m = self.create_map(*args, **kwargs)
-        m.draw_topo_3d(cmap = cmap_topo)
+        m.draw_topo_3d(cmap=cmap_topo, contour_color=contour_color, 
+                       contour_lw=contour_lw, 
+                       contour_antialiased=contour_antialiased)
         if draw_all_points:
             zr = self.topo_data.alt_range * 0.05
             alts = []

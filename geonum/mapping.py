@@ -358,16 +358,28 @@ class Map(Basemap):
             self.etopo()
          
     def draw_topo_3d(self, num_ticks=4, cmap="Oranges", alpha=0.5,
-                     linewidth=0.5, edgecolors="#708090", ax=None):
+                     contour_color="#708090", contour_antialiased=True, 
+                     contour_lw=0.2, ax=None):
         """Draw topography into 3D axis
         
-        :param num_ticks: number of lon / lat axis ticks (default: 4)
-        :param str cmap: the colormap used (default: "Oranges")
-        :param float alpha: Alpha value (transparency) of plotted topography
-            (default: 0.5)
-        :param float linewidth: width of drawn contour lines  (default: 0.5)
-        :param float edgecolors: colors of contour lines (default: "#708090")
-        :param ax: axes object
+        Parameters
+        ----------        
+        num_ticks : int 
+            number of lon / lat axis ticks (default: 4)
+        cmap : str
+            string ID of the colormap used (default: "Oranges")
+        alpha : flaot
+            Alpha value (transparency) of plotted topography (default: 0.5)
+        contour_color : str
+            string specifying color of contour lines colors of contour lines 
+            (default: "#708090")
+        contour_antialiased : bool
+            apply antialiasing to surface plot of topography, defaults to False
+        contour_lw : 
+            width of drawn contour lines, defaults to 0.5, use 0 if you do not 
+            want contour lines inserted
+        ax : 
+            axes object
         """
         if not self._check_ax3d(ax):
             if self._check_ax3d(self.ax):
@@ -378,9 +390,10 @@ class Map(Basemap):
             
         x, y, z, z_min, z_max, z_order = self._prep_topo_data()
         tickformatter = "{:.2f}"    
-        ax.plot_surface(x, y, z, rstride=1, cstride=1, cmap=cmap,
-                        alpha=alpha, linewidth=linewidth, edgecolors=edgecolors
-                        , vmin=z_min, vmax=z_max, zorder=1)
+        ax.plot_surface(x, y, z, rstride=1, cstride=1, cmap=cmap, alpha=alpha, 
+                        linewidth=contour_lw, antialiased=contour_antialiased, 
+                        edgecolors=contour_color, vmin=z_min, vmax=z_max, 
+                        zorder=1)
         #xlabels=ax.get_xticklabels()
         ax.set_xlabel("Lons")
         ax.set_ylabel("Lats")
