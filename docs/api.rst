@@ -49,10 +49,6 @@ Helper methods
 Plotting (creating 2D and 3D Basemaps)
 ======================================
 
-.. note::
-
-  RTD fails to build documentation for this module due to ImportError of module mpl_toolkits.basemap (even though this was mocked out in conf.py file). 
-  
 .. automodule:: geonum.mapping
    :members:
    :undoc-members:
