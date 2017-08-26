@@ -34,9 +34,7 @@ class Mock(MagicMock):
         return Mock()
 
 MOCK_MODULES = [
-    'cv2',
-    'mpl_toolkits.basemap',
-    'pyproj'
+  'mpl_toolkits.basemap'
 ]
 #autodoc_mock_imports = ['mpl_toolkits']
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
