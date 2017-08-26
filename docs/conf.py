@@ -34,7 +34,7 @@ class Mock(MagicMock):
         return Mock()
 
 MOCK_MODULES = [
-    'cv2'
+    'cv2',
     'mpl_toolkits.basemap',
     'pyproj'
 ]
