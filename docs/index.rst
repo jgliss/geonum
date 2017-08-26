@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to geonum's documentation!
-===================================
+Welcome to Geonum
+=================
 
 Official code documentation web page of geonum. 
 
@@ -21,7 +21,7 @@ Official code documentation web page of geonum.
    
    intro
    examples
-   code
+   api
 
 Indices and tables
 ==================
