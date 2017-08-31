@@ -6,7 +6,7 @@
 Welcome to Geonum
 =================
 
-Official code documentation web page of geonum. 
+Official code documentation web page of Geonum. 
 
 .. thumbnail::  _graphics/topo_lines_guallatiri.png
   :width: 600px

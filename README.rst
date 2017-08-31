@@ -1,5 +1,5 @@
-geonum provides functionality for 3D geo numerical calculations
-including online access and handling of topography data. The module is based on two fundamental classes "GeoPoint" and "GeoVector3D" which are inherited from the respective base classes of the `LatLon module <https://pypi.python.org/pypi/LatLon>`_ and were expanded for the 3rd (elevation) dimension.
+Geonum provides functionality for 3D geo numerical calculations
+including online access and handling of topography data. The module is based on the two base classes :class:`GeoPoint` and :class:`GeoVector3D` which are inherited from the respective base classes of the `LatLon module <https://pypi.python.org/pypi/LatLon>`_ and were expanded including the  3rd (elevation) dimension.
 Topography access is supported for SRTM data, which is handled by the 
 `SRTM module <https://pypi.python.org/pypi/SRTM.py/>`_, and the `Etopo1 Dataset <https://www.ngdc.noaa.gov/mgg/global/global.html>`_ for which the data needs to be downloaded and stored locally.
 
@@ -25,7 +25,7 @@ It is recommended to use the package manager `Anaconda <https://www.continuum.io
 Installation
 ------------
 
-geonum can be installed from `PyPi <https://pypi.python.org/pypi/geonum>`_ using::
+Geonum can be installed from `PyPi <https://pypi.python.org/pypi/geonum>`_ using::
 
   pip install geonum
   
