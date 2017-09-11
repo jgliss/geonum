@@ -237,7 +237,8 @@ class GeoPoint(object, LatLon):
         
         """
         from geonum.processing import ElevationProfile
-        data, pf = self.get_topo_data(geo_point, azimuth, dist_hor, lon1, lat1)
+        data, pf = self.get_topo_data(geo_point, azimuth, dist_hor, lon1, 
+                                      lat1)
         return ElevationProfile(data, self, pf, resolution=resolution)
         
     def get_altitude(self):

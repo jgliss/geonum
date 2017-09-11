@@ -39,7 +39,8 @@ class GeoSetup(object):
         self.points = {}
         self.vectors = {}
         
-        self.topo_access = TopoDataAccess(topo_access_mode, local_topo_path) 
+        self.topo_access = TopoDataAccess(topo_access_mode, 
+                                          local_topo_path) 
         self.topo_data = None
         try:
             iter(points)

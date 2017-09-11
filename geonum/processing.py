@@ -145,7 +145,9 @@ class ElevationProfile(object):
         idx_lat_0 = argmin(abs(data.lats - self.observer.lat.decimal_degree))
         idx_lon_1 = argmin(abs(data.lons - self.endpoint.lon.decimal_degree))
         idx_lat_1 = argmin(abs(data.lats - self.endpoint.lat.decimal_degree))
-        self.line = l = LineOnGrid(idx_lon_0, idx_lat_0, idx_lon_1, idx_lat_1)
+        
+        self.line = l = LineOnGrid(idx_lon_0, idx_lat_0, 
+                                   idx_lon_1, idx_lat_1)
         z = l.get_line_profile(data.data)
         self._observer_topogrid = GeoPoint(data.lats[idx_lat_0],\
                                 data.lons[idx_lon_0], topo_data = data)

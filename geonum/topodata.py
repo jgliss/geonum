@@ -546,7 +546,7 @@ class TopoData(object):
         topographic data 
         
     """
-    def __init__(self, lats, lons, data, data_id=""):
+    def __init__(self, lats, lons, data, data_id="", repl_nan_minval=True):
         """Class initialisation
         
         :param ndarray lats: numpy array with latitude coordinates of the 
@@ -555,12 +555,16 @@ class TopoData(object):
             topographic dataset
         :param ndarray data: 2D numpy array containing elevation values
         :param str data_id: string identification of this data set
-        
+        :param bool repl_nan_minval: pixels containing NaN values are 
+            replaced with the minimum altitude in the range
         """
         self.data_id = data_id #: ID of topodata file
 
         self.lats = lats
         self.lons = lons
+        if repl_nan_minval:
+            data[isnan(data)] = nanmin(data)
+        
         self.data = data
         
     @property
@@ -612,7 +616,7 @@ class TopoData(object):
         r_lat = (p0 - LatLon(self.lats[x_lat + 1], self.lons[x_lon])).magnitude
         return (r_lat, r_lon)
         
-    def increase_grid_resolution(self, res=0.2, polyorde=2):
+    def increase_grid_resolution(self, res=0.2, polyorder=2):
         """Gaussian pyramide based upscaling of topographic grid
         
         This function checks the current topographic resolution in the center
@@ -656,8 +660,8 @@ class TopoData(object):
         print("Increasing spatial topography resolution by factor %s" %(2**fac))
         for k in range(fac):
             vals = pyrUp(vals)
-        p_lons = poly1d(polyfit(arange(len(lons)), lons, 2))
-        p_lats = poly1d(polyfit(arange(len(lats)), lats, 2))
+        p_lons = poly1d(polyfit(arange(len(lons)), lons, polyorder))
+        p_lats = poly1d(polyfit(arange(len(lats)), lats, polyorder))
         lons_new = p_lons(linspace(0, len(lons) - 1, vals.shape[1]))
         lats_new = p_lats(linspace(0, len(lats) - 1, vals.shape[0]))
         return TopoData(lats_new, lons_new, vals, self.data_id + "_interp")
