@@ -1,12 +1,11 @@
-Geonum provides functionality for 3D geo numerical calculations
-including online access and handling of topography data. The module is based on the two base classes :class:`GeoPoint` and :class:`GeoVector3D` which are inherited from the respective base classes of the `LatLon module <https://pypi.python.org/pypi/LatLon>`_ and were expanded including the  3rd (elevation) dimension.
-Topography access is supported for SRTM data, which is handled by the 
-`SRTM module <https://pypi.python.org/pypi/SRTM.py/>`_, and the `Etopo1 Dataset <https://www.ngdc.noaa.gov/mgg/global/global.html>`_ for which the data needs to be downloaded and stored locally.
+Geonum provides functionality for geographical calculations in three dimensions and includes interfaces for accessing and processing of topographic data. Most of the features (e.g. distance retrievals) are based on the two fundamental objects *GeoPoint* and *GeoVector3D* which are inherited from the respective 2D base classes of the `LatLon module <https://pypi.python.org/pypi/LatLon>`_ and were expanded including the 3rd dimension (altitude).
+Geonum features online access to topographic data from the SRTM dataset, using the 
+`SRTM module <https://pypi.python.org/pypi/SRTM.py/>`_. Furthermore, topographic data from the `ETOPO1 Dataset <https://www.ngdc.noaa.gov/mgg/global/global.html>`_ is supported.
 
 Requirements
 ------------
 
-It is recommended to use the package manager `Anaconda <https://www.continuum.io/downloads>`_ since it includes many of the required dependencies and makes life easier when it comes to installation or upgrade of non-straight forward installations of additional requirements (e.g. opencv, basemap)
+It is recommended to use `Anaconda <https://www.continuum.io/downloads>`_ as Python package manager as it includes many of the required dependencies and makes life easier when it comes to installation or upgrade of non-straight forward installations of additional requirements (e.g. opencv, basemap)
 
   - numpy
   - matplotlib >= 1.4.3
@@ -20,7 +19,7 @@ It is recommended to use the package manager `Anaconda <https://www.continuum.io
 **Optional dependencies (to use extra features)**
 
   - OpenCV (used for changing resolution of topographic elevation maps, for installation remarks, see `here <http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_setup/py_setup_in_windows/py_setup_in_windows.html>`_)
-  - netCDF4 (needed in case `Etopo1 <https://www.ngdc.noaa.gov/mgg/global/global.html>`_ data acess is required).
+  - netCDF4 (needed in case `ETOPO1 <https://www.ngdc.noaa.gov/mgg/global/global.html>`_ data acess is required).
 
 Installation
 ------------
@@ -45,9 +44,9 @@ Get started
 
 After installation try running the `example scripts <http://geonum.readthedocs.io/en/latest/examples.html>`_ in order to test the installation. The scripts are also meant to provide an easy start into the main features of geonum.
 
-Supported Etopo1 files
+Supported ETOPO1 files
 ----------------------
-In order to use topography data from the Etopo1 dataset, please download and unzip one of the following files to the package folder *geonum/local_topo_data/*.
+In order to use topography data from the ETOPO1 dataset, please download and unzip one of the following files to the package folder *geonum/local_topo_data/*.
 Tested and supported are the following two files (grid registered):
 
   1. Ice surface: ETOPO1_Ice_g_gmt4.grd (download `here <https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/netcdf/ETOPO1_Ice_g_gmt4.grd.gz>`__)
