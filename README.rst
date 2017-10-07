@@ -5,7 +5,7 @@ Geonum features online access to topographic data from the SRTM dataset, using t
 Requirements
 ------------
 
-It is recommended to use `Anaconda <https://www.continuum.io/downloads>`_ as Python package manager as it includes many of the required dependencies and makes life easier when it comes to installation or upgrade of non-straight forward installations of additional requirements (e.g. opencv, basemap)
+It is recommended to use `Anaconda <https://www.continuum.io/downloads>`_ as Python package manager as it includes many of the required dependencies and makes life easier when it comes to the installation or upgrade of non-straight forward installations of additional requirements such as OpenCV or basemap.
 
   - numpy
   - matplotlib >= 1.4.3
