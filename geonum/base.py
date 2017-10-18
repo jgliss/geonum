@@ -15,14 +15,15 @@ from numpy import radians, cos, sin, degrees, sqrt,tan, isnan, arctan2,\
 from copy import deepcopy
 from warnings import warn
 from .topodata import TopoDataAccess, TopoData
-    
+
 class GeoPoint(object, LatLon):
     """The Geopoint object represents a point on an ellipsoid (e.g. earth) 
     including elevation information. It inherits from :class:`LatLon` object 
     from the :mod:`LatLon` library.
     """
     def __init__(self, lat=0.0, lon=0.0, altitude=None, name="n/d",
-                 topo_access_mode="srtm", topo_path=None, topo_data=None):
+                 topo_access_mode="srtm", topo_path=None, topo_data=None,
+                 auto_topo_access=True):
                         
         """Class initialisation
         
@@ -47,7 +48,9 @@ class GeoPoint(object, LatLon):
                                            local_path=topo_path)
         self.topo_data = None 
         self.set_topo_data(topo_data)
-        if self.altitude is None or isnan(self.altitude):
+        
+        if auto_topo_access and (self.altitude is None or\
+                                 isnan(self.altitude)):
             self.get_altitude()
     
     @property
@@ -287,7 +290,8 @@ class GeoPoint(object, LatLon):
         """
         if local_path is None:
             local_path = self._topo_access.local_path
-        self._topo_access = TopoDataAccess(mode=mode, local_path=local_path)
+        self._topo_access = TopoDataAccess(mode=mode, 
+                                           local_path=local_path)
         
     @property
     def topo_access_mode(self):

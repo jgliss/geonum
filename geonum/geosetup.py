@@ -33,7 +33,8 @@ class GeoSetup(object):
         :param str id ("MyGeoSetup"): identification string of this setup
         :param str topo_access_mode ("srtm"): topo data mode 
             (see :class:`TopoDataAccess` for details)
-        :param str local_topo_path (None): local path were topography data is stored
+        :param str local_topo_path (None): local path were topography data 
+            is stored
         """
         self.id = id
         self.points = {}
