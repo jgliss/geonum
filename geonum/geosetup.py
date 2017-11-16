@@ -24,7 +24,8 @@ muliple geo point and geo vector objects.
 from numpy import asarray, nanmin, nanmax
 from os.path import exists
 from traceback import print_exc
-from matplotlib.pyplot import subplots
+from warnings import warn
+from matplotlib.pyplot import subplots, get_cmap
 
 from .base import GeoPoint, GeoVector3D
 from .topodata import TopoDataAccess, TopoData
@@ -35,27 +36,46 @@ class GeoSetup(object):
     """
     def __init__(self, points=[], vectors=[], lat_ll=None, lon_ll=None, 
                  lat_tr=None, lon_tr=None, id="MyGeoSetup", 
-                 topo_access_mode="srtm", local_topo_path=None):
+                 topo_access_mode="srtm", local_topo_path=None, 
+                 cmap_vecs="Greens"):
         """Init object
         
-        
-        :param list points: list of :class:`GeoPoint` objects to be 
-            included in this setup
-        :param list vectors: list of :class:`GeoVector3D` objects to be 
-            included in this setup
-        :param float lat_ll (None): lower left latitude of regime
-        :param float lon_ll (None): lower left longitude of regime
-        :param float lat_tr (None): top right latitude of regime
-        :param float lon_tr (None): top right longitude of regime
-        :param str id ("MyGeoSetup"): identification string of this setup
-        :param str topo_access_mode ("srtm"): topo data mode 
+        Parameters
+        ----------
+        points : list
+            list of :class:`GeoPoint` objects to be included in this setup
+        vectors : list
+            list of :class:`GeoVector3D` objects to be included in this\
+            setup
+        lat_ll : :obj:`float`, optional
+            lower left latitude of regime
+        lon_ll : :obj:`float`, optional
+            lower left longitude of regime
+        lat_tr : :obj:`float`, optional
+            top right latitude of regime
+        lon_tr : :obj:`float`, optional
+            top right longitude of regime
+        id : str 
+            identification string of this setup
+        topo_access_mode : str
+            topo data mode, default is SRTM
             (see :class:`TopoDataAccess` for details)
-        :param str local_topo_path (None): local path were topography data 
-            is stored
+        local_topo_path : str 
+            local path were topography data (e.g. ETOPO1 data) is stored
+        cmap_vecs : str
+            String specifying a valid matplotlib colormap supposed to be
+            used for drawing :class:`GeoVector3D` objects into overview
+            maps
         """
         self.id = id
         self.points = {}
         self.vectors = {}
+        
+        try:
+            cmap = get_cmap(cmap_vecs)
+        except:
+            cmap = get_cmap("Greens")
+        self.cmap = cmap
         
         self.topo_access = TopoDataAccess(topo_access_mode, 
                                           local_topo_path) 
@@ -443,7 +463,7 @@ class GeoSetup(object):
     def plot_2d(self, draw_all_points=True, draw_all_vectors=True,
                 draw_topo=True, draw_coastline=True, draw_mapscale=True,
                 draw_legend=True, *args, **kwargs):
-        """High level plottting function to draw an overview map
+        """Draw overview map of the current setup
         
         :param bool draw_all_points (True): if true, all points are included
         :param bool draw_all_vectors (True): if true, all vectors (with anchor) 
@@ -487,12 +507,17 @@ class GeoSetup(object):
                         ang = ang - step * p_close_count
                         p_close_count += 1
                     m.write_point_name_2d(pt, dist, ang)
+        
+        #create some color indices for colormap
+        nums = [int(255.0 / k) for k in range(1, len(self.vectors)+3)]
         if draw_all_vectors:
-            for vec in self.vectors.values():
-                m.draw_geo_vector_2d(vec, label = vec.name)
+            for i, vec in enumerate(self.vectors.values()):
+                m.draw_geo_vector_2d(vec, 
+                                     c=self.cmap(nums[i]),
+                                     label=vec.name)
         if draw_legend:
             m.legend()
-
+        
         return m
                 
     def plot_3d(self, draw_all_points=True, draw_all_vectors=True, 
@@ -553,16 +578,19 @@ class GeoSetup(object):
                         alts.append(pt.altitude)
     
                     except Exception as e:
-                        print ("Point %s could not be drawn: %s"
-                                                        %(pt.name, repr(e)))
+                        warn("Point %s could not be drawn: %s"
+                             %(pt.name, repr(e)))
                         pass
         if draw_all_vectors:
-            for name, vec in self.vectors.iteritems():
+            nums = [int(255.0 / k) for k in range(1, len(self.vectors)+3)]
+            for i, vec in enumerate(self.vectors.values()):
                 try:
-                    m.draw_geo_vector_3d(vec, label = vec.name, **kwargs)
+                    m.draw_geo_vector_3d(vec, label=vec.name,
+                                         c=self.cmap(nums[i]),
+                                         **kwargs)
                 except Exception as e:
-                    print ("Vector %s could not be drawn: %s"
-                                                        %(vec.name, repr(e)))
+                    warn("Vector %s could not be drawn: %s"
+                         %(vec.name, repr(e)))
                     pass
                 
         return m

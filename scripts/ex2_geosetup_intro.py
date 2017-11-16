@@ -4,7 +4,7 @@ Introduction into the GeoSetup class
 """
 
 from geonum import GeoPoint, GeoVector3D, GeoSetup
-from matplotlib.pyplot import show
+from matplotlib.pyplot import show, close
 from os.path import join
 from os import getcwd
 ### Set save directory for figures
@@ -44,6 +44,7 @@ def plot_geosetup(geosetup):
     return map2d, map3d
     
 if __name__ == "__main__":
+    close("all")
     s = create_geosetup()
     map2d, map3d = plot_geosetup(s)
     map2d.ax.figure.savefig(join(save_path, "ex2_out_1_map2D.png"))
