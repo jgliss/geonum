@@ -25,7 +25,7 @@ from numpy import asarray, nanmin, nanmax
 from os.path import exists
 from traceback import print_exc
 from warnings import warn
-from matplotlib.pyplot import subplots, get_cmap
+from matplotlib.pyplot import get_cmap, figure
 
 from .base import GeoPoint, GeoVector3D
 from .topodata import TopoDataAccess, TopoData
@@ -483,13 +483,15 @@ class GeoSetup(object):
             
         """
         if not "ax" in kwargs:
-            fig, ax = subplots(1,1)
+            #fig, ax = subplots(1,1)
+            fig = figure(figsize=(10,8))
+            ax = fig.add_axes([0.12,0.15,0.8,0.8])
             kwargs["ax"] = ax
         m = self.create_map(*args, **kwargs)
         if draw_coastline:
             m.drawcoastlines()
         if draw_topo:
-            m.draw_topo(insert_colorbar = True)
+            m.draw_topo(insert_colorbar=True)
             m.draw_topo_contour()        
         m.draw_coordinates()
         if draw_mapscale:
@@ -513,6 +515,7 @@ class GeoSetup(object):
         if draw_all_vectors:
             for i, vec in enumerate(self.vectors.values()):
                 m.draw_geo_vector_2d(vec, 
+                                     ls="-",
                                      c=self.cmap(nums[i]),
                                      label=vec.name)
         if draw_legend:
@@ -587,6 +590,7 @@ class GeoSetup(object):
                 try:
                     m.draw_geo_vector_3d(vec, label=vec.name,
                                          c=self.cmap(nums[i]),
+                                         ls="-",
                                          **kwargs)
                 except Exception as e:
                     warn("Vector %s could not be drawn: %s"

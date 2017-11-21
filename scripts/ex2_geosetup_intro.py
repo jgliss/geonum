@@ -4,12 +4,13 @@ Introduction into the GeoSetup class
 """
 
 from geonum import GeoPoint, GeoVector3D, GeoSetup
-from matplotlib.pyplot import show, close
+from matplotlib.pyplot import show, close, rcParams
 from os.path import join
 from os import getcwd
 ### Set save directory for figures
 save_path = join(getcwd(), "scripts_out")
 
+rcParams["font.size"] = 12
 def create_geosetup():
     s = GeoSetup() 
     

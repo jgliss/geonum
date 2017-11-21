@@ -460,8 +460,10 @@ class Map(Basemap):
             kwargs["length"] = l
         if l < 40:
             str_format = '%.1f'
-        if not "fontsize" in kwargs:
-            kwargs["fontsize"] = 8
+# =============================================================================
+#         if not "fontsize" in kwargs:
+#             kwargs["fontsize"] = 8
+# =============================================================================
         if not "lon0" in kwargs:
             kwargs["lon0"] = lon_center
             kwargs["lat0"] = lat_center
@@ -518,7 +520,8 @@ class Map(Basemap):
     
         
     def draw_coordinates(self, lat_tick=None, lon_tick=None,
-                         labelslon=[0,0,0,1], labelslat=[1,0,0,0], **kwargs):
+                         labelslon=[0,0,0,1], labelslat=[1,0,0,0], 
+                         **kwargs):
         """Draws meridians and parallels 
         
         :param float lat_tick: latitude separation (in decimal degrees)
@@ -543,9 +546,15 @@ class Map(Basemap):
             except:
                 pass
         self.meridians = meridians
-        self.parallels = self.drawparallels(lat_tick_array, labels=labelslat, 
-                                            **kwargs)
-        
+        self.parallels = ps =self.drawparallels(lat_tick_array, 
+                                                labels=labelslat, 
+                                                **kwargs)
+        for p in ps:
+            try:
+                ps[p][1][0].set_rotation(25)
+            except:
+                print("Could not rotate parallel...")
+            
     def remove_coordinates(self):
         """Remove drawn parallels and meridians"""
         if self.meridians is not None:
@@ -562,8 +571,10 @@ class Map(Basemap):
         """Insert a legend"""
         if ax is None:
             ax = self.ax
-        if not "fontsize" in kwargs:
-            kwargs["fontsize"] = 10
+# =============================================================================
+#         if not "fontsize" in kwargs:
+#             kwargs["fontsize"] = 10
+# =============================================================================
         ax.legend(loc="best", fancybox=True, framealpha=0.7, **kwargs)\
             .draggable()
                                                                 
@@ -889,7 +900,7 @@ class Map(Basemap):
         """
         if ax is None:
             ax = self.ax
-        cb = self.fig.colorbar(obj, shrink=0.95, ax=ax, **kwargs)
+        cb = self.fig.colorbar(obj, shrink=0.9, ax=ax, **kwargs)
         if isinstance(label, str):
             cb.set_label(label, fontsize=16)
         self.colorbars[obj_id] = cb
