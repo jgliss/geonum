@@ -15,11 +15,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-
+try:
+    from mpl_toolkits.basemap import Basemap
+    BASEMAP_AVAILABLE = True
+except:
+    BASEMAP_AVAILABLE = False
+    
 from numpy import round, log10, floor, meshgrid, arange, array, zeros, ceil,\
     log2, asarray
 
-from mpl_toolkits.basemap import Basemap
 from matplotlib.pyplot import subplots, Polygon
 import matplotlib.cm as colormaps
 from random import randrange
@@ -29,9 +33,9 @@ from matplotlib.pyplot import figure, draw
 
 try:
     from cv2 import pyrDown
-    CV2_AVAILABLE = 1
+    CV2_AVAILABLE = True
 except:
-    CV2_AVAILABLE = 0
+    CV2_AVAILABLE = False
 
 #from geonum.base import GeoPoint, GeoVector3D
 from .topodata import TopoAccessError

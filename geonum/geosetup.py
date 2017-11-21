@@ -29,7 +29,7 @@ from matplotlib.pyplot import get_cmap, figure
 
 from .base import GeoPoint, GeoVector3D
 from .topodata import TopoDataAccess, TopoData
-from .mapping import Map
+from .mapping import Map, BASEMAP_AVAILABLE
 
 class GeoSetup(object):
     """The GeoSetup class represents acollection of GeoPoints and vectors
@@ -423,6 +423,9 @@ class GeoSetup(object):
    
     def create_map(self, *args, **kwargs):     
         """Create a Basemap object for this regime"""
+        if not BASEMAP_AVAILABLE:
+            raise ImportError("Cannot create map: "
+                              "Basemap library is not available")
         if not isinstance(self.topo_data, TopoData):
             self.load_topo_data()
         if not "projection" in kwargs and self.magnitude < 150:
@@ -482,6 +485,9 @@ class GeoSetup(object):
             - :class:`geonum.mapping.Map` object
             
         """
+        if not BASEMAP_AVAILABLE:
+            raise ImportError("Cannot create overview map: Basemap module "
+                              "is not available")
         if not "ax" in kwargs:
             #fig, ax = subplots(1,1)
             fig = figure(figsize=(10,8))
@@ -526,7 +532,7 @@ class GeoSetup(object):
     def plot_3d(self, draw_all_points=True, draw_all_vectors=True, 
                 cmap_topo="Oranges", contour_color="#708090", 
                 contour_lw=0.2, contour_antialiased=True, *args, **kwargs):
-        """Make a 3D plot of the current setup
+        """Create a 3D overview map of the current setup
         
         Parameters
         ----------
@@ -542,11 +548,11 @@ class GeoSetup(object):
         contour_color : str
             string specifying color of contour lines colors of contour lines 
             (default: "#708090")
-        contour_antialiased : bool
-            apply antialiasing to surface plot of topography, defaults to False
         contour_lw : 
             width of drawn contour lines, defaults to 0.5, use 0 if you do not 
             want contour lines inserted
+        contour_antialiased : bool
+            apply antialiasing to surface plot of topography, defaults to False
         *args : 
             additional non-keyword parameters (passed to `basemap 
             <http://matplotlib.org/basemap/api/basemap_api.html#mpl
@@ -561,6 +567,9 @@ class GeoSetup(object):
         Map
             plotted 3D basemap
         """
+        if not BASEMAP_AVAILABLE:
+            raise ImportError("Cannot create overview map: Basemap module "
+                              "is not available.")
         m = self.create_map(*args, **kwargs)
         m.draw_topo_3d(cmap=cmap_topo, contour_color=contour_color, 
                        contour_lw=contour_lw, 
