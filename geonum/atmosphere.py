@@ -204,7 +204,6 @@ def number_density(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
                    lapse_rate=L_STD_ATM, mol_mass=M_AIR_AVG, lat=45.0):
     """Get atmospheric number density :math:`$[m^-3]$`
     
-    
     Parameters
     ----------
     alt : :obj:`float`, :obj:`array`
