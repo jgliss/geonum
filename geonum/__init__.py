@@ -17,9 +17,11 @@
 from os.path import abspath, dirname, join
 from pkg_resources import get_distribution
 
+__dir__ = abspath(dirname(__file__))
 __version__ = get_distribution('geonum').version
 
-_LIBDIR = abspath(dirname(__file__))
+_LIBDIR = __dir__ #from older version
+
 LOCAL_TOPO_PATH = join(_LIBDIR, "local_topo_data")
 
 from .base import GeoPoint, GeoVector3D

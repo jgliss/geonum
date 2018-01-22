@@ -525,8 +525,11 @@ class GeoSetup(object):
                                      c=self.cmap(nums[i]),
                                      label=vec.name)
         if draw_legend:
-            m.legend()
-        
+            try:
+                m.legend()
+            except:
+                warn("Failed to draw legend in GeoSetup...")
+                
         return m
                 
     def plot_3d(self, draw_all_points=True, draw_all_vectors=True, 
@@ -608,3 +611,39 @@ class GeoSetup(object):
                 
         return m
     
+def show_coordinate(geo_point=None, lat_pt=None, lon_pt=None, extend_km=10.0, 
+                    *args, **kwargs):
+    """Draw overview map for a given point
+    
+    Parameters
+    ----------
+    geo_point : GeoPoint
+        Geographical location around which overview map is drawn
+    lat_pt : float
+        Latitude of geographical location around which overview map is 
+        drawn (only considered if :attr:`geo_point` is invalid)
+    lon_pt : float
+        Longitude of geographical location around which overview map is 
+        drawn (only considered if :attr:`geo_point` is invalid)
+    extend_km : float
+        map extend in km around considered geolocation
+    *args :
+        non-keyword arguments passed to :func:`plot_2d` of the 
+        :class:`GeoSetup` instance that is created in order to draw the map
+    
+    Returns
+    -------
+    Map
+        instance of :class:`geonum.Map`
+        
+    """
+    if not isinstance(geo_point, GeoPoint):
+        try: 
+            geo_point = GeoPoint(lat=lat_pt, lon=lon_pt)
+        except:
+            raise TypeError("Invalid input, please provide information "
+                            "about location of GeoPoint")
+    stp = GeoSetup(points=[geo_point])
+    stp.set_borders_from_points(extend_km=extend_km)
+    m = stp.plot_2d(*args, **kwargs)
+    return m 

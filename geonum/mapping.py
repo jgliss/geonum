@@ -30,7 +30,8 @@ from random import randrange
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 import mpl_toolkits.mplot3d.art3d as a3d
 from matplotlib.pyplot import figure, draw
-
+from os import getcwd
+from os.path import join
 try:
     from cv2 import pyrDown
     CV2_AVAILABLE = True
@@ -991,6 +992,14 @@ class Map(Basemap):
         print "(Lon|Lat) top right: (%s|%s)" %(self.lon_tr, self.lat_tr)
         print "(Lon|Lat) center: (%s|%s)" %(lon_center, lat_center)
         print "Projection: %s" %self.projection
+        
+    def save_as(self, save_dir=None, save_name=None, ftype="png"):
+        """Save current figure as image"""
+        if save_dir is None:
+            save_dir = getcwd()
+        if save_name is None:
+            save_name = "geonum_map"
+        self.fig.savefig(join(save_dir, save_name + ftype))
         
 if __name__ == "__main__":
     from matplotlib.pyplot import close
