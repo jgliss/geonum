@@ -580,8 +580,7 @@ class Map(Basemap):
 #         if not "fontsize" in kwargs:
 #             kwargs["fontsize"] = 10
 # =============================================================================
-        ax.legend(loc="best", fancybox=True, framealpha=0.7, **kwargs)\
-            .draggable()
+        ax.legend(loc="best", fancybox=True, framealpha=0.7, **kwargs)
                                                                 
     def draw_geo_point_2d(self, p, add_name=False, ax=None, **kwargs):
         """Draw a GeoPoint into 2D basemap
