@@ -640,8 +640,7 @@ class GeoVector3D(object, GeoVector):
         if not isinstance(geo_point, GeoPoint):
             raise TypeError("Could not set anchor: Invalid input type")
         self._priv_attr["anchor"] = geo_point
-        
-    """Processing functionality"""    
+           
     def intersect_hor(self, other):
         """Determine the horizontal intersection of this vector with other 
         input vector
@@ -650,7 +649,7 @@ class GeoVector3D(object, GeoVector):
         
         .. note::
         
-            Only works, if anchor is defined
+            Only works if anchor is defined
         """
         if not all([isinstance(x,GeoPoint) for x in [self.anchor, other.anchor]]):
             raise ValueError("Intersection can not be determined, anchor "
@@ -661,7 +660,7 @@ class GeoVector3D(object, GeoVector):
         self_az = radians((self.azimuth + 360) % 360)
         dy = (v.dx - tan(other_az) * v.dy) / (tan(self_az) - tan(other_az))
         dx = tan(self_az) * dy
-        return GeoVector3D(dx, dy, dz = 0.0)
+        return GeoVector3D(dx, dy, dz=0.0)
         
     def _geom_hor(self):
         """Returns horizontal heading and horizontal magnitude"""
