@@ -31,6 +31,7 @@ from numpy import radians, cos, sin, degrees, sqrt,tan, isnan, arctan2,\
     asarray, nanmin, nanmax
 from copy import deepcopy
 from warnings import warn
+from .helpers import isnum
 from .topodata import TopoDataAccess, TopoData
 
 class GeoPoint(object, LatLon):
@@ -56,6 +57,12 @@ class GeoPoint(object, LatLon):
         :param TopoData topo_data: you can assign an existing topo dataset 
             to this point (can save time, e.g. for altitude access)
         """
+        lat, lon = float(lat), float(lon)
+        if not all([isnum(x) for x in [lat, lon]]):
+            raise ValueError("Invalid input for lat, lon in GeoPoint, got "
+                             "%s, %s (%s, %s) need non-NaN numeric" %(lat, lon,
+                                                              type(lat),
+                                                              type(lon)))
         #super(GeoPoint, self).__init__(lon, lat, name)
         LatLon.__init__(self, lat, lon, name)
         self.altitude = altitude #altitude in m

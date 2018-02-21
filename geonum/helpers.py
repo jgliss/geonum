@@ -21,12 +21,21 @@ Helper methods for geonum library
 """
 
 from numpy import radians, cos, arcsin, sin, sqrt, array, linspace, hstack,\
-    floor, log10, abs, int
+    floor, log10, abs, int, isnan
 import matplotlib.cm as colormaps
 import matplotlib.colors as colors
 from matplotlib.pyplot import draw
 
 exponent = lambda num: int(floor(log10(abs(num))))
+
+def isnum(val):
+    """Checks if input is number (int or float) or and not nan
+    
+    :returns: bool, True or False    
+    """
+    if isinstance(val, (int, float, long)) and not isnan(val):
+        return True
+    return False
 
 def rotate_xtick_labels(ax, deg=30, ha="right"):
     """Rotate xtick labels in matplotlib axes object"""

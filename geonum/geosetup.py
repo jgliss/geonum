@@ -286,7 +286,7 @@ class GeoSetup(object):
                 print ("Point ID %s already exists in GeoSetup" %(pt.name))
                 pt2 = self.points[pt.name]
                 if pt.almost_equal(pt2) and pt.altitude == pt2.altitude:
-                    print "Point already exists"
+                    print("Point is unchanged")
                     return
                 print "Updating name of existing GeoPoint to: %s_old" %pt.name
                 pt2.name = pt2.name + "_old"
@@ -327,7 +327,7 @@ class GeoSetup(object):
             vec2 = self.vectors[vec.name]
             if (vec2.almost_equals(vec) and vec2.dz == vec.dz 
                 and vec.anchor == vec2.anchor):
-                print "Vector already exists"
+                print("Vector is unchanged")
                 return 
             print "Updating name of existing vector to: %s_old" %vec.name
             vec2.name = vec2.name + "_old"
