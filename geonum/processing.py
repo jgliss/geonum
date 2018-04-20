@@ -23,7 +23,7 @@ from numpy import radians, cos, sin, arctan, pi, argmin, linspace,\
     tan, ceil, hypot, vstack, nanmin, nanmax, where, sign, diff,\
     logical_and, arange, nan, gradient, rad2deg
     #gradient
-
+from warnings import warn
 from scipy.ndimage import map_coordinates
 from scipy.interpolate import interp1d
 
@@ -38,8 +38,26 @@ class ElevationProfile(object):
     The profile is calculated between two geo point objects using a 
     provided topographic data grid which must cover the range spanned by 
     both points
+    
+    Parameters
+    ----------
+    topo_data : TopoData 
+        topography data object
+    observer : :obj:`GeoPoint` or :obj:`LatLon`
+        starting point of profile 
+    endpoint : :obj:`GeoPoint` or :obj:`LatLon`
+        stop point of profile 
+    interpolate : bool
+        if True, the profile is interpolated to a certain horizontal resolution
+    resolution : float
+        desired grid resolution in m for interpolation. Interpolation is 
+        performed if :attr:`interpolate` is True and if the actual 
+        resolution of the topo data is smaller than input, else, nothing is done
+    itp_type : str
+        interpolation type (e.g. "linear", "cubic")
     """
-    def __new__(cls, topo_data, observer, endpoint, resolution=5.):
+    def __new__(cls, topo_data, observer, endpoint, interpolate=True, 
+                resolution=5.0, itp_type="linear"):
         """These objects strictly can only be created with the right input, 
         
         For input specs see __init__ method
@@ -58,18 +76,13 @@ class ElevationProfile(object):
                     "created\nWrong input point not covered by input topodata")
         
         return super(ElevationProfile, cls).__new__(cls, topo_data, observer,
-                                                    endpoint, resolution)
+                                                    endpoint, interpolate,
+                                                    resolution, 
+                                                    itp_type)
         
-    def __init__(self, topo_data, observer, endpoint, resolution):
-        """Initiate and determine elevation profile
-        
-        :param TopoData topo_data: topography data object
-        :param (GeoPoint, LatLon) observer: starting point of profile 
-        :param (GeoPoint, LatLon) endpoint: stop point of profile 
-        :param float resolution (5): desired grid resolution in m. 
-            Interpolation is performed if topo data resolution is smaller than
-            input, else, nothing is done
-        """
+    def __init__(self, topo_data, observer, endpoint, interpolate=True, 
+                 resolution=5.0, itp_type="linear"):
+     
         self.topo_data = topo_data
         self.observer = observer #: coordinate of observer (start of profile)
         self.endpoint = endpoint #: coordinate of endpoint of profile
@@ -81,8 +94,12 @@ class ElevationProfile(object):
         self.line = None
         self.profile = None
         self.dists = None
-    
-        self.det_profile(resolution)
+
+        try:
+            self.det_profile(interpolate, resolution, itp_type)
+        except Exception as e:
+            warn("Failed to compute elevation profile. Error msg: %s"
+                 %repr(e))
         
     @property
     def dist_hor(self):
@@ -144,7 +161,7 @@ class ElevationProfile(object):
         idx = argmin(abs(self.dists - dist))
         return self.slope_angles()[idx]
         
-    def det_profile(self, resolution=5.):
+    def det_profile(self, interpolate=True, resolution=5.0, itp_type="linear"):
         """Determines the elevation profile
         
         Searches the closest tiles in the topo data grid for both observer and
@@ -153,9 +170,20 @@ class ElevationProfile(object):
         from the topo data along the connection vector of the 2 points using 
         2D spline intepolation)
         
-        :param float resolution (5): desired profile resolution in m (uses
-            interpolation of profile if applicable)
-            
+        Parameters
+        ----------
+        interpolate : bool
+            if True, the profile is interpolated to a certain horizontal resolution
+        resolution : float
+            desired grid resolution in m for interpolation. Interpolation is 
+            performed if :attr:`interpolate` is True and if the actual 
+            resolution of the topo data is smaller than input, else, nothing is done
+        itp_type : str
+            interpolation type (e.g. "linear", "cubic")
+        
+        Returns
+        -------
+                
         """
         data = self.topo_data
         idx_lon_0 = argmin(abs(data.lons - self.observer.lon.decimal_degree))
@@ -165,18 +193,24 @@ class ElevationProfile(object):
         
         self.line = l = LineOnGrid(idx_lon_0, idx_lat_0, 
                                    idx_lon_1, idx_lat_1)
+        
         z = l.get_line_profile(data.data)
         self._observer_topogrid = GeoPoint(data.lats[idx_lat_0],\
                                 data.lons[idx_lon_0], topo_data = data)
         self._endpoint_topogrid = GeoPoint(data.lats[idx_lat_1],\
                                 data.lons[idx_lon_1], topo_data = data)
-        dists = linspace(0, self.dist_hor, l.length)
-        res0 = (dists[1] - dists[0]) * 1000
-        fac = int(ceil(res0 / resolution))
-        if fac > 1:
-            fz = interp1d(dists, z, kind = 'cubic')
-            dists = linspace(0, self.dist_hor, l.length * fac)
-            z = fz(dists)
+        dists = linspace(0, self.dist_hor, l.length + 1)
+        if interpolate:
+            try:
+                res0 = (dists[1] - dists[0]) * 1000
+                fac = int(ceil(res0 / resolution))
+                if fac > 1:
+                    fz = interp1d(dists, z, kind=itp_type)
+                    dists = linspace(0, self.dist_hor, l.length * fac)
+                    z = fz(dists)
+            except Exception as e:
+                warn("Failed to perform interpolation of retrieved elevation "
+                     "profile. Error msg: %s" %repr(e))
         self.dists = dists
         self.profile = z
      
@@ -420,8 +454,8 @@ class LineOnGrid(object):
         length = self.length
         x0, y0 = self.start     
         x1, y1 = self.stop
-        x = linspace(x0, x1, length)
-        y = linspace(y0, y1, length)
+        x = linspace(x0, x1, length+1)
+        y = linspace(y0, y1, length+1)
         self.profile_coords = vstack((y,x))
     
     @property

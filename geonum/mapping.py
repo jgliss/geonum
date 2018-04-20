@@ -122,7 +122,7 @@ class Map(Basemap):
         if isinstance(topo, TopoData):
             self.topo_data = topo
         
-    def load_topo_data(self, mode="srtm", local_path=""):
+    def load_topo_data(self, mode="srtm", local_path=None):
         """Geonum wrapper for topography access"""
         ta = TopoDataAccess(mode, local_path)
         try:

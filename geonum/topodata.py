@@ -165,7 +165,7 @@ class Etopo1Access(TopoFile):
     instructions on the data access.
     
     """
-    def __init__(self, local_path=None, file_name="ETOPO1_Ice_g_gmt4.grd"):
+    def __init__(self, local_path=None, file_name=None):
         """Class initialisation
         
         :param str local_path: directory where Etopo data files are stored
@@ -173,9 +173,8 @@ class Etopo1Access(TopoFile):
         
         """
         if not NETCDF_AVAILABLE:
-            warn("Etopo1 file could not be initiated, netCDF4 library not "
-                "installed...")
-            return None
+            raise NameError("Etopo1Access class cannot be initiated. Please "
+                            "install netCDF4 library first")
             
         self.topo_id = "etopo1"
         
@@ -184,8 +183,8 @@ class Etopo1Access(TopoFile):
 
         self.supported_topo_files = ["ETOPO1_Ice_g_gmt4.grd",
                                      "ETOPO1_Bed_g_gmt4.grd"]
-    
-        self._check_topo_path(local_path) #checks input and if applicable adds to database
+        #checks input and if applicable adds to database
+        self._check_topo_path(local_path) 
         if local_path is None or not exists(local_path):
             from geonum import LOCAL_TOPO_PATH
             self.local_path = LOCAL_TOPO_PATH
@@ -202,6 +201,11 @@ class Etopo1Access(TopoFile):
             raise TopoAccessError("File %s could not be found in local "
                 "topo directory: %s" %(self.file_name, self.local_path))
     
+    @property
+    def file_path(self):
+        """Return full file path of current topography file"""
+        return join(self.local_path, self.file_name)
+    
     def _check_topo_path(self, path):
         """Check if path exists and if it is already included in database"""
         if path is None or not exists(path):
@@ -213,9 +217,7 @@ class Etopo1Access(TopoFile):
                 print("Adding new default local topo data path to "
                     "file LOCAL_TOPO_DATA.txt: %s" %path)
             f.close()
-            
-
-    
+        
     def _get_all_local_topo_paths(self):
         """Get all search paths for topography files"""
         from geonum import LOCAL_TOPO_PATH
@@ -234,7 +236,7 @@ class Etopo1Access(TopoFile):
         if path is None or not exists(path):
             return False
         
-    def _search_topo_file(self, path = None):
+    def _search_topo_file(self, path=None):
         """Checks if a valid etopo data file can be found in local folder
         
         Searches in ``self.local_path`` for any of the file names specified 
@@ -247,7 +249,7 @@ class Etopo1Access(TopoFile):
         fnames = listdir(path)
         for name in fnames:
             if name in self.supported_topo_files:
-                self.topo_file = name
+                self.file_name = name
                 self.local_path = path
                 print("Found match, setting current filepath: %s" 
                 %self.file_path)
@@ -270,12 +272,6 @@ class Etopo1Access(TopoFile):
             if self._search_topo_file(path):
                 return True
         return False
-        
-    @property
-    def file_path(self):
-        """Return full file path of current topography file"""
-        return join(self.local_path, self.file_name)
-
         
     def set_file_location(self, full_path):
         """Set the full file path of a topography data file
@@ -447,7 +443,7 @@ class TopoDataAccess(object):
     
     Default access mode is SRTM. 
     """
-    def __init__(self, mode="srtm", local_path=""):
+    def __init__(self, mode="srtm", local_path=None):
         """Class initialisation
         
         :param str mode: choose between one of the supported data
@@ -481,9 +477,12 @@ class TopoDataAccess(object):
         :raises TopoAccessError: if mode "etopo1" and corresponding data 
             file cannot be found at ``self.local_path``
         """
-        if local_path is not None and exists(local_path):
-            print("Updating local topography access path...")
+        if local_path is not None: 
+            if not exists(local_path):
+                raise ValueError("Failed to set local topography path, path "
+                                 "does not exist: %s" %local_path)
             self.local_path = local_path
+        
         
         if not mode in self.modes:
             raise InvalidTopoMode("Mode %s not supported...\nSupported modes:"
@@ -578,8 +577,8 @@ class TopoData(object):
         """
         self.data_id = data_id #: ID of topodata file
 
-        self.lats = lats
-        self.lons = lons
+        self.lats = lats #asarray(lats)
+        self.lons = lons #asarray(lons)
         if repl_nan_minval:
             data[isnan(data)] = nanmin(data)
         
