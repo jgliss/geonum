@@ -67,8 +67,7 @@ extensions = [
     'sphinx.ext.pngmath',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
-	  'sphinx.ext.graphviz',
-    'sphinxcontrib.images',
+	'sphinx.ext.graphviz',
     'sphinxcontrib.napoleon']
 
 # Add any paths that contain templates here, relative to this directory.

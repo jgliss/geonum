@@ -8,9 +8,9 @@ Welcome to Geonum
 
 Official code documentation web page of Geonum. 
 
-.. thumbnail::  _graphics/topo_lines_guallatiri.png
+.. figure::  _graphics/topo_lines_guallatiri.png
   :width: 600px
-  :title:
+  :align: center
   
   Automatic retrieval of topographic distances (example showing Guallatiri volcano, Chile)
   
