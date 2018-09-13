@@ -7,6 +7,8 @@ from geonum import GeoPoint, GeoVector3D, GeoSetup
 from matplotlib.pyplot import show, close, rcParams
 from os.path import join
 from os import getcwd
+from SETTINGS import OPTPARSE
+from numpy import testing as npt
 ### Set save directory for figures
 save_path = join(getcwd(), "scripts_out")
 
@@ -40,8 +42,6 @@ def plot_geosetup(geosetup):
     map2d = geosetup.plot_2d()
     map3d = geosetup.plot_3d()
     
-    show()
-    
     return map2d, map3d
     
 if __name__ == "__main__":
@@ -50,3 +50,37 @@ if __name__ == "__main__":
     map2d, map3d = plot_geosetup(s)
     map2d.ax.figure.savefig(join(save_path, "ex2_out_1_map2D.png"))
     map3d.ax.figure.savefig(join(save_path, "ex2_out_2_map3D.png"))
+    
+    # Import script options
+    (options, args) = OPTPARSE.parse_args()
+    
+    # If applicable, do some tests. This is done only if TESTMODE is active: 
+    # testmode can be activated globally (see SETTINGS.py) or can also be 
+    # activated from the command line when executing the script using the 
+    # option --test 1
+    if int(options.test):
+        from os.path import basename
+        npt.assert_array_equal([4, 2, True],
+                               [len(s.points),
+                                len(s.vectors),
+                                all([x in ['source', 
+                                           'll', 
+                                           'tr', 
+                                           'cam'] for x in list(s.points)])],
+                                all([x in ['plume', 
+                                           'cam_view'] for x in list(s.vectors)]))
+        
+        actual = [s.points['source'].altitude,
+                  s.points['cam'].altitude]
+        npt.assert_allclose(actual=actual,
+                            desired=[3264.0,
+                                     803.0],
+                            rtol=1e-7)
+        print("All tests passed in script: %s" %basename(__file__)) 
+    try:
+        if int(options.show) == 1:
+            show()
+    except:
+        print "Use option --show 1 if you want the plots to be displayed"
+    
+    

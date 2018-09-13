@@ -15,14 +15,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-from os import listdir
+
+import glob
 from os.path import basename
 from traceback import format_exc
 from SETTINGS import OPTPARSE
 
-raise NotImplementedError("Under development...")
-paths = [f  for f in listdir(".") if f[:2] == "ex" and f[:4] != "ex0_"
-         and f.endswith("py")]
+paths = sorted(glob.glob('ex*.py'))
 
 # init arrays, that store messages that are printed after execution of all 
 # scripts

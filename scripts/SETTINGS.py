@@ -20,8 +20,6 @@ from os.path import join, abspath
 from optparse import OptionParser
 from matplotlib import rcParams
 
-raise NotImplementedError("Under development...")
-
 rcParams.update({'figure.autolayout': True})
 rcParams.update({'font.size': 13})
 
