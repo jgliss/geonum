@@ -8,6 +8,8 @@ Welcome to Geonum
 
 Official code documentation web page of Geonum. 
 
+.. note:: **NEW**: Supports both Python 2.7 and 3.6 from now.
+
 .. figure::  _graphics/topo_lines_guallatiri.png
   :width: 600px
   :align: center
