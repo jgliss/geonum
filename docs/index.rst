@@ -6,7 +6,7 @@
 Welcome to Geonum
 =================
 
-Official code documentation web page of Geonum. 
+Official code documentation web page of Geonum (`GitHub <https://github.com/jgliss/geonum>`__). 
 
 .. note:: **NEW**: Supports both Python 2.7 and 3.6 from now.
 

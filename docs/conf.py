@@ -29,14 +29,16 @@ with open(os.path.join("..", "VERSION.rst")) as f:
     f.close()
 
 try:
-    from unittest.mock import MagicMock
+    from unittest.mock import MagicMock as Mock
 except ImportError:
-    from mock import Mock as MagicMock
+    from mock import Mock
 
-class Mock(MagicMock):
-    @classmethod
-    def __getattr__(cls, name):
-        return Mock()
+# =============================================================================
+# class Mock(MagicMock):
+#     @classmethod
+#     def __getattr__(cls, name):
+#         return Mock()
+# =============================================================================
 
 MOCK_MODULES = [
   'mpl_toolkits.basemap'
