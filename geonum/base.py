@@ -38,7 +38,7 @@ from warnings import warn
 from .helpers import isnum
 from .topodata import TopoDataAccess, TopoData
 
-class GeoPoint(object, LatLon):
+class GeoPoint(LatLon):
     """The Geopoint object represents a point on an ellipsoid (e.g. earth) 
     including elevation information. It inherits from :class:`LatLon` object 
     from the :mod:`LatLon` library.
@@ -512,7 +512,7 @@ class GeoPoint(object, LatLon):
         return 'GeoPoint'
 
 
-class GeoVector3D(object, GeoVector):
+class GeoVector3D(GeoVector):
     """A 3 dimensional geo vector object 
     
     3D vector representation for geo numerical calculations, intuitive 
