@@ -203,8 +203,8 @@ class GeoPoint(object, LatLon):
         lat0, lon0 = ll.latitude, ll.longitude
         lat1, lon1 = tr.latitude, tr.longitude
         if not (self.check_topo(lat1, lon1) and self.check_topo(lat0, lon0)):
-            print(("Topo data not avaialable in geo point %s, loading topodata"
-                        %self.name))
+            print ("Topo data not avaialable in geo point %s, loading topodata"
+                        %self.name)
             self._load_topo_data(lat0, lon0, lat1, lon1)
         else:
             print ("Topo data avaialable in geo point %s")
@@ -366,7 +366,7 @@ class GeoPoint(object, LatLon):
         if not any([x in kwargs for x in ["c", "color"]]):
             kwargs["c"] = "lime"
         map.draw_geo_point_3d(self, **kwargs)
-        x0, y0 = list(map(self.lon.decimal_degree, self.lat.decimal_degree))
+        x0, y0 = map(self.lon.decimal_degree, self.lat.decimal_degree)
         if add_name and self.name is not None:
             try:
                 fs = kwargs["fontSize"]
@@ -389,7 +389,7 @@ class GeoPoint(object, LatLon):
             - :class:`TopoData` object with loaded data (it is also stored in
                 ``self.topo_data``)
         """
-        print("Trying to load topography data in GeoPoint obj..")
+        print "Trying to load topography data in GeoPoint obj.."
         self.topo_data = self._topo_access.get_data(lat0, lon0, lat1, lon1)
         return self.topo_data
         
@@ -562,7 +562,8 @@ class GeoVector3D(object, GeoVector):
             self.dx = dx
             self.dy = dy
         else:
-            raise NameError
+            raise (NameError, "Class GeoVector3D requires two arguments "
+                                "(dx and dy or initial_heading and distance)")
         #Check input for altitude difference dz
         if dz is None or isnan(dz): #invalid for dz directly
             if -90 <= elevation <= 90: #check if instead elevation is valid, then set dz

@@ -315,7 +315,7 @@ class Map(Basemap):
             raise
             msg=("Could not draw topography in high res, using default "
                  "etopo() instead...")
-            print(msg + repr(e))
+            print msg + repr(e)
             self.etopo()
             
     def draw_topo_old(self, insert_colorbar=False, include_seabed=True,
@@ -365,7 +365,7 @@ class Map(Basemap):
                                   extend="both", alpha=alpha)
                                   
             elif levels_filled[0] >= 0:        
-                print("HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEERE")
+                print "HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEERE"
                 cs2 = ax.contourf(x, y, z, levels_filled, cmap=cmap_seq,
                                   alpha=1.0, extend="min")
                 self.contour_filled = cs2
@@ -377,7 +377,7 @@ class Map(Basemap):
             raise
             msg=("Could not draw topography in high res, using default "
                  "etopo() instead...")
-            print(msg + repr(e))
+            print msg + repr(e)
             self.etopo()
          
     def draw_topo_3d(self, num_ticks=4, cmap="Oranges", alpha=0.5,
@@ -490,8 +490,8 @@ class Map(Basemap):
                 try:
                     i.remove()
                 except:
-                    print(("Warning in remove_map_scale: item %s could not be "
-                        "removed" %i))
+                    print ("Warning in remove_map_scale: item %s could not be "
+                        "removed" %i)
         self.fig.canvas.draw()
     
     def _prep_coord_ticks(self, lon_tick=None, lat_tick=None):
@@ -569,7 +569,7 @@ class Map(Basemap):
                         try:
                             item[0].remove()
                         except:
-                            print("Object %s could not be removed" %item)
+                            print "Object %s could not be removed" %item
         self.fig.canvas.draw()
     
     def legend(self, ax=None, **kwargs):
@@ -647,7 +647,7 @@ class Map(Basemap):
                 self.draw_geo_point_3d(p, alt_offset_m=alt_offset_m, 
                                        marker=marker, s=20, c=color)
             except:
-                print("Failed to add %s to map" %p)
+                print "Failed to add %s to map" %p
         if distances is not None and len(distances) == len(pts):
             sc = self.ax.scatter(xs, ys, asarray(zs)+alt_offset_m, zdir='z', 
                                  s=20, c=distances, cmap="Oranges", 
@@ -725,7 +725,7 @@ class Map(Basemap):
             return pf
 
         except:
-            print(vec.anchor.type())
+            print vec.anchor.type()
             raise
     
     def add_polygon_2d(self, points=[], poly_id="undefined", ax=None, **kwargs):
@@ -744,7 +744,7 @@ class Map(Basemap):
             try:
                 coords.append(self(p.longitude, p.latitude))
             except Exception as e:
-                print("Failed to add one point to poly: " + repr(e))
+                print "Failed to add one point to poly: " + repr(e)
         polygon = Polygon(coords, **kwargs)
         ax.add_patch(polygon)
         
@@ -765,7 +765,7 @@ class Map(Basemap):
             xs.append(x)
             ys.append(y)
             zs.append(p.altitude)#*1000)
-        coords = [list(zip(xs, ys, zs))]
+        coords = [zip(xs, ys, zs)]
         poly_coll = a3d.Poly3DCollection(coords, **kwargs)
         ax.add_collection3d(poly_coll)
            
@@ -881,7 +881,7 @@ class Map(Basemap):
             kwargs["edgecolor"] = "none"
         
         if data is None:
-            print("No input data, create random data")
+            print "No input data, create random data"
             lons, lats, data = self.make_random_data()
             data_id = "TestData"
             unit = 'n/d'
@@ -936,7 +936,7 @@ class Map(Basemap):
     def remove_all_colorbars(self):
         """Remove all colorbars from map"""
         cbs = self.colorbars
-        for key, cb in cbs.items():
+        for key, cb in cbs.iteritems():
             cb.remove()
             del self.colorbars[key]
         self.colorbars = {}
@@ -982,15 +982,15 @@ class Map(Basemap):
     def print_map_info(self):
         """Print some basic info about this map"""
         lat_center,lon_center=self.get_map_center()
-        print()
-        print("-------------------------------")
-        print("------- MAP INFORMATION -------")
-        print("-------------------------------")
-        print()
-        print("(Lon|Lat) lower left: (%s|%s)" %(self.lon_ll, self.lat_ll))
-        print("(Lon|Lat) top right: (%s|%s)" %(self.lon_tr, self.lat_tr))
-        print("(Lon|Lat) center: (%s|%s)" %(lon_center, lat_center))
-        print("Projection: %s" %self.projection)
+        print
+        print "-------------------------------"
+        print "------- MAP INFORMATION -------"
+        print "-------------------------------"
+        print
+        print "(Lon|Lat) lower left: (%s|%s)" %(self.lon_ll, self.lat_ll)
+        print "(Lon|Lat) top right: (%s|%s)" %(self.lon_tr, self.lat_tr)
+        print "(Lon|Lat) center: (%s|%s)" %(lon_center, lat_center)
+        print "Projection: %s" %self.projection
         
     def save_as(self, save_dir=None, save_name=None, ftype="png"):
         """Save current figure as image"""

@@ -86,7 +86,7 @@ class GeoSetup(object):
             if isinstance(points, GeoPoint):
                 points = [points]
             else:
-                print("Invalid input points: ", points) 
+                print "Invalid input points: ", points 
                 points = []
         try:
             iter(vectors)
@@ -94,7 +94,7 @@ class GeoSetup(object):
             if isinstance(points, GeoPoint):
                 points = [points]
             else:
-                print("invalid input vectors: ", vectors)
+                print "invalid input vectors: ", vectors
                 vectors = []
                 
         for pt in points:
@@ -176,13 +176,13 @@ class GeoSetup(object):
             :class:`GeoPoint` objects belonging to this setup
             
         """
-        if "ll" not in self.points:
+        if not self.points.has_key("ll"):
             self.set_borders_from_points()
         self.topo_data = self.topo_access.get_data(self.ll.latitude,
                                                    self.ll.longitude,
                                                    self.tr.latitude,
                                                    self.tr.longitude)
-        for p in list(self.points.values()):
+        for p in self.points.values():
             p.set_topo_data(self.topo_data)
         
     @property
@@ -191,7 +191,7 @@ class GeoSetup(object):
         try:
             return self.points["ll"]
         except AttributeError:
-            print("Lower left corner (GeoPoint) not yet defined in GeoSetup")
+            print "Lower left corner (GeoPoint) not yet defined in GeoSetup"
     
     @ll.setter
     def ll(self, value):
@@ -206,7 +206,7 @@ class GeoSetup(object):
         try:
             return self.points["tr"]
         except AttributeError:
-            print("Top right corner (GeoPoint) not yet defined in GeoSetup")
+            print "Top right corner (GeoPoint) not yet defined in GeoSetup"
             pass
     
     @tr.setter
@@ -266,13 +266,13 @@ class GeoSetup(object):
         :param str key: name of point
         :return: bool
         """
-        if name in self.points:
+        if self.points.has_key(name):
             return True
         return False
     
     def has_vector(self, name):
         """Checks if vector with input name exists"""
-        if name in self.vectors:
+        if self.vectors.has_key(name):
             return True
         return False
         
@@ -283,12 +283,12 @@ class GeoSetup(object):
         """
         try:
             if pt.name in self.points:
-                print(("Point ID %s already exists in GeoSetup" %(pt.name)))
+                print ("Point ID %s already exists in GeoSetup" %(pt.name))
                 pt2 = self.points[pt.name]
                 if pt.almost_equal(pt2) and pt.altitude == pt2.altitude:
                     print("Point is unchanged")
                     return
-                print("Updating name of existing GeoPoint to: %s_old" %pt.name)
+                print "Updating name of existing GeoPoint to: %s_old" %pt.name
                 pt2.name = pt2.name + "_old"
                 self.points[pt2.name] = pt2
             self.points[pt.name] = pt
@@ -296,7 +296,7 @@ class GeoSetup(object):
                 pt.set_topo_data(self.topo_data)
         
         except Exception as e:
-            print("Geopoint could not be added: " + repr(e))
+            print "Geopoint could not be added: " + repr(e)
             
     def set_geo_point(self, p_id, pt):
         """Update an existing GeoPoint in the collection
@@ -319,17 +319,17 @@ class GeoSetup(object):
         :param GeoVector3D vec: should be clear ;)
         """
         if not isinstance(vec, GeoVector3D):
-            print(("Error adding GeoVector3D, wrong input type, need "
-                  ":class:`GeoVector3D` object, input type: %s" %type(vec)))
+            print ("Error adding GeoVector3D, wrong input type, need "
+                  ":class:`GeoVector3D` object, input type: %s" %type(vec))
             return
         if vec.name in self.vectors:
-            print(("Vector ID %s already exists in %s" %(vec.name, self)))
+            print ("Vector ID %s already exists in %s" %(vec.name, self))
             vec2 = self.vectors[vec.name]
             if (vec2.almost_equals(vec) and vec2.dz == vec.dz 
                 and vec.anchor == vec2.anchor):
                 print("Vector is unchanged")
                 return 
-            print("Updating name of existing vector to: %s_old" %vec.name)
+            print "Updating name of existing vector to: %s_old" %vec.name
             vec2.name = vec2.name + "_old"
             self.vectors[vec2.name] = vec2
         self.vectors[vec.name] = vec
@@ -372,7 +372,7 @@ class GeoSetup(object):
             
         """
         lats, lons = [], []
-        for id, p in self.points.items():
+        for id, p in self.points.iteritems():
             if not any([id == x for x in ["ll","tr"]]):
                 lats.append(p.latitude)
                 lons.append(p.longitude)
@@ -456,11 +456,11 @@ class GeoSetup(object):
         if radius == None:
             radius = self.magnitude * .1
         ids = []
-        for pt in list(self.points.values()):
+        for pt in self.points.values():
             if not pt is p and (pt - p).magnitude < radius:
                 ids.append(pt.name)
-        print(("Found %d points within radius of %.1f km of point %s" 
-                                                %(len(ids), radius, p.name)))
+        print ("Found %d points within radius of %.1f km of point %s" 
+                                                %(len(ids), radius, p.name))
         return ids
         
     def plot_2d(self, draw_all_points=True, draw_all_vectors=True,
@@ -505,7 +505,7 @@ class GeoSetup(object):
         p_close_count = 0
         if draw_all_points:
             dist = self.magnitude * .05
-            for pt in list(self.points.values()):
+            for pt in self.points.values():
                 if not any([pt.name == x for x in ["ll", "tr"]]):
                     m.draw_geo_point_2d(pt)
                     ang = -45
@@ -580,14 +580,14 @@ class GeoSetup(object):
         if draw_all_points:
             zr = self.topo_data.alt_range * 0.05
             alts = []
-            for name, pt in self.points.items():
+            for name, pt in self.points.iteritems():
                 if not any([name == x for x in ["ll", "tr"]]):
                     try:
                         add_alt = 0 #in m
                         for alt in alts:
                             if abs(alt - pt.altitude) < zr:
                                 add_alt = 3 * zr
-                                print("Add " + str(add_alt))
+                                print "Add " + str(add_alt)
                                 
                         pt.plot_3d(m, add_name = True, dz_text = zr + add_alt)
                         alts.append(pt.altitude)

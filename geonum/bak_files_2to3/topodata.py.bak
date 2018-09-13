@@ -35,9 +35,6 @@ from os import listdir
 from warnings import warn
 import srtm
 from LatLon import LatLon
-# python 2 and 3 support see e.g.
-# http://python-future.org/compatible_idioms.html#metaclasses
-from six import with_metaclass
 
 try:
     from cv2 import pyrUp
@@ -52,8 +49,9 @@ except:
 
 from abc import ABCMeta, abstractmethod
  
-class TopoFile(with_metaclass(ABCMeta, object)):
+class TopoFile(object):
     """Abstract base class for topgraphy file implementations"""
+    __metaclass__ = ABCMeta
     local_path = None
     topo_id = None
     
@@ -216,8 +214,8 @@ class Etopo1Access(TopoFile):
             from geonum import LOCAL_TOPO_PATH
             with open(join(LOCAL_TOPO_PATH, "LOCAL_TOPO_PATHS.txt"), "a") as f:
                 f.write("\n" + path  + "\n")
-                print(("Adding new default local topo data path to "
-                    "file LOCAL_TOPO_DATA.txt: %s" %path))
+                print("Adding new default local topo data path to "
+                    "file LOCAL_TOPO_DATA.txt: %s" %path)
             f.close()
         
     def _get_all_local_topo_paths(self):
@@ -247,14 +245,14 @@ class Etopo1Access(TopoFile):
         """
         if path is None:
             path = self.local_path
-        print(("Searching valid topo file in folder: %s" %path))
+        print("Searching valid topo file in folder: %s" %path)
         fnames = listdir(path)
         for name in fnames:
             if name in self.supported_topo_files:
                 self.file_name = name
                 self.local_path = path
-                print(("Found match, setting current filepath: %s" 
-                %self.file_path))
+                print("Found match, setting current filepath: %s" 
+                %self.file_path)
                 return True
         return False
         
@@ -526,13 +524,13 @@ class TopoDataAccess(object):
         topo_data = None
         try:
             lat0, lon0 = float(lat0), float(lon0)
-        except Exception as e:
+        except Exception, e:
             raise TopoAccessError(repr(e))
         try:
             topo_data = self.topo_file.get_data(lat0, lon0, lat1, lon1)
-        except Exception as e:
-            print(("Topo retrieval failed using mode " + str(self.mode) +
-                                ", try extracting data from Etopo1 dataset"))
+        except Exception, e:
+            print ("Topo retrieval failed using mode " + str(self.mode) +
+                                ", try extracting data from Etopo1 dataset")
             msg = repr(e)
             try:
                 self.set_mode("etopo1")
@@ -543,11 +541,11 @@ class TopoDataAccess(object):
             try:
                 topo_data = self.topo_file.get_data(lat0, lon0, lat1, lon1)
                 
-            except Exception as err:
+            except Exception, err:
                 msg = "Error loading topodata: %s\n%s" %(msg, repr(err))
                 raise TopoAccessError(msg)
         try:
-            print("Important remarks while accessing topodata: %s" %msg)
+            print "Important remarks while accessing topodata: %s" %msg
         except:
             pass
         return topo_data
@@ -671,12 +669,12 @@ class TopoData(object):
         dist = (p2 - p1).magnitude #distance between 2 points on grid
         res_fac = dist / res #factor for increasing the spatial resolution
         if res_fac <= 1:
-            print(("No interpolation of topodata necessary: topo raw data "
+            print ("No interpolation of topodata necessary: topo raw data "
                 "already has desired resolution...\nCurrent resolution: %s" 
-                + str(dist) + "km\nDesired resolution: %s km" %(dist, res)))
+                + str(dist) + "km\nDesired resolution: %s km" %(dist, res))
             return self
         fac = int(ceil(log2(res_fac))) #the corresponding up-factor for the scale space
-        print(("Increasing spatial topography resolution by factor %s" %(2**fac)))
+        print("Increasing spatial topography resolution by factor %s" %(2**fac))
         for k in range(fac):
             vals = pyrUp(vals)
         p_lons = poly1d(polyfit(arange(len(lons)), lons, polyorder))

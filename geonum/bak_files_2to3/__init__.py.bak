@@ -29,5 +29,5 @@ from .geosetup import GeoSetup
 from .topodata import TopoData, TopoDataAccess
 from .processing import LineOnGrid, ElevationProfile  
 from .mapping import Map
-from . import helpers
-from . import atmosphere
+import helpers
+import atmosphere

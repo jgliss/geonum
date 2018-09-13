@@ -340,7 +340,7 @@ class ElevationProfile(object):
             intersect.altitude = self.get_altitude_at_distance(dist) # / 1000.
            
         except IndexError as e:
-            print(("No intersections could be detected, err: %s" %repr(e)))
+            print ("No intersections could be detected, err: %s" %repr(e))
         
         ax = None
         if plot:
@@ -444,8 +444,8 @@ class LineOnGrid(object):
             raise ValueError("Invalid value encountered, coords must not be"
                 " smaller than 0")
         if self.start[0] > self.stop[0]:
-            print("X coordinate of Start point is larger than X of stop point")
-            print("Start and Stop will be exchanged")
+            print "X coordinate of Start point is larger than X of stop point"
+            print "Start and Stop will be exchanged"
             self.start, self.stop = self.stop, self.start
     
     """Processing functionality"""
