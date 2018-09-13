@@ -1,4 +1,4 @@
-Geonum provides functionality for geographical calculations in three dimensions and includes interfaces for accessing and processing of topographic data. Most of the features (e.g. distance retrievals) are based on the two fundamental objects *GeoPoint* and *GeoVector3D* which are inherited from the respective 2D base classes of the `LatLon module <https://pypi.python.org/pypi/LatLon>`_ and were expanded including the 3rd dimension (altitude).
+Geonum provides functionality for geographical calculations in three dimensions and includes interfaces for accessing and processing of topographic data. Most of the features (e.g. distance retrievals) are based on the two fundamental objects *GeoPoint* and *GeoVector3D* which are inherited from the respective 2D base classes of the `LatLon23 module <https://pypi.org/project/LatLon23>`_ and were expanded including the 3rd dimension (altitude).
 Geonum features online access to topographic data from the SRTM dataset, using the 
 `SRTM module <https://pypi.python.org/pypi/SRTM.py/>`_. Furthermore, topographic data from the `ETOPO1 Dataset <https://www.ngdc.noaa.gov/mgg/global/global.html>`_ is supported.
 
@@ -21,9 +21,9 @@ It is recommended to use `Anaconda <https://www.continuum.io/downloads>`_ as Pyt
   - numpy
   - matplotlib >= 1.4.3
   - matplotlib `basemap <https://pypi.python.org/pypi/basemap/1.0.7>`_ (*installation of this module may not be straight forward - especially on Windows machines -, please follow the instructions provided on the web page*) 
-  - `LatLon <https://pypi.python.org/pypi/LatLon>`_
+  - LatLon23 >= 1.0.7
   
-    - LatLon requires installation of `pyproj <https://pypi.python.org/pypi/pyproj/>`_
+    - LatLon23 requires installation of `pyproj <https://pypi.python.org/pypi/pyproj/>`_
     
   - Scipy (including `scipy.ndimage <https://docs.scipy.org/doc/scipy-0.18.1/reference/ndimage.html>`_)
 

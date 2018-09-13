@@ -78,7 +78,7 @@ def add_points_and_plot_map(basemap):
     
     
     # save the 3D figure
-    print("Save path: %s (exists: %s)" %(save_path, exists(save_path)))
+    print(("Save path: %s (exists: %s)" %(save_path, exists(save_path))))
     
     try:
         basemap.ax.figure.savefig(join(save_path, "ex3_out_1_map3D.png"))
@@ -140,11 +140,11 @@ if __name__ == "__main__":
                                      -18.43500000000,
                                      -69.10000000000],
                             rtol=1e-7)
-        print("All tests passed in script: %s" %basename(__file__)) 
+        print(("All tests passed in script: %s" %basename(__file__))) 
     try:
         if int(options.show) == 1:
             show()
     except:
-        print "Use option --show 1 if you want the plots to be displayed"
+        print("Use option --show 1 if you want the plots to be displayed")
 
 

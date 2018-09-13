@@ -93,10 +93,10 @@ if __name__ == "__main__":
                                      2.169563e+03,
                                      13.299999999999988],
                             rtol=1e-6)
-        print("All tests passed in script: %s" %basename(__file__)) 
+        print(("All tests passed in script: %s" %basename(__file__))) 
     try:
         if int(options.show) == 1:
             show()
     except:
-        print "Use option --show 1 if you want the plots to be displayed"
+        print("Use option --show 1 if you want the plots to be displayed")
     

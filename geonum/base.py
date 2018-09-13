@@ -26,7 +26,11 @@ This modules includes the two base objects of geonum:
     points)
         
 """
-from LatLon import LatLon, GeoVector
+try:
+    from LatLon23 import LatLon, GeoVector
+except:
+    from LatLon import LatLon, GeoVector
+    
 from numpy import radians, cos, sin, degrees, sqrt,tan, isnan, arctan2,\
     asarray, nanmin, nanmax
 from copy import deepcopy

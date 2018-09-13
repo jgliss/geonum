@@ -34,7 +34,10 @@ from os.path import basename, exists, join, dirname, normpath
 from os import listdir
 from warnings import warn
 import srtm
-from LatLon import LatLon
+try:
+    from LatLon23 import LatLon
+except:
+    from LatLon import LatLon
 # python 2 and 3 support see e.g.
 # http://python-future.org/compatible_idioms.html#metaclasses
 from six import with_metaclass
