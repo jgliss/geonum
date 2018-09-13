@@ -15,7 +15,7 @@ with open("VERSION.rst") as f:
     version = f.readline()
     f.close()
  
-with open(join("geonum","local_topo_data", "LOCAL_TOPO_PATHS.txt"), 'w'): pass
+#with open(join("geonum","local_topo_data", "LOCAL_TOPO_PATHS.txt"), 'w'): pass
        
 setup(
     name        =   'geonum',
