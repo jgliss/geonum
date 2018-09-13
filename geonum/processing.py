@@ -56,29 +56,31 @@ class ElevationProfile(object):
     itp_type : str
         interpolation type (e.g. "linear", "cubic")
     """
-    def __new__(cls, topo_data, observer, endpoint, interpolate=True, 
-                resolution=5.0, itp_type="linear"):
-        """These objects strictly can only be created with the right input, 
-        
-        For input specs see __init__ method
-        """
-        if not isinstance(topo_data, TopoData):
-            raise ValueError("ElevationProfile instance could not be created\n"
-                "Wrong input type: topo_data, need TopoData object...")
-        for p in [observer, endpoint]:
-            if not any([p.type() == x for x in ["LatLon", "GeoPoint"]]):
-                raise ValueError ("ElevationProfile instance could not be "
-                    "created\nWrong input type: observer/endpoint, need GeoPoint "
-                    "or LatLon object...")
-            elif not topo_data.includes_coordinate(p.lat.decimal_degree,
-                                                   p.lon.decimal_degree):
-                raise ValueError ("ElevationProfile instance could not be "
-                    "created\nWrong input point not covered by input topodata")
-        
-        return super(ElevationProfile, cls).__new__(cls, topo_data, observer,
-                                                    endpoint, interpolate,
-                                                    resolution, 
-                                                    itp_type)
+# =============================================================================
+#     def __new__(cls, topo_data, observer, endpoint, interpolate=True, 
+#                 resolution=5.0, itp_type="linear"):
+#         """These objects strictly can only be created with the right input, 
+#         
+#         For input specs see __init__ method
+#         """
+#         if not isinstance(topo_data, TopoData):
+#             raise ValueError("ElevationProfile instance could not be created\n"
+#                 "Wrong input type: topo_data, need TopoData object...")
+#         for p in [observer, endpoint]:
+#             if not any([p.type() == x for x in ["LatLon", "GeoPoint"]]):
+#                 raise ValueError ("ElevationProfile instance could not be "
+#                     "created\nWrong input type: observer/endpoint, need GeoPoint "
+#                     "or LatLon object...")
+#             elif not topo_data.includes_coordinate(p.lat.decimal_degree,
+#                                                    p.lon.decimal_degree):
+#                 raise ValueError ("ElevationProfile instance could not be "
+#                     "created\nWrong input point not covered by input topodata")
+#         
+#         return super(ElevationProfile, cls).__new__(cls, topo_data, observer,
+#                                                     endpoint, interpolate,
+#                                                     resolution, 
+#                                                     itp_type)
+# =============================================================================
         
     def __init__(self, topo_data, observer, endpoint, interpolate=True, 
                  resolution=5.0, itp_type="linear"):

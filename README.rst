@@ -2,6 +2,12 @@ Geonum provides functionality for geographical calculations in three dimensions 
 Geonum features online access to topographic data from the SRTM dataset, using the 
 `SRTM module <https://pypi.python.org/pypi/SRTM.py/>`_. Furthermore, topographic data from the `ETOPO1 Dataset <https://www.ngdc.noaa.gov/mgg/global/global.html>`_ is supported.
 
+News / Notifications
+====================
+
+- Now also available and tested in Python 3.6
+- Changed requirement **LatLon** -> **LatLon23** to support Python 3
+
 Copyright
 =========
   
