@@ -33,7 +33,7 @@ except:
     
 from numpy import radians, cos, sin, degrees, sqrt,tan, isnan, arctan2,\
     asarray, nanmin, nanmax
-from copy import deepcopy
+
 from warnings import warn
 from geonum.helpers import isnum
 from geonum.topodata import TopoDataAccess, TopoData
@@ -195,7 +195,7 @@ class GeoPoint(LatLon):
             #. specify endpoint using lon1 and lat1
         
         """
-        pf = deepcopy(self)
+        pf = self
         if isinstance(geo_point, GeoPoint):
             pf = geo_point
         elif all(isinstance(x, (int, float)) for x in [dist_hor, azimuth]):

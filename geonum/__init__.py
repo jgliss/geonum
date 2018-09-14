@@ -15,24 +15,32 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 def check_requirements():
+    from warnings import warn
+    
+    BASEMAP_AVAILABLE = True
+    CV2_AVAILABLE = True
+    NETCDF_AVAILABLE = True
+    LATLON_AVAILABLE = True
+    SRTM_AVAILABLE = True
+    
     try:
         from LatLon23 import LatLon
     except:
         try:
             from LatLon import LatLon
         except:
-            raise ImportError('Cannot import geonum. Require either LatLon23 '
-                              'or LatLon library. Use\n\npip install LatLon23\n\n'
-                              'to install.')
-    BASEMAP_AVAILABLE = True
-    CV2_AVAILABLE = True
-    NETCDF_AVAILABLE = True
+            warn('Neither LatLon23 nor LatLon are available. Many basic features '
+                 'will not be available (e.g. objects GeoPoint or GeoVector ')
+            LATLON_AVAILABLE = False
+    try:
+        import srtm
+    except:
+        SRTM_AVAILABLE = False
     try:
         from mpl_toolkits.basemap import Basemap
     except:
-        print('Plotting of maps etc. is deactivated, please install Basemap')
+        warn('Plotting of maps etc. is deactivated, please install Basemap')
         BASEMAP_AVAILABLE = False
-        
     
     try:
         from cv2 import pyrUp
@@ -42,12 +50,21 @@ def check_requirements():
         from netCDF4 import Dataset
     except:
         NETCDF_AVAILABLE = False
-    return (BASEMAP_AVAILABLE, CV2_AVAILABLE, NETCDF_AVAILABLE)
+        
+    return (LATLON_AVAILABLE, 
+            SRTM_AVAILABLE, 
+            BASEMAP_AVAILABLE, 
+            CV2_AVAILABLE, 
+            NETCDF_AVAILABLE)
         
 from os.path import abspath, dirname, join
 from pkg_resources import get_distribution
 
-BASEMAP_AVAILABLE, CV2_AVAILABLE, NETCDF_AVAILABLE = check_requirements()
+(LATLON_AVAILABLE, 
+ SRTM_AVAILABLE, 
+ BASEMAP_AVAILABLE, 
+ CV2_AVAILABLE, 
+ NETCDF_AVAILABLE) = check_requirements()
 
 __dir__ = abspath(dirname(__file__))
 __version__ = get_distribution('geonum').version
@@ -56,13 +73,21 @@ _LIBDIR = __dir__ #from older version
 
 LOCAL_TOPO_PATH = join(_LIBDIR, "local_topo_data")
 
-from .base import GeoPoint, GeoVector3D
-from .geosetup import GeoSetup
+from . import helpers
+from . import atmosphere
 from .topodata import TopoData, TopoDataAccess
-from .processing import LineOnGrid, ElevationProfile  
+
+if LATLON_AVAILABLE:
+    from .base import GeoPoint, GeoVector3D
+    from .geosetup import GeoSetup
+    from . import base
+    from . import geosetup
+
+if LATLON_AVAILABLE:
+    from .processing import LineOnGrid, ElevationProfile  
+    from . import processing
 
 if BASEMAP_AVAILABLE:
     from .mapping import Map
+    from . import mapping
     
-from . import helpers
-from . import atmosphere

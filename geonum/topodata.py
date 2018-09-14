@@ -33,19 +33,19 @@ from numpy import argmin, mod, ceil, log2, poly1d, polyfit,\
 from os.path import basename, exists, join, dirname, normpath
 from os import listdir
 from warnings import warn
-import srtm
-
 # python 2 and 3 support see e.g.
 # http://python-future.org/compatible_idioms.html#metaclasses
 from six import with_metaclass
 
 from abc import ABCMeta, abstractmethod
  
-from geonum import NETCDF_AVAILABLE, CV2_AVAILABLE
-try:
-    from LatLon23 import LatLon
-except:
-    from LatLon import LatLon
+from geonum import (NETCDF_AVAILABLE, CV2_AVAILABLE, LATLON_AVAILABLE, 
+                    SRTM_AVAILABLE)
+if LATLON_AVAILABLE:
+    try:
+        from LatLon23 import LatLon
+    except:
+        from LatLon import LatLon
         
 class TopoFile(with_metaclass(ABCMeta, object)):
     """Abstract base class for topgraphy file implementations"""
@@ -170,8 +170,8 @@ class Etopo1Access(TopoFile):
         
         """
         if not NETCDF_AVAILABLE:
-            raise NameError("Etopo1Access class cannot be initiated. Please "
-                            "install netCDF4 library first")
+            raise ModuleNotFoundError("Etopo1Access class cannot be initiated. "
+                                      "Please install netCDF4 library first")
         from netCDF4 import Dataset
         self.loader = Dataset
         self.topo_id = "etopo1"
@@ -350,6 +350,11 @@ class SRTMAccess(TopoFile):
     """
     def __init__(self):
         """Class initialisation"""
+        if not SRTM_AVAILABLE:
+            raise ModuleNotFoundError("SRTM access class cannot be initiated. "
+                                      "Please install srtm.py library first")
+        import srtm
+        self.loader = srtm
         self.topo_id = "srtm"
         
     def coordinate_covered(self, access_obj, lat, lon):
@@ -386,7 +391,7 @@ class SRTMAccess(TopoFile):
         """
         print("Retrieving SRTM data (this might take a while) ... ")
         # create GeoElevationData object for data access
-        dat = srtm.get_data()
+        dat = self.loader.get_data()
         # check if second input point is specified and set equal first point if
         # not
         if any([x is None for x in [lat1, lon1]]):
@@ -426,17 +431,11 @@ class SRTMAccess(TopoFile):
         return TopoData(lats, lons, vals, data_id=self.topo_id)
         
 class TopoDataAccess(object):
-    """Class for topo data access management from different topo datasets
+    """Factory class for accessing topographic data
     
     This is a high level access class which handles the access of topography
     data. It is, for instance, implemented within :class:`geonum.base.GeoPoint` 
     or :class:`geonum.geosetup.GeoSetup` classes. 
-    
-    .. todo::
-    
-        Future ideas:
-        
-        1. fill gaps of missing SRTM data
     
     Default access mode is SRTM. 
     """
@@ -624,6 +623,9 @@ class TopoData(object):
         
             The resolution is determined at the center of this grid
         """
+        if not LATLON_AVAILABLE:
+            raise ModuleNotFoundError('Feature disabled: Neither LatLon nor '
+                                      'LatLon23 are installed')
         x_lon, x_lat = int(len(self.lons) / 2), int(len(self.lats) / 2)
         p0 = LatLon(self.lats[x_lat], self.lons[x_lon])
         r_lon = (p0 - LatLon(self.lats[x_lat], self.lons[x_lon + 1])).magnitude
@@ -651,8 +653,10 @@ class TopoData(object):
             
             
         """
-        if not CV2_AVAILABLE:
-            raise ImportError('Require opencv library to change grid resolution ')
+        if not CV2_AVAILABLE or not LATLON_AVAILABLE:
+            raise ModuleNotFoundError('Feature disabled: Require opencv and '
+                                      'LatLon (or LatLon23) library to change '
+                                      'grid resolution ')
         from cv2 import pyrUp
         lons = self.lons
         lats = self.lats
