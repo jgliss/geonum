@@ -27,8 +27,7 @@ setup(
     include_package_data    =   True,  
     package_data=   {'geonum'     :   ['local_topo_data/*.rst',
                                        'local_topo_data/*.txt']},
-    install_requires        =   ["LatLon23",
-                                 "srtm.py"],
+    install_requires  =   [],
     extras_require={
         'cv2':      ["opencv-python>=2.4.11"],
         'netCDF4':  ["netCDF4>=1.1.8"]},
