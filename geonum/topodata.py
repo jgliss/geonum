@@ -34,27 +34,19 @@ from os.path import basename, exists, join, dirname, normpath
 from os import listdir
 from warnings import warn
 import srtm
-try:
-    from LatLon23 import LatLon
-except:
-    from LatLon import LatLon
+
 # python 2 and 3 support see e.g.
 # http://python-future.org/compatible_idioms.html#metaclasses
 from six import with_metaclass
 
-try:
-    from cv2 import pyrUp
-    CV2_AVAILABLE = 1
-except:
-    CV2_AVAILABLE = 0
-try:
-    from netCDF4 import Dataset
-    NETCDF_AVAILABLE = 1
-except:
-    NETCDF_AVAILABLE = 0
-
 from abc import ABCMeta, abstractmethod
  
+from geonum import NETCDF_AVAILABLE, CV2_AVAILABLE
+try:
+    from LatLon23 import LatLon
+except:
+    from LatLon import LatLon
+        
 class TopoFile(with_metaclass(ABCMeta, object)):
     """Abstract base class for topgraphy file implementations"""
     local_path = None
@@ -180,7 +172,8 @@ class Etopo1Access(TopoFile):
         if not NETCDF_AVAILABLE:
             raise NameError("Etopo1Access class cannot be initiated. Please "
                             "install netCDF4 library first")
-            
+        from netCDF4 import Dataset
+        self.loader = Dataset
         self.topo_id = "etopo1"
         
         self.local_path = local_path
@@ -314,10 +307,9 @@ class Etopo1Access(TopoFile):
 #         print ("Trying topo data access Etopo1 within borders (Lon0 | Lat0), : "
 #             "(Lon1 | Lat1): (%s | %s), (%s | %s)" %(lat0, lon0, lat1, lon1))
 #==============================================================================
-        
-        etopo1 = Dataset(self.file_path)
+    
+        etopo1 = self.loader(self.file_path)
 
-            
         lons = etopo1.variables["x"][:]
         lats = etopo1.variables["y"][:]
         
@@ -659,6 +651,9 @@ class TopoData(object):
             
             
         """
+        if not CV2_AVAILABLE:
+            raise ImportError('Require opencv library to change grid resolution ')
+        from cv2 import pyrUp
         lons = self.lons
         lats = self.lats
         vals = self.data

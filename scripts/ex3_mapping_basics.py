@@ -106,12 +106,14 @@ def add_points_and_plot_map(basemap):
     basemap.add_polygon_2d([summit, p2, p1], fc="lime", alpha=0.2)
     try:
         basemap.ax.figure.savefig(join(save_path, "ex3_out_2_map2D.png"))
-    except:
+    except Exception as e:
         exceptions.append("Failed to save second plot... %s" %repr(e))
     for e in exceptions:
         print(e)
 
 if __name__ == "__main__":
+    if not geonum.BASEMAP_AVAILABLE:
+        raise ImportError('Cannot run script. Basemap is not installed')
     m = create_map_and_load_topodata()
     add_points_and_plot_map(m)
     

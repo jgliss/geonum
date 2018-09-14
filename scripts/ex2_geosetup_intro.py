@@ -3,7 +3,7 @@
 Introduction into the GeoSetup class
 """
 
-from geonum import GeoPoint, GeoVector3D, GeoSetup
+from geonum import GeoPoint, GeoVector3D, GeoSetup, BASEMAP_AVAILABLE
 from matplotlib.pyplot import show, close, rcParams
 from os.path import join
 from os import getcwd
@@ -39,6 +39,8 @@ def create_geosetup():
     
 def plot_geosetup(geosetup):
     # Now plot 2D and 3D overview maps
+    if not BASEMAP_AVAILABLE:
+        raise ImportError('Basemap module is not available, cannot plot map')
     map2d = geosetup.plot_2d()
     map3d = geosetup.plot_3d()
     
@@ -47,10 +49,14 @@ def plot_geosetup(geosetup):
 if __name__ == "__main__":
     close("all")
     s = create_geosetup()
-    map2d, map3d = plot_geosetup(s)
-    map2d.ax.figure.savefig(join(save_path, "ex2_out_1_map2D.png"))
-    map3d.ax.figure.savefig(join(save_path, "ex2_out_2_map3D.png"))
-    
+    try:
+        map2d, map3d = plot_geosetup(s)
+    except ImportError as e:
+        print(repr(e))
+    else:
+        map2d.ax.figure.savefig(join(save_path, "ex2_out_1_map2D.png"))
+        map3d.ax.figure.savefig(join(save_path, "ex2_out_2_map3D.png"))
+        
     # Import script options
     (options, args) = OPTPARSE.parse_args()
     

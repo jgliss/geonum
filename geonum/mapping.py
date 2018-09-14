@@ -17,9 +17,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 try:
     from mpl_toolkits.basemap import Basemap
-    BASEMAP_AVAILABLE = True
 except:
-    BASEMAP_AVAILABLE = False
+    print('Plotting of maps etc. is deactivated, please install Basemap')
     
 from numpy import round, log10, floor, meshgrid, arange, array, zeros, ceil,\
     log2, asarray
@@ -32,16 +31,14 @@ import mpl_toolkits.mplot3d.art3d as a3d
 from matplotlib.pyplot import figure, draw
 from os import getcwd
 from os.path import join
-try:
-    from cv2 import pyrDown
-    CV2_AVAILABLE = True
-except:
-    CV2_AVAILABLE = False
+
 
 #from geonum.base import GeoPoint, GeoVector3D
-from .topodata import TopoAccessError
-from .topodata import TopoData, TopoDataAccess
-from .helpers import haversine_formula, shifted_color_map, exponent
+from geonum.topodata import TopoAccessError
+from geonum.topodata import TopoData, TopoDataAccess
+from geonum.helpers import haversine_formula, shifted_color_map, exponent
+
+from geonum import CV2_AVAILABLE
 
 class Map(Basemap):
     """Basemap object for drawing and plotting (on) a geographic map
@@ -191,9 +188,11 @@ class Map(Basemap):
         x, y = self(X, Y)
         z = topo.data
         if not CV2_AVAILABLE:
-            print ("Could not reduce resolution of topographic data, opencv "
-                "library is not available")
+            import warnings
+            warnings.warn("Could not reduce resolution of topographic data, opencv "
+                          "library is not available")
         else:
+            from cv2 import pyrDown
             if pyr_steps > 0:
                 for k in range(pyr_steps):
                     x = pyrDown(x)

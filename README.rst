@@ -10,6 +10,13 @@ News / Notifications
 - Now also available and tested in Python 3.6
 - Changed requirement **LatLon** -> **LatLon23** to support Python 3
 
+Planned changes
+===============
+
+- Refactoring of ``basemap`` dependency to ``cartopy``
+- :class:`TopoData` should be based on :class:`xarray.DataArray`
+- Support for more topographic datasets, interpolation of gaps in topodata and 
+
 Copyright
 =========
   

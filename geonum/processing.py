@@ -29,7 +29,6 @@ from scipy.interpolate import interp1d
 
 from matplotlib.pyplot import subplots, tight_layout
 
-from geonum.topodata import TopoData
 from geonum.base import GeoPoint
 
 class ElevationProfile(object):

@@ -42,7 +42,14 @@ for path in paths:
                "\n\n"
                %(basename(path), format_exc(e)))
         test_err_messages.append(msg)
-        
+    except ImportError as e:
+        msg = ("\n\n"
+               "--------------------------------------------------------\n"
+               "Feature missing for executing {}.\n"
+               "Error traceback:\n{}\n"
+               "--------------------------------------------------------"
+               "\n\n".format(basename(path), repr(e)))
+        test_err_messages.append(msg)
 (options, args) = OPTPARSE.parse_args()
 
 # If applicable, do some tests. This is done only if TESTMODE is active: 

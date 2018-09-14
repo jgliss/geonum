@@ -35,8 +35,8 @@ from numpy import radians, cos, sin, degrees, sqrt,tan, isnan, arctan2,\
     asarray, nanmin, nanmax
 from copy import deepcopy
 from warnings import warn
-from .helpers import isnum
-from .topodata import TopoDataAccess, TopoData
+from geonum.helpers import isnum
+from geonum.topodata import TopoDataAccess, TopoData
 
 class GeoPoint(LatLon):
     """The Geopoint object represents a point on an ellipsoid (e.g. earth) 

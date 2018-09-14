@@ -20,16 +20,17 @@
 This module contains the GeoSetup class, a high level object for managing 
 muliple geo point and geo vector objects.
 """
-
+from geonum import BASEMAP_AVAILABLE
+if BASEMAP_AVAILABLE:
+    from geonum.mapping import Map
 from numpy import asarray, nanmin, nanmax
 from os.path import exists
 from traceback import print_exc
 from warnings import warn
 from matplotlib.pyplot import get_cmap, figure
 
-from .base import GeoPoint, GeoVector3D
-from .topodata import TopoDataAccess, TopoData
-from .mapping import Map, BASEMAP_AVAILABLE
+from geonum.base import GeoPoint, GeoVector3D
+from geonum.topodata import TopoDataAccess, TopoData
 
 class GeoSetup(object):
     """The GeoSetup class represents acollection of GeoPoints and vectors
@@ -426,6 +427,7 @@ class GeoSetup(object):
         if not BASEMAP_AVAILABLE:
             raise ImportError("Cannot create map: "
                               "Basemap library is not available")
+        
         if not isinstance(self.topo_data, TopoData):
             self.load_topo_data()
         if not "projection" in kwargs and self.magnitude < 150:

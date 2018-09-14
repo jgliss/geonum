@@ -25,15 +25,18 @@ def load_topo_oslo():
     
 if __name__ == "__main__":
     topo_data = load_topo_oslo()
-    basemap = topo_data.plot_2d()
-    basemap.ax.set_title("SRTM topo data Oslo")
-    basemap.draw_mapscale_auto()
-    
     my_flat = geonum.base.GeoPoint(59.919386, 10.714970,
                                    name="Somewhere in Frogner (Oslo)")
-    my_flat.plot_2d(basemap, add_name=True)
-    basemap.ax.figure.savefig(join(save_path, "ex5_out_1_oslo_map.png"))
     
+    if geonum.BASEMAP_AVAILABLE:
+        basemap = topo_data.plot_2d()
+        basemap.ax.set_title("SRTM topo data Oslo")
+        basemap.draw_mapscale_auto()
+        
+        
+        my_flat.plot_2d(basemap, add_name=True)
+        basemap.ax.figure.savefig(join(save_path, "ex5_out_1_oslo_map.png"))
+        
     # Import script options
     (options, args) = OPTPARSE.parse_args()
     
