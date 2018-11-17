@@ -569,7 +569,7 @@ class GeoVector3D(GeoVector):
             raise NameError
         #Check input for altitude difference dz
         if dz is None or isnan(dz): #invalid for dz directly
-            if -90 <= elevation <= 90: #check if instead elevation is valid, then set dz
+            if elevation is not None and -90 <= elevation <= 90: #check if instead elevation is valid, then set dz
                 #tan elev = dz/dist_hor
                 dz = tan(radians(elevation)) * sqrt(self.dx**2 + self.dy**2)\
                                                                         * 1000
