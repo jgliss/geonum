@@ -454,7 +454,10 @@ class TopoDataAccess(object):
         self.topo_file = SRTMAccess()
         
         self.set_mode(mode, local_path)
-            
+
+    def __deepcopy__(self, memo):
+        return TopoDataAccess(self.mode, self.local_path)
+
     def init_default_mode(self):
         """Set default mode (e.g. called when object is initiated with etopo1
         but without a file specification)
