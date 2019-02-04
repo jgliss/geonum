@@ -43,6 +43,7 @@ class GeoPoint(LatLon):
     including elevation information. It inherits from :class:`LatLon` object 
     from the :mod:`LatLon` library.
     """
+    _ALTERR_DEFAULT = 99999999999.9
     def __init__(self, lat=0.0, lon=0.0, altitude=None, name="n/d",
                  topo_access_mode="srtm", topo_path=None, topo_data=None,
                  auto_topo_access=True):
@@ -61,26 +62,33 @@ class GeoPoint(LatLon):
         :param TopoData topo_data: you can assign an existing topo dataset 
             to this point (can save time, e.g. for altitude access)
         """
-        lat, lon = float(lat), float(lon)
-        if not all([isnum(x) for x in [lat, lon]]):
-            raise ValueError("Invalid input for lat, lon in GeoPoint, got "
-                             "%s, %s (%s, %s) need non-NaN numeric" %(lat, lon,
-                                                              type(lat),
-                                                              type(lon)))
+        #lat, lon = float(lat), float(lon)
+# =============================================================================
+#         if not all([isnum(x) for x in [lat, lon]]):
+#             raise ValueError("Invalid input for lat, lon in GeoPoint, got "
+#                              "%s, %s (%s, %s) need non-NaN numeric" %(lat, lon,
+#                                                               type(lat),
+#                                                               type(lon)))
+# =============================================================================
         #super(GeoPoint, self).__init__(lon, lat, name)
-        LatLon.__init__(self, lat, lon, name)
+        LatLon.__init__(self, float(lat), float(lon), name)
         self.altitude = altitude #altitude in m
         self.altitude_err = 0.0
         
         self._topo_access = TopoDataAccess(mode=topo_access_mode,
                                            local_path=topo_path)
         self.topo_data = None 
-        self.set_topo_data(topo_data)
         
-        if auto_topo_access and (self.altitude is None or\
-                                 isnan(self.altitude)):
-            self.get_altitude()
-    
+        if topo_data is not None:
+            self.set_topo_data(topo_data)
+        
+        if self.altitude is None or isnan(self.altitude):
+            if auto_topo_access:
+                self.get_altitude()
+            else:
+                self.altitude = 0.0
+                self.altitude_err = self._ALTERR_DEFAULT
+        
     @property
     def local_topo_path(self):
         """Returns current etopo1 data access path (str)"""
@@ -302,7 +310,7 @@ class GeoPoint(LatLon):
 #            print "Retrieved altitude: %s +/- %s m" %(z, z_err)
         except:
             warn("Altitude could not be retrieved...setting altitude to 0.0 m")
-            z, z_err = 0.0, 99999999999.9
+            z, z_err = 0.0, self._ALTERR_DEFAULT
     
         self.altitude, self.altitude_err = z, z_err
         
