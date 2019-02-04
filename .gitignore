@@ -96,3 +96,5 @@ _private
 
 # .idea folder
 .idea
+
+.pytest_cache
