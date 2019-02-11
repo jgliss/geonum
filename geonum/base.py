@@ -15,62 +15,46 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-
-"""
-This modules includes the two base objects of geonum:
-    
-    1. :class:`GeoPoint` specifies a coordinate geographical coordinate 
-    (lon, lat, altitude)
-    
-    2. :class:`GeoVector3D` specifies a vector (e.g. connection between 2 
-    points)
-        
-"""
 try:
     from LatLon23 import LatLon, GeoVector
 except:
     from LatLon import LatLon, GeoVector
     
-from numpy import radians, cos, sin, degrees, sqrt,tan, isnan, arctan2,\
-    asarray, nanmin, nanmax
+from numpy import (radians, cos, sin, degrees, sqrt,tan, isnan, arctan2,
+                   asarray, nanmin, nanmax)
 
 from warnings import warn
-from geonum.helpers import isnum
 from geonum.topodata import TopoDataAccess, TopoData
 
 class GeoPoint(LatLon):
-    """The Geopoint object represents a point on an ellipsoid (e.g. earth) 
-    including elevation information. It inherits from :class:`LatLon` object 
-    from the :mod:`LatLon` library.
+    """The Geopoint object represents a location in the atmosphere 
+    
+    This object is in 3D and includes elevation information.
+    
+    Parameters
+    ----------
+    lat : float 
+        latitude of point (decimal degrees)
+    lon : float 
+        longitude of point (decimal degrees)
+    altitude : float
+        elevation of point in m
+    name : str
+        name (ID) of this point
+    topo_access_mode : str
+        string specifying the current access mode for topographic data (in v1, 
+        choose between srtm or etopo1)
+    topo_path : str
+        specify path where etopo1 data files are stored
+    topo_data : TopoData 
+        existing topographic dataset that can be assigned to this point (can 
+        save time, e.g. for altitude access)
     """
     _ALTERR_DEFAULT = 99999999999.9
     def __init__(self, lat=0.0, lon=0.0, altitude=None, name="n/d",
                  topo_access_mode="srtm", topo_path=None, topo_data=None,
                  auto_topo_access=True):
-                        
-        """Class initialisation
         
-        :param float lat: latitude of point (decimal degrees)
-        :param float lon: longitude of point (decimal degrees)
-        :param float altitude: elevation (above surface) of point in m
-        :param str name: name (ID) of this point
-        :param str topo_access_mode: string specifying the current access 
-            mode for topographic data (in v1, choose between "srtm" or 
-            "etopo1")
-        :param str topo_path: specify path where etopo1 data files are 
-            stored
-        :param TopoData topo_data: you can assign an existing topo dataset 
-            to this point (can save time, e.g. for altitude access)
-        """
-        #lat, lon = float(lat), float(lon)
-# =============================================================================
-#         if not all([isnum(x) for x in [lat, lon]]):
-#             raise ValueError("Invalid input for lat, lon in GeoPoint, got "
-#                              "%s, %s (%s, %s) need non-NaN numeric" %(lat, lon,
-#                                                               type(lat),
-#                                                               type(lon)))
-# =============================================================================
-        #super(GeoPoint, self).__init__(lon, lat, name)
         LatLon.__init__(self, float(lat), float(lon), name)
         self.altitude = altitude #altitude in m
         self.altitude_err = 0.0
@@ -94,22 +78,32 @@ class GeoPoint(LatLon):
         """Returns current etopo1 data access path (str)"""
         return self._topo_access.local_path    
     
-    """PROCESSING"""  
     def offset(self, azimuth, dist_hor, dist_vert=0.0, ellipse="WGS84", 
                **kwargs):
         """Returns new GeoPoint at offset position
-    
-        :param float azimuth: azimuth direction angle (in decimal degrees, e.g.
-            90 for E direction, -90 or 270 for west)
-        :param float dist_hor: horizontal offset to this point in km 
-        :param float dist_vert: vertical offset to this point in m (positive
-            if point is higher, negative, if it is lower)
-        :param float ellipse: geodetic system (ellipsoid), default is 
-            "WGS84", i.e. `World Geodetic System <https://confluence.qps.
-            nl/pages/view page.action?pageId=29855173>`_)
-        :param **kwargs: additional keyword arguments passed to init of new
-            :class:`GeoPoint` object (e.g. name = "blablub")
-        :return: - new :class:`GeoPoint` at offset position
+        
+        Parameters
+        -----------
+        azimuth : float
+            azimuth direction angle (in decimal degrees, e.g. 90 for E 
+            direction, -90 or 270 for west)
+        dist_hor : float 
+            horizontal offset to this point in km 
+        dist_vert : float 
+            vertical offset to this point in m (positive if point is higher, 
+            negative, if it is lower)
+        ellipse : float 
+            geodetic system (ellipsoid), default is "WGS84", i.e. 
+            `World Geodetic System <https://confluence.qps.nl/pages/view page.
+            action?pageId=29855173>`__
+        **kwargs : 
+            additional keyword arguments passed to init of new 
+            :class:`GeoPoint` object
+        
+        Returns
+        -------
+        GeoPoint
+            new location at offset position
         """
         p = LatLon(self.lat.decimal_degree, self.lon.decimal_degree)
         p1 = p.offset(azimuth, dist_hor, ellipse)
@@ -122,7 +116,10 @@ class GeoPoint(LatLon):
         If input is valid, the topographic data set will be stored in 
         class attribute topo_data.
         
-        :param TopoData topo_data: the topo data set        
+        Parameters
+        ----------
+        topo_data : TopoData
+            topography dataset
         """
         if not isinstance(topo_data, TopoData):
             return
@@ -140,9 +137,15 @@ class GeoPoint(LatLon):
         the range corners will be set corresponding to 1km diagonal 
         distance to this point.
         
-        :param *points: additional :class:`GeoPoint` objects to be 
-            considered
-        :returns:
+        Parameters
+        ----------
+        *points 
+            additional :class:`GeoPoint` objects to be  considered
+        
+        Returns
+        -------
+        2-element tuple, containing:
+            
             - :class:`GeoPoint`, lower left corner of regime
             - :class:`GeoPoint`, top right corner of regime
         
@@ -179,22 +182,8 @@ class GeoPoint(LatLon):
         from the current :class:`TopoDataAccess` object within the lon lat 
         range covered by the 2 points (set using :func:`range_borders`)
         
-        :param GeoPoint geo_point: another geo_point,topo data will be 
-            retrieved between this point and destination point
-        :param float azimuth: azimuth angle of heading in decimal degrees 
-            (to be used with dist_hor)
-        :param float dist_hor: horizontal distance from this point in km 
-            (to be used with azimuth)
-        :param float lon1: longitude of destination point, topo data will be 
-            retrieved between this point and destination point 
-            (to be used with lat1)
-        :param float lat1: latitude of destination point, topo data will be 
-            retrieved between this point and destination point 
-            (to be used with lon1)
-        :returns: 
-            - :class:`TopoData`, the topographic data
-            - :class:`GeoPoint`, the second coordinate
-          
+        Note
+        ----
         The following input combinations work (and are preferentially 
         processed in the specified list order if multiple input is given):
         
@@ -202,6 +191,29 @@ class GeoPoint(LatLon):
             #. specify endpoint using azimuth and dist_hor
             #. specify endpoint using lon1 and lat1
         
+        Parameters
+        ----------
+        geo_point : GeoPoint 
+            another geo_point,topo data will be retrieved between this point 
+            and destination point
+        azimuth : float 
+            azimuth angle of heading in decimal degrees (to be used with 
+            dist_hor)
+        dist_hor : float 
+            horizontal distance from this point in km (to be used with azimuth)
+        lon1 : float
+            longitude of destination point, topo data will be retrieved between 
+            this point and destination point (to be used with lat1)
+        lat1 : float 
+            latitude of destination point, topo data will be retrieved between 
+            this point and destination point (to be used with lon1)
+        
+        Returns
+        -------
+        2-element tuple, containing:
+            
+            - :class:`TopoData`, the topographic data
+            - :class:`GeoPoint`, the second coordinate
         """
         pf = self
         if isinstance(geo_point, GeoPoint):
@@ -409,7 +421,7 @@ class GeoPoint(LatLon):
         """Subtract another geo vector
         
         Called when subtracting a GeoVector object from self (adapted from
-        :class:`LatLon` object,  only return type was changed from LatLon 
+        `LatLon` object,  only return type was changed from LatLon 
         object to GeoPoint object)
         
         :param (GeoVector, GeoVector3D) other: vector to be subtracted
@@ -424,7 +436,7 @@ class GeoPoint(LatLon):
     def _add_geo_vector_2d(self, other):
         """Subtract another geo vector
         
-        Add a geo vector (adapted from :class:`LatLon` object,  only return 
+        Add a geo vector (adapted from `LatLon` object,  only return 
         type was changed from LatLon object to GeoPoint object)
         
         :param GeoVector other: Geovector added to this 
@@ -469,8 +481,6 @@ class GeoPoint(LatLon):
         return GeoVector3D(dz=dz, azimuth=heading, dist_hor=distance,
                            anchor=other, name=name)
         
-    """Redfined magic methods initially implemented for :class:`LatLon` object
-    """    
     def __eq__(self, other):
         """Checks equality of this point with another
         
@@ -533,10 +543,11 @@ class GeoVector3D(GeoVector):
         new_point = p + v # GeoPoint object
         
     
-    .. note:: 
+    Note
+    ----
     
         This class inherits and makes use of the functionality of 
-        :class:`GeoVector` objects of the :mod:`LatLon` library. Methods and 
+        `GeoVector` objects of the `LatLon` library. Methods and 
         attributes are partly the same and partly overwritten
         (note that it is not initiated as :class:`GeoVector`)
  
