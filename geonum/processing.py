@@ -19,9 +19,9 @@
 """
 Processing module of geonum library
 """
-from numpy import radians, cos, sin, arctan, pi, argmin, linspace,\
-    tan, ceil, hypot, vstack, nanmin, nanmax, where, sign, diff,\
-    logical_and, arange, nan, gradient, rad2deg
+from numpy import (radians, cos, sin, arctan, pi, argmin, linspace,
+                   tan, ceil, hypot, vstack, nanmin, nanmax, where, sign, diff,
+                   logical_and, arange, nan, gradient, rad2deg)
     #gradient
 from warnings import warn
 from scipy.ndimage import map_coordinates
@@ -42,9 +42,9 @@ class ElevationProfile(object):
     ----------
     topo_data : TopoData 
         topography data object
-    observer : :obj:`GeoPoint` or :obj:`LatLon`
+    observer : :obj:`GeoPoint`
         starting point of profile 
-    endpoint : :obj:`GeoPoint` or :obj:`LatLon`
+    endpoint : :obj:`GeoPoint`
         stop point of profile 
     interpolate : bool
         if True, the profile is interpolated to a certain horizontal resolution
@@ -54,33 +54,7 @@ class ElevationProfile(object):
         resolution of the topo data is smaller than input, else, nothing is done
     itp_type : str
         interpolation type (e.g. "linear", "cubic")
-    """
-# =============================================================================
-#     def __new__(cls, topo_data, observer, endpoint, interpolate=True, 
-#                 resolution=5.0, itp_type="linear"):
-#         """These objects strictly can only be created with the right input, 
-#         
-#         For input specs see __init__ method
-#         """
-#         if not isinstance(topo_data, TopoData):
-#             raise ValueError("ElevationProfile instance could not be created\n"
-#                 "Wrong input type: topo_data, need TopoData object...")
-#         for p in [observer, endpoint]:
-#             if not any([p.type() == x for x in ["LatLon", "GeoPoint"]]):
-#                 raise ValueError ("ElevationProfile instance could not be "
-#                     "created\nWrong input type: observer/endpoint, need GeoPoint "
-#                     "or LatLon object...")
-#             elif not topo_data.includes_coordinate(p.lat.decimal_degree,
-#                                                    p.lon.decimal_degree):
-#                 raise ValueError ("ElevationProfile instance could not be "
-#                     "created\nWrong input point not covered by input topodata")
-#         
-#         return super(ElevationProfile, cls).__new__(cls, topo_data, observer,
-#                                                     endpoint, interpolate,
-#                                                     resolution, 
-#                                                     itp_type)
-# =============================================================================
-        
+    """        
     def __init__(self, topo_data, observer, endpoint, interpolate=True, 
                  resolution=5.0, itp_type="linear"):
      
@@ -117,9 +91,9 @@ class ElevationProfile(object):
     def resolution(self):
         """Get profile x (distance) resolution (averaged from distance array)
         
-        .. note::
-
-            Only works if profile was already determined
+        Note
+        ----
+        Only works if profile was already determined
             
         """
         return abs((self.dists[1:] - self.dists[:-1]).mean())

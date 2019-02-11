@@ -82,8 +82,6 @@ if LATLON_AVAILABLE:
     from .geosetup import GeoSetup
     from . import base
     from . import geosetup
-
-if LATLON_AVAILABLE:
     from .processing import LineOnGrid, ElevationProfile  
     from . import processing
 
