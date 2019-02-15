@@ -19,7 +19,7 @@
 """
 Helper methods for geonum library
 """
-
+import os
 from numpy import radians, cos, arcsin, sin, sqrt, array, linspace, hstack,\
     floor, log10, abs, int, isnan
 import matplotlib.cm as colormaps
@@ -28,6 +28,41 @@ from matplotlib.pyplot import draw
 
 exponent = lambda num: int(floor(log10(abs(num))))
 
+def all_topodata_search_dirs():
+    """Returns a list of all directories that are searched for topography data
+    
+    Returns
+    -------
+    list
+        list containing all search directories (absolute paths)
+    """
+    import os
+    from geonum import TOPO_INFO_FILE, LOCAL_TOPO_PATH
+    paths = [LOCAL_TOPO_PATH]
+    with open(TOPO_INFO_FILE, "r") as f:
+        for line in f:
+            p = line.strip()
+            if os.path.exists(p) and not p in paths:
+                paths.append(os.path.normpath(p))
+    return paths
+    
+def check_and_add_topodir(local_dir):
+    """Check if input directory is registered and if not, register it
+    
+    Parameters
+    ----------
+    local_dir : str
+        directory that is supposed to be checked
+    
+    """
+    p = os.path.normpath(local_dir)
+    if not p in all_topodata_search_dirs():
+        from geonum import TOPO_INFO_FILE
+        with open(TOPO_INFO_FILE, "a") as f:
+           f.write('{}'.format(p))
+           print('Adding new default local topo data path to '
+                 'file LOCAL_TOPO_DATA.txt:\n{}'.format(p))
+           
 def isnum(val):
     """Checks if input is number (int or float) or and not nan
     
