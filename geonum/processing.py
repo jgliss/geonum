@@ -19,10 +19,12 @@
 """
 Processing module of geonum library
 """
-from numpy import (radians, cos, sin, arctan, pi, argmin, linspace,
-                   tan, ceil, hypot, vstack, nanmin, nanmax, where, sign, diff,
-                   logical_and, arange, nan, gradient, rad2deg)
-    #gradient
+# =============================================================================
+# from numpy import (radians, cos, sin, arctan, pi, argmin, linspace,
+#                    tan, ceil, hypot, vstack, nanmin, nanmax, where, sign, diff,
+#                    logical_and, arange, nan, gradient, rad2deg)
+# =============================================================================
+import numpy as np
 from warnings import warn
 from scipy.ndimage import map_coordinates
 from scipy.interpolate import interp1d
@@ -54,9 +56,11 @@ class ElevationProfile(object):
         resolution of the topo data is smaller than input, else, nothing is done
     itp_type : str
         interpolation type (e.g. "linear", "cubic")
+    mapping_opts
+        additional keyword args that are passed to :func:`det_profile`
     """        
     def __init__(self, topo_data, observer, endpoint, interpolate=True, 
-                 resolution=5.0, itp_type="linear"):
+                 resolution=5.0, itp_type="linear", **mapping_opts):
      
         self.topo_data = topo_data
         self.observer = observer #: coordinate of observer (start of profile)
@@ -71,7 +75,7 @@ class ElevationProfile(object):
         self.dists = None
 
         try:
-            self.det_profile(interpolate, resolution, itp_type)
+            self.det_profile(interpolate, resolution, itp_type, **mapping_opts)
         except Exception as e:
             warn("Failed to compute elevation profile. Error msg: %s"
                  %repr(e))
@@ -104,7 +108,7 @@ class ElevationProfile(object):
         
         Uses numpy function ``gradient``
         """
-        return gradient(self.profile)
+        return np.gradient(self.profile)
     
     @property
     def slope(self):
@@ -116,16 +120,16 @@ class ElevationProfile(object):
                 (gradient(self.dists) * 1000.0)
             
         """
-        return gradient(self.profile) / (gradient(self.dists) * 1000)
+        return np.gradient(self.profile)/(np.gradient(self.dists)*1000)
     
     def slope_angles(self, decimal_degrees=True):
         """Returns slope angle of profile (in each sample point)
         
         :param bool decimal_degrees: rad or degrees (default True)
         """
-        a = tan(self.slope)
+        a = np.tan(self.slope)
         if decimal_degrees:
-            a = rad2deg(a)
+            a = np.rad2deg(a)
         return a
         
     def slope_angle(self, dist):
@@ -133,10 +137,11 @@ class ElevationProfile(object):
         
         :param float dist: distance in km
         """
-        idx = argmin(abs(self.dists - dist))
+        idx = np.argmin(abs(self.dists - dist))
         return self.slope_angles()[idx]
         
-    def det_profile(self, interpolate=True, resolution=5.0, itp_type="linear"):
+    def det_profile(self, interpolate=True, resolution=5.0, itp_type="linear",
+                    **mapping_opts):
         """Determines the elevation profile
         
         Searches the closest tiles in the topo data grid for both observer and
@@ -155,39 +160,47 @@ class ElevationProfile(object):
             resolution of the topo data is smaller than input, else, nothing is done
         itp_type : str
             interpolation type (e.g. "linear", "cubic")
+        **mapping_opts
+            additional keyword arguments that are passed to 
+            :func:`LineOnGrid.get_line_profile`
         
         Returns
         -------
-                
+        ndarray
+            the array containing the retrieved altitude levels along the 
+            retrieval direction (from the observer)
         """
         data = self.topo_data
-        idx_lon_0 = argmin(abs(data.lons - self.observer.lon.decimal_degree))
-        idx_lat_0 = argmin(abs(data.lats - self.observer.lat.decimal_degree))
-        idx_lon_1 = argmin(abs(data.lons - self.endpoint.lon.decimal_degree))
-        idx_lat_1 = argmin(abs(data.lats - self.endpoint.lat.decimal_degree))
+        idx_lon_0 = np.argmin(abs(data.lons - self.observer.lon.decimal_degree))
+        idx_lat_0 = np.argmin(abs(data.lats - self.observer.lat.decimal_degree))
+        idx_lon_1 = np.argmin(abs(data.lons - self.endpoint.lon.decimal_degree))
+        idx_lat_1 = np.argmin(abs(data.lats - self.endpoint.lat.decimal_degree))
         
         self.line = l = LineOnGrid(idx_lon_0, idx_lat_0, 
                                    idx_lon_1, idx_lat_1)
         
-        z = l.get_line_profile(data.data)
-        self._observer_topogrid = GeoPoint(data.lats[idx_lat_0],\
-                                data.lons[idx_lon_0], topo_data = data)
-        self._endpoint_topogrid = GeoPoint(data.lats[idx_lat_1],\
-                                data.lons[idx_lon_1], topo_data = data)
-        dists = linspace(0, self.dist_hor, l.length + 1)
+        z = l.get_line_profile(data.data, **mapping_opts)
+        self._observer_topogrid = GeoPoint(data.lats[idx_lat_0],
+                                           data.lons[idx_lon_0], 
+                                           topo_data=data)
+        self._endpoint_topogrid = GeoPoint(data.lats[idx_lat_1],
+                                           data.lons[idx_lon_1], 
+                                           topo_data=data)
+        dists = np.linspace(0, self.dist_hor, l.length + 1)
         if interpolate:
             try:
                 res0 = (dists[1] - dists[0]) * 1000
-                fac = int(ceil(res0 / resolution))
+                fac = int(np.ceil(res0 / resolution))
                 if fac > 1:
                     fz = interp1d(dists, z, kind=itp_type)
-                    dists = linspace(0, self.dist_hor, l.length * fac)
+                    dists = np.linspace(0, self.dist_hor, l.length * fac)
                     z = fz(dists)
             except Exception as e:
                 warn("Failed to perform interpolation of retrieved elevation "
                      "profile. Error msg: %s" %repr(e))
         self.dists = dists
         self.profile = z
+        return z
      
     def get_altitudes_view_dir(self, elev_angle, view_above_topo_m=1.5):
         """Get vector containing altitudes for a viewing direction 
@@ -205,7 +218,7 @@ class ElevationProfile(object):
             - vector with altitude values (same length as ``self.profile``)
             
         """
-        return (1000 * tan(radians(elev_angle)) * self.dists + 
+        return (1000 * np.tan(np.radians(elev_angle)) * self.dists + 
                 self.profile[0] + view_above_topo_m)
     
     def find_horizon_elev(self, elev_start=0.0, elev_stop=60.0, step_deg=0.1,
@@ -218,7 +231,7 @@ class ElevationProfile(object):
         :param **kwargs: additional keyword agruments passed to 
             :func:`get_first_intersection`
         """
-        elevs = arange(elev_start, elev_stop + step_deg, step_deg)
+        elevs = np.arange(elev_start, elev_stop + step_deg, step_deg)
         elev_sects = []
         dists_sects = []
         for elev in elevs:
@@ -298,12 +311,12 @@ class ElevationProfile(object):
             #: get all diff vals matching the 2 conditions
             diff_vals = diff_signal[cond1 * cond2]
             #: get the index of the first zero crossing
-            first_idx = where(diff(sign(diff_vals)))[0][0]
+            first_idx = np.where(np.diff(np.sign(diff_vals)))[0][0]
             
             #: get distance and local tolerance value
             dist, tol = dists_0[first_idx], self.resolution * local_tolerance
             #: make mask to access all distances within tolerance range
-            cond4 = logical_and(dist - tol <= dists_0, dist + tol >= dists_0)
+            cond4 = np.logical_and(dist - tol <= dists_0, dist + tol >= dists_0)
             #: estimate distance error from standard deviation of all 
             #: distances within tolerance range
             dist_err = dists_0[cond4].std()
@@ -321,7 +334,7 @@ class ElevationProfile(object):
         if plot:
             ax = self._plot_intersect_search_result(view_elevations, dist)
             if dist == None:
-                dist = nan
+                dist = np.nan
             ax.set_title("Azim: %.1f, Elev: %.1f, Intersect @ "
                 "dist =%.1f km" %(self.azimuth, elev_angle, dist))
             
@@ -343,7 +356,7 @@ class ElevationProfile(object):
         
         :param float dist: horizontal distance from obsever along profile        
         """
-        idx = argmin(abs(self.dists - dist))
+        idx = np.argmin(abs(self.dists - dist))
         return self.profile[idx]
     
     @property
@@ -354,12 +367,12 @@ class ElevationProfile(object):
     @property
     def min(self):
         """Return minimum altitude in profile"""
-        return nanmin(self.profile)
+        return np.nanmin(self.profile)
         
     @property
     def max(self):
         """Return maximum altitude in profile"""
-        return nanmax(self.profile)
+        return np.nanmax(self.profile)
     
     @property
     def alt_range(self):
@@ -429,9 +442,9 @@ class LineOnGrid(object):
         length = self.length
         x0, y0 = self.start     
         x1, y1 = self.stop
-        x = linspace(x0, x1, length+1)
-        y = linspace(y0, y1, length+1)
-        self.profile_coords = vstack((y,x))
+        x = np.linspace(x0, x1, length+1)
+        y = np.linspace(y0, y1, length+1)
+        self.profile_coords = np.vstack((y,x))
     
     @property
     def normal_vector(self):
@@ -442,19 +455,38 @@ class LineOnGrid(object):
     def length(self):
         """Determine the length in grid coordinates"""
         del_x, del_y = self._delx_dely()
-        return int(round(hypot(del_x, del_y)))
+        return int(round(np.hypot(del_x, del_y)))
     
-    def get_line_profile(self, array):
+    def get_line_profile(self, array, **kwargs):
         """Retrieve line profile of data on a 2D array
         
-        :param ndarray array: the data array
+        Uses method :func:`scipy.ndimage.map_coordinates` 
+        
+        Note
+        ----
+        The spline interpolation will fail if there are NaNs in the input data. 
+        In this case, try using order=1 as additional input argument or use
+        prefilter=False. For details see `here <https://docs.scipy.org/doc/
+        scipy-0.14.0/reference/generated/scipy.ndimage.interpolation.
+        map_coordinates.html>`__
+        
+        Parameters
+        ----------
+        array : ndarray
+            2D data array
+        **kwargs
+            additional keyword args that are passed to
+            :func:`scipy.ndimage.map_coordinates`
+            
+        Returns
+        -------
+        ndarray
+            1D array containing the values along the line profile coordinates
         """
         # Extract the values along the line, using cubic interpolation
-        zi = map_coordinates(array, self.profile_coords)
+        zi = map_coordinates(array, self.profile_coords, **kwargs)
         return zi
-        
-    """Plotting / visualisation etc...
-    """
+    
     def plot_line_on_grid(self, array, ax=None, **kwargs):
         """Plot this line on an input array using imshow
         
@@ -511,8 +543,8 @@ class LineOnGrid(object):
             fig, axes = subplots(2,1, figsize=(fig_width, h))
         else:
             fig, axes=subplots(1,2, figsize = (18, 6))
-        self.plot_line_on_grid(array, ax = axes[0])
-        self.plot_line_profile(array, ax = axes[1])
+        self.plot_line_on_grid(array, ax=axes[0])
+        self.plot_line_profile(array, ax=axes[1])
         tight_layout()
     
     """'Private' functions"""
@@ -525,10 +557,10 @@ class LineOnGrid(object):
         """Determines the normal vector of the line"""
         delx, dely = self._delx_dely()
         try:
-            a = arctan(float(dely) / float(delx))
+            a = np.arctan(float(dely) / float(delx))
         except ZeroDivisionError:
-            a = pi / 2
-        return (sin(a), cos(a))
+            a = np.pi / 2
+        return (np.sin(a), np.cos(a))
         
     """Magic methods"""
     def __str__(self):
