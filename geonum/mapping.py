@@ -20,8 +20,8 @@ try:
 except:
     print('Plotting of maps etc. is deactivated, please install Basemap')
     
-from numpy import round, log10, floor, meshgrid, arange, array, zeros, ceil,\
-    log2, asarray
+from numpy import (round, log10, floor, meshgrid, arange, array, zeros, ceil,
+                   log2, asarray, dot, diag)
 
 from matplotlib.pyplot import subplots, Polygon
 import matplotlib.cm as colormaps
@@ -239,8 +239,8 @@ class Map(Basemap):
     def _check_ax3d(self, ax):
         """Check if input is :class:`Axes3D`"""
         if isinstance(ax, Axes3D):
-            return 1
-        return 0
+            return True
+        return False
     
     def set_ticks_topo_colorbar(self, start, stop, step):
         """Update ticks of topo colorbar"""
@@ -381,7 +381,7 @@ class Map(Basemap):
          
     def draw_topo_3d(self, num_ticks=4, cmap="Oranges", alpha=0.5,
                      contour_color="#708090", contour_antialiased=True, 
-                     contour_lw=0.2, ax=None):
+                     contour_lw=0.2, ax=None, figsize=(16,8)):
         """Draw topography into 3D axis
         
         Parameters
@@ -400,6 +400,7 @@ class Map(Basemap):
         contour_lw : 
             width of drawn contour lines, defaults to 0.5, use 0 if you do not 
             want contour lines inserted
+            
         ax : 
             axes object
         """
@@ -407,9 +408,9 @@ class Map(Basemap):
             if self._check_ax3d(self.ax):
                 ax = self.ax
             else:
-                fig = figure()
+                fig = figure(figsize=figsize)
                 ax = Axes3D(fig)
-            
+    
         x, y, z, z_min, z_max, z_order = self._prep_topo_data()
         tickformatter = "{:.2f}"    
         ax.plot_surface(x, y, z, rstride=1, cstride=1, cmap=cmap, alpha=alpha, 

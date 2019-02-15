@@ -73,6 +73,8 @@ _LIBDIR = __dir__ #from older version
 
 LOCAL_TOPO_PATH = join(_LIBDIR, "local_topo_data")
 
+TOPO_INFO_FILE = join(LOCAL_TOPO_PATH,  "LOCAL_TOPO_PATHS.txt")
+
 from . import helpers
 from . import atmosphere
 from .topodata import TopoData, TopoDataAccess
