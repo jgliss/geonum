@@ -255,7 +255,7 @@ class GeoPoint(LatLon):
         
     def get_elevation_profile(self, geo_point=None, azimuth=None, 
                               dist_hor=None, lon1=None, lat1=None, 
-                              resolution=5.):
+                              resolution=5., **mapping_opts):
         """Estimates the elevation profile for a given viewing direction up
         to a given distance from the coordinates of this point. For input 
         possibilities see docs of :func:`get_topo_data`.
@@ -290,7 +290,8 @@ class GeoPoint(LatLon):
         from geonum.processing import ElevationProfile
         data, pf = self.get_topo_data(geo_point, azimuth, dist_hor, lon1, 
                                       lat1)
-        return ElevationProfile(data, self, pf, resolution=resolution)
+        return ElevationProfile(data, self, pf, resolution=resolution,
+                                **mapping_opts)
         
     def get_altitude(self):
         """Estimate the altitude (+/- uncertainty) of this point 
@@ -590,8 +591,7 @@ class GeoVector3D(GeoVector):
         if dz is None or isnan(dz): #invalid for dz directly
             if elevation is not None and -90 <= elevation <= 90: #check if instead elevation is valid, then set dz
                 #tan elev = dz/dist_hor
-                dz = tan(radians(elevation)) * sqrt(self.dx**2 + self.dy**2)\
-                                                                        * 1000
+                dz = tan(radians(elevation))*sqrt(self.dx**2+self.dy**2)*1000
             else: #both dz input and elevation are invalid, set dz=0
                 dz = 0.0
         self.dz = dz
@@ -745,8 +745,11 @@ class GeoVector3D(GeoVector):
 
     def __str__(self):
         """String representation"""
-        return ('GeoVector3D %s\nAzimuth: %s, Elevation: %s, Magnitude: %s m\n'
-                %(self.name,self.azimuth, self.elevation, self.magnitude))
+        return ('GeoVector3D {}\n'
+                'Azimuth: {:.2f}°, Elevation: {:.4f}°, Magnitude: {:.2f} km '
+                '(hor: {:.2f} km)'
+                .format(self.name, self.azimuth, self.elevation, 
+                        self.magnitude, self.dist_hor))
             
     
     def __repr__(self):
