@@ -236,7 +236,7 @@ class Etopo1Access(TopoFile):
                  search_database=True):
         
         if not NETCDF_AVAILABLE:
-            raise ModuleNotFoundError("Etopo1Access class cannot be initiated. "
+            raise ImportError("Etopo1Access class cannot be initiated. "
                                       "Please install netCDF4 library first")
         self._local_path = None
         self._file_name = None
@@ -447,7 +447,7 @@ class SRTMAccess(TopoFile):
     def __init__(self, check_access=False, **kwargs):
         """Class initialisation"""
         if not SRTM_AVAILABLE:
-            raise ModuleNotFoundError("SRTM access class cannot be initiated. "
+            raise ImportError("SRTM access class cannot be initiated. "
                                       "Please install srtm.py library first")
         import srtm
         self.loader = srtm
@@ -818,7 +818,7 @@ class TopoData(object):
         The resolution is determined at the center of this grid
         """
         if not LATLON_AVAILABLE:
-            raise ModuleNotFoundError('Feature disabled: Neither LatLon nor '
+            raise ImportError('Feature disabled: Neither LatLon nor '
                                       'LatLon23 are installed')
         x_lon, x_lat = int(len(self.lons) / 2), int(len(self.lats) / 2)
         p0 = LatLon(self.lats[x_lat], self.lons[x_lon])
@@ -856,7 +856,7 @@ class TopoData(object):
             
         """
         if not CV2_AVAILABLE or not LATLON_AVAILABLE:
-            raise ModuleNotFoundError('Feature disabled: Require opencv and '
+            raise ImportError('Feature disabled: Require opencv and '
                                       'LatLon (or LatLon23) library to change '
                                       'grid resolution ')
         from cv2 import pyrUp
