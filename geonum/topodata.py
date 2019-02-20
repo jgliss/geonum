@@ -578,7 +578,7 @@ class TopoDataAccess(object):
         self.mode = "srtm"
         self.topo_file = SRTMAccess()
     
-    def set_mode(self, mode="srtm", local_path=None, check_access=True,
+    def set_mode(self, mode="srtm", local_path=None, check_access=False,
                  **kwargs):
         """Change the current topography mode 
         

@@ -31,6 +31,15 @@ class GeoPoint(LatLon):
     
     This object is in 3D and includes elevation information.
     
+    Attributes
+    ----------
+    altitude : float
+        altitude in m
+    altitude_err : float
+        uncertainty in altitude
+    local_topo_path : str
+        directory that is used to search for local topography if topodata is
+        requested. Irrelevant for default topo
     Parameters
     ----------
     lat : float 
@@ -59,8 +68,9 @@ class GeoPoint(LatLon):
         self.altitude = altitude #altitude in m
         self.altitude_err = 0.0
         
-        self._topo_access = TopoDataAccess(mode=topo_access_mode,
-                                           local_path=topo_path)
+        self.topo_access_mode = topo_access_mode
+        self.local_topo_path = topo_path
+        
         self.topo_data = None 
         
         if topo_data is not None:
@@ -72,11 +82,16 @@ class GeoPoint(LatLon):
             else:
                 self.altitude = 0.0
                 self.altitude_err = self._ALTERR_DEFAULT
-        
+    
     @property
-    def local_topo_path(self):
-        """Returns current etopo1 data access path (str)"""
-        return self._topo_access.local_path    
+    def longitude(self):
+        """Longitude coordinate in decimal degrees"""
+        return self.lon.decimal_degree
+
+    @property
+    def latitude(self):
+        """Latitude coordinate in decimal degrees"""
+        return self.lat.decimal_degree
     
     def offset(self, azimuth, dist_hor, dist_vert=0.0, ellipse="WGS84", 
                **kwargs):
@@ -327,7 +342,7 @@ class GeoPoint(LatLon):
     
         self.altitude, self.altitude_err = z, z_err
         
-        return z, z_err
+        return (z, z_err)
     
     """HELPERS, IO stuff, etc"""
     def update_topo_access(self, mode, local_path=None):
@@ -337,25 +352,10 @@ class GeoPoint(LatLon):
         :param str local_path (None): path for etopo1 access (if None, uses 
             the one which is currently set in ``self._topo_access``)
         """
-        if local_path is None:
-            local_path = self._topo_access.local_path
-        self._topo_access = TopoDataAccess(mode=mode, 
-                                           local_path=local_path)
+        if local_path is not None:
+            self.local_topo_path = local_path
+        self.topo_access_mode = mode
         
-    @property
-    def topo_access_mode(self):
-        """Return current topography access mode"""
-        return self._topo_access.mode
-        
-    @property
-    def longitude(self):
-        """Returns longitude coordinate as decimal number"""
-        return self.lon.decimal_degree
-
-    @property
-    def latitude(self):
-        """Returns longitude coordinate as decimal number"""
-        return self.lat.decimal_degree
         
     """Plotting etc..."""
     def plot_2d(self, map, add_name=False, dist_text=0.5, angle_text=-45, 
@@ -402,7 +402,12 @@ class GeoPoint(LatLon):
             map.draw_text_3d(self.longitude, self.latitude, zt, self.name,
                              color="k", fontsize=fs)
             
-    """PRIVATE METHODS"""  
+    @property
+    def _topo_access(self):
+        """Topography data access class"""
+        return TopoDataAccess(mode=self.topo_access_mode,
+                              local_path=self.local_topo_path)
+        
     def _load_topo_data(self, lat0, lon0, lat1, lon1):
         """Load and update topo data
         
@@ -414,7 +419,7 @@ class GeoPoint(LatLon):
             - :class:`TopoData` object with loaded data (it is also stored in
                 ``self.topo_data``)
         """
-        print("Trying to load topography data in GeoPoint obj..")
+        print("Trying to load topography data for {}".format(self))
         self.topo_data = self._topo_access.get_data(lat0, lon0, lat1, lon1)
         return self.topo_data
         

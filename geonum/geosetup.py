@@ -78,8 +78,9 @@ class GeoSetup(object):
             cmap = get_cmap("Greens")
         self.cmap = cmap
         
-        self.topo_access = TopoDataAccess(topo_access_mode, 
-                                          local_topo_path) 
+        self.topo_access_mode = topo_access_mode
+        self.local_topo_path = local_topo_path
+        
         self.topo_data = None
         try:
             iter(points)
@@ -113,6 +114,11 @@ class GeoSetup(object):
         except (TypeError, ValueError):
             pass
       
+    @property
+    def topo_access(self):
+        """Topograph data access class"""
+        return TopoDataAccess(self.topo_access_mode, 
+                              self.local_topo_path) 
     def has_points(self):
         """Returns True, if this setup includes GeoPoints, False if not"""
         if not bool(self.points):
@@ -135,32 +141,37 @@ class GeoSetup(object):
     def set_local_topo_path(self, p):
         """Sets local path for Etopo1 data files can be found
         
-        :param str p: path 
+        Note
+        ----
+        The default topomode is "srtm" which provides online access, so
+        it is not mandatory to provide topography data locally. However, 
+        the SRTM model has no global coverage, so there might be need to 
+        use another of the provided topomodes and provide the respective
+        files locally.
         
-        .. note::
-        
-            The default topomode is "srtm" which provides online access, so
-            it is not mandatory to provide topography data locally. However, 
-            the SRTM model has no global coverage, so there might be need to 
-            use another of the provided topomodes and provide the respective
-            files locally.
-            
+        Parameters
+        ----------
+        p : str
+            new search path for topography data
         """
-        if p is None:
-            return
         if not exists(p):
-            raise IOError("Path %s could not be set" %p)
+            raise IOError("Input path does not exist")
         self.topo_access.local_path = p
     
     def change_topo_mode(self, new_mode="srtm", local_path=None):
-        """Change the current mode for topography data retrieval and optionally
-        change the local topo data path at the same time
+        """Change the current mode for topography data access
         
-        :param str new_mode: the new mode 
-        :param local_path (None): if not None and valid, update local topo access
-            in ``self.topo_access``
+        Parameters
+        ----------
+        new_mode : str
+            new topo access mode
+        local_path : :obj:`str`, optional 
+            if not None and valid, update local topo access
+            
         """
-        self.topo_access.set_mode(new_mode, local_path)
+        if local_path is not None and exists(local_path):
+            self.load_topo_path = local_path
+        self.topo_access_mode = new_mode
     
     def get_topo(self):
         """Get current topo data"""
