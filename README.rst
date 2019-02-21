@@ -1,4 +1,4 @@
-.. note:: **NEW**: Supports both Python 2.7 and 3.6 from now.
+
 
 `geonum <https://github.com/jgliss/geonum>`__ provides functionality for geographical calculations in three dimensions and includes interfaces for accessing and processing of topographic data. Most of the features (e.g. distance retrievals) are based on the two fundamental objects *GeoPoint* and *GeoVector3D* which are inherited from the respective 2D base classes of the `LatLon23 module <https://pypi.org/project/LatLon23>`_ and were expanded including the 3rd dimension (altitude).
 Geonum features online access to topographic data from the SRTM dataset, using the
