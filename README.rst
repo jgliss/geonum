@@ -1,6 +1,7 @@
 .. image:: https://travis-ci.com/jgliss/geonum.svg?branch=master
     :target: https://travis-ci.com/jgliss/geonum
 
+
 `geonum <https://github.com/jgliss/geonum>`__ provides functionality for geographical calculations in three dimensions and includes interfaces for accessing and processing of topographic data. Most of the features (e.g. distance retrievals) are based on the two fundamental objects *GeoPoint* and *GeoVector3D* which are inherited from the respective 2D base classes of the `LatLon23 module <https://pypi.org/project/LatLon23>`_ and were expanded including the 3rd dimension (altitude).
 Geonum features online access to topographic data from the SRTM dataset, using the
 `SRTM module <https://pypi.python.org/pypi/SRTM.py/>`_. Furthermore, topographic data from the `ETOPO1 Dataset <https://www.ngdc.noaa.gov/mgg/global/global.html>`_ is supported.
@@ -8,7 +9,7 @@ Geonum features online access to topographic data from the SRTM dataset, using t
 News / Notifications
 ====================
 
-- Now also available and tested in Python 3.6
+- Now also available and tested in Python > 3
 - Changed requirement **LatLon** -> **LatLon23** to support Python 3
 
 Planned changes
