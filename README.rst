@@ -93,3 +93,7 @@ If the path is valid, it will be added to the installation file *LOCAL_TOPO_PATH
 
 .. |build-status| image:: https://travis-ci.com/jgliss/geonum.svg?branch=master
     :target: https://travis-ci.com/jgliss/geonum
+    
+.. |docs| image:: https://readthedocs.org/projects/geonum/badge/?version=latest
+:target: https://geonum.readthedocs.io/en/latest/?badge=latest
+:alt: Documentation Status
