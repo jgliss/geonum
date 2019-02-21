@@ -96,4 +96,3 @@ If the path is valid, it will be added to the installation file *LOCAL_TOPO_PATH
     
 .. |docs| image:: https://readthedocs.org/projects/geonum/badge/?version=latest
 :target: https://geonum.readthedocs.io/en/latest/?badge=latest
-:alt: Documentation Status
