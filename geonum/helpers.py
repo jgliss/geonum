@@ -20,13 +20,12 @@
 Helper methods for geonum library
 """
 import os
-from numpy import radians, cos, arcsin, sin, sqrt, array, linspace, hstack,\
-    floor, log10, abs, int, isnan
+import numpy as np
 import matplotlib.cm as colormaps
 import matplotlib.colors as colors
 from matplotlib.pyplot import draw
 
-exponent = lambda num: int(floor(log10(abs(num))))
+exponent = lambda num: np.int(np.floor(np.log10(np.abs(num))))
 
 def all_topodata_search_dirs():
     """Returns a list of all directories that are searched for topography data
@@ -68,7 +67,7 @@ def isnum(val):
     
     :returns: bool, True or False    
     """
-    if isinstance(val, (int, float)) and not isnan(val):
+    if isinstance(val, (int, float)) and not np.isnan(val):
         return True
     return False
 
@@ -93,15 +92,15 @@ def haversine_formula(lon0, lat0, lon1, lat1, radius=6371.0):
     :param float lat1: latitude of second point in decimal degrees
     :param float radius (6371.0): average earth radius in km
     """
-    hav = lambda d_theta: sin(d_theta / 2.0) ** 2
+    hav = lambda d_theta: np.sin(d_theta / 2.0) ** 2
     
-    d_lon = radians(lon1 - lon0)
-    d_lat = radians(lat1 - lat0)
-    lat0 = radians(lat0)
-    lat1 = radians(lat1)
+    d_lon = np.radians(lon1 - lon0)
+    d_lat = np.radians(lat1 - lat0)
+    lat0 = np.radians(lat0)
+    lat1 = np.radians(lat1)
  
-    a = hav(d_lat) + cos(lat0) * cos(lat1) * hav(d_lon)
-    c = 2 * arcsin(sqrt(a))
+    a = hav(d_lat) + np.cos(lat0) * np.cos(lat1) * hav(d_lon)
+    c = 2 * np.arcsin(np.sqrt(a))
  
     return radius * c
 
@@ -118,9 +117,9 @@ def approximate_connection_vector(lon0, lat0, lon1, lat1, len_lat_km=111.20):
     
         
     lat = (lat0 + lat1) / 2 * 0.01745
-    dx = len_lat_km * cos(lat) * (lon1 - lon0)
+    dx = len_lat_km * np.cos(lat) * (lon1 - lon0)
     dy = len_lat_km * (lat1 - lat0)
-    return array((dx,dy))
+    return np.array((dx,dy))
     
 def shifted_color_map(vmin, vmax, cmap=None):
     """Shift center of a diverging colormap to value 0
@@ -144,11 +143,11 @@ def shifted_color_map(vmin, vmax, cmap=None):
         - shifted colormap
         
     """
-    #midpoint = 1 - abs(im.max())/(abs(im.max()) + abs(im.min()))
+    #midpoint = 1 - np.abs(im.max())/(np.abs(im.max()) + np.abs(im.min()))
     if cmap is None:
         cmap = colormaps.seismic
         
-    midpoint = 1 - abs(vmax)/(abs(vmax) + abs(vmin))
+    midpoint = 1 - np.abs(vmax)/(np.abs(vmax) + np.abs(vmin))
     
     cdict = {
         'red': [],
@@ -158,12 +157,12 @@ def shifted_color_map(vmin, vmax, cmap=None):
     }
 
     # regular index to compute the colors
-    reg_index = linspace(0, 1, 257)
+    reg_index = np.linspace(0, 1, 257)
 
     # shifted index to match the data
-    shift_index = hstack([
-        linspace(0.0, midpoint, 128, endpoint=False), 
-        linspace(midpoint, 1.0, 129, endpoint=True)
+    shift_index = np.hstack([
+        np.linspace(0.0, midpoint, 128, endpoint=False), 
+        np.linspace(midpoint, 1.0, 129, endpoint=True)
     ])
 
     for ri, si in zip(reg_index, shift_index):
