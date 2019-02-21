@@ -20,7 +20,25 @@ def test_srtm():
     
     npt.assert_array_almost_equal(vals, [4.0, 857.0, 853.0, 861.0])
 
+def test_topoaccess_invalid_mode():
+    all_ok = True
+    try:
+        tp.TopoDataAccess('bla')
+    except tp.InvalidTopoMode:
+        pass
+    except:
+        all_ok = False
+    
+    acc = tp.TopoDataAccess()
+    try:
+        acc.get_data(0,0, mode='bla')
+    except tp.InvalidTopoMode:
+        pass
+    except:
+        all_ok = False    
+    assert all_ok
     
 if __name__=='__main__':
     test_etopo1_init()
     test_srtm()
+    test_topoaccess_invalid_mode()

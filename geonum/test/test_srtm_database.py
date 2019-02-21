@@ -6,12 +6,15 @@ import pytest
 from geonum import SRTM_AVAILABLE
 import geonum.topodata as tp
 
-@pytest.mark.skipif(SRTM_AVAILABLE==False,
+# custom skipif marker that is used below for test functions that 
+# require SRTM.py to be installed
+srtm_avail = pytest.mark.skipif(SRTM_AVAILABLE==False,
                    reason='Skipping SRTM database tests. srtm.py library is '
                    'not installed')
-                #allow_module_level=True)
+                    #allow_module_level=True)
     
 @pytest.fixture(scope='session')
+@srtm_avail
 def guallatiri_data():
     # Coordinates around Guallatiri volcano
     lat0 = -18.55
@@ -22,7 +25,8 @@ def guallatiri_data():
     acc = tp.TopoDataAccess()
     
     return acc.get_data(lat0, lon0, lat1, lon1)
-    
+
+@srtm_avail    
 def test_guallatiri_topo(guallatiri_data):
     data = guallatiri_data
     npt.assert_array_equal(data.shape, (242, 122))

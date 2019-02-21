@@ -18,6 +18,8 @@ def test_ElevationProfile():
     
     obs = GeoPoint(lat_taranaki, lon_observer)
     
+    npt.assert_almost_equal(obs.altitude, 324)
+    
     prof = obs.get_elevation_profile(azimuth=90, dist_hor=50)
     
     prof_nans = obs.get_elevation_profile(azimuth=45, dist_hor=50)
@@ -36,7 +38,7 @@ def test_ElevationProfile():
     
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
-    import numpy as np
+    
     plt.close('all')
     test_ElevationProfile()
     
