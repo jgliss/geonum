@@ -327,9 +327,12 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/': None}
 
+#: names of private methods that are supposed to be included in docs
 def skip(app, what, name, obj, skip, options):
-    if name == "__init__":
-        return False
+# =============================================================================
+#     if name == "__init__":
+#         return False
+# =============================================================================
     return skip
 
 def setup(app):
