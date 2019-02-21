@@ -1,6 +1,6 @@
 numpy
 matplotlib
-LatLon
+netcdf4
 LatLon23
 scikit-image
 SRTM.py
