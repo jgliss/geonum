@@ -336,8 +336,10 @@ class GeoPoint(LatLon):
             z = data(self.latitude, self.longitude)# / 1000.
             z_err = (data.data.max() - data.data.min()) #/ 1000.'
 #            print "Retrieved altitude: %s +/- %s m" %(z, z_err)
-        except:
-            warn("Altitude could not be retrieved...setting altitude to 0.0 m")
+        except Exception as e:
+            warn('Altitude of {} could not be retrieved...\n'
+                 'Setting altitude to 0.0 m\n'
+                 'Error: {}'.format(repr(self), repr(e)))
             z, z_err = 0.0, self._ALTERR_DEFAULT
     
         self.altitude, self.altitude_err = z, z_err

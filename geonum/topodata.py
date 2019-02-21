@@ -32,9 +32,7 @@ Access and handling of topography data
 #                    empty, nan, asarray, nanmax, nanmin, isnan, nanmean)
 # =============================================================================
 import numpy as np
-
-from os.path import basename, exists, join, dirname
-from os import listdir
+import os
 from warnings import warn
 # python 2 and 3 support see e.g.
 # http://python-future.org/compatible_idioms.html#metaclasses
@@ -211,10 +209,10 @@ class Etopo1Access(TopoFile):
     file_name :  str
         file name of etopo data file
     check_access : bool
-        if True, then access to topography data is checked on init and am
+        if True, then access to topography data is checked on init and an
         error is raised if no dataset can be accessed
     search_database : bool
-        if True and topodata file :attr:`file_path` does not exist, then the 
+        if True and topodata file :attr:`file_path` does not exist, then
         a valid topography file is searched in all paths that are specified
         in file `LOCAL_TOPO_PATHS.txt` that is shipped with this library and 
         can be found in installation subdirectory local_topo_data.
@@ -232,7 +230,7 @@ class Etopo1Access(TopoFile):
     #: filenames of supported topographic datasets in preferred order
     supported_topo_files = ["ETOPO1_Ice_g_gmt4.grd",
                             "ETOPO1_Bed_g_gmt4.grd"]
-    def __init__(self, local_path=None, file_name=None, check_access=True,
+    def __init__(self, local_path=None, file_name=None, check_access=False,
                  search_database=True):
         
         if not NETCDF_AVAILABLE:
@@ -248,12 +246,12 @@ class Etopo1Access(TopoFile):
         self.local_path = local_path
         self.file_name = file_name
         
-        if not exists(self.file_path) and search_database:
+        if not os.path.exists(self.file_path) and search_database:
             self.search_topo_file_database()
         
         # check if file exists
         if check_access:
-            if not exists(self.file_path):
+            if not os.path.exists(self.file_path):
                 raise TopoAccessError('File {} could not be found in local '
                                       'topo directory: {}'.format(self.file_name, 
                                                        self.local_path))
@@ -268,7 +266,7 @@ class Etopo1Access(TopoFile):
     
     @local_path.setter
     def local_path(self, val):
-        if val is None or not exists(val):
+        if val is None or not os.path.exists(val):
             from geonum import LOCAL_TOPO_PATH
             print('Invalid input for local_path, setting default: '
                   '{}'.format(LOCAL_TOPO_PATH))
@@ -294,7 +292,7 @@ class Etopo1Access(TopoFile):
     @property
     def file_path(self):
         """Return full file path of current topography file"""
-        return join(self.local_path, self.file_name)
+        return os.path.join(self.local_path, self.file_name)
     
     @file_path.setter
     def file_path(self, val):
@@ -320,7 +318,7 @@ class Etopo1Access(TopoFile):
         if path is None:
             path = self.local_path
         print(("Searching valid topo file in folder: %s" %path))
-        fnames = listdir(path)
+        fnames = os.listdir(path)
         for name in fnames:
             if name in self.supported_topo_files:
                 self.file_name = name
@@ -332,7 +330,7 @@ class Etopo1Access(TopoFile):
         
     def _find_supported_files(self):
         """Look for all supported files in ``self.local_path```and return list"""
-        files = listdir(self.local_path)
+        files = os.listdir(self.local_path)
         lst = []
         for name in files:
             if name in self.supported_topo_files:
@@ -361,11 +359,11 @@ class Etopo1Access(TopoFile):
             if filepath does not exist or if the provided file is not 
             supported by this interface.
         """
-        if not exists(full_path):
+        if not os.path.exists(full_path):
             raise TopoAccessError('Input file location %s does not exist'
                                   .format(full_path))
-        _dir = dirname(full_path)
-        _f = basename(full_path)
+        _dir = os.path.dirname(full_path)
+        _f = os.path.basename(full_path)
         if not _f in self.supported_topo_files:
             raise TopoAccessError('Invalid topography data file name, please '
                                   'use either of the supported files from the '
@@ -374,12 +372,12 @@ class Etopo1Access(TopoFile):
         self.local_path = _dir
         self.file_name = _f
         
-        if not basename(full_path) in self.supported_topo_files:
+        if not os.path.basename(full_path) in self.supported_topo_files:
             raise TopoAccessError("Invalid topography data file, please use "
                 "one of the supported files from the Etopo1 data set\n%s" 
                 %self.supported_topo_files)
-        self.local_path = dirname(full_path)
-        self.file_name = basename(full_path)
+        self.local_path = os.path.dirname(full_path)
+        self.file_name = os.path.basename(full_path)
     
     def get_data(self, lat0, lon0, lat1=None, lon1=None):
         """Retrieve data from topography file 
@@ -497,12 +495,13 @@ class SRTMAccess(TopoFile):
             lat1, lon1 = lat0, lon0
         # Check if first point is covered by dataset
         if not self.coordinate_covered(dat, lat0, lon0):
-            raise SRTMNotCoveredError("Point not covered by SRTM (Lat|Lon): "
-                                                    "(%s | %s)" %(lat0, lon0))
+            raise SRTMNotCoveredError('Point (lat={:.2f}, lon={:.2f}) not '
+                                      'covered by SRTM'.format(lat0, lon0))
         # check if second point is covered by dataset
         if not self.coordinate_covered(dat, lat1, lon1):
-            raise SRTMNotCoveredError("Destination point not covered by SRTM ("
-                "Lat | Lon): (%s | %s)" %(lat0, lon0))
+            raise SRTMNotCoveredError('Endpoint coordinate (lat={:.2f}, '
+                                      'lon={:.2f}) not covered by SRTM'
+                                      .format(lat1, lon1))
         # prepare borders of covered lon / lat regime
         lat_ll, lon_ll, lat_tr,lon_tr = self._prep_borders(lat0, lon0,
                                                            lat1, lon1)
@@ -528,7 +527,7 @@ class SRTMAccess(TopoFile):
                 vals[i, j] = dat.get_elevation(lats[i], lons[j])
 
         return TopoData(lats, lons, vals, data_id=self.topo_id)
-        
+    
 class TopoDataAccess(object):
     """Factory class for accessing topographic data
     
@@ -546,24 +545,21 @@ class TopoDataAccess(object):
         local path to etopo data (only relevant for etopo1 mode)
     """
     #: supported access modes (topographic datasets)
-    _SUPPORTED = dict(srtm      = SRTMAccess,
+    REGISTERED = dict(srtm      = SRTMAccess,
                       etopo1    = Etopo1Access)
     
     def __init__(self, mode="srtm", local_path=None):
-        
         #mode and data access variables
-        self.mode = None
+        if not mode in self.REGISTERED:
+            raise InvalidTopoMode(mode)
+        self.mode = mode
     
         self.local_path = local_path
         
-        self.topo_file = SRTMAccess()
-        
-        self.set_mode(mode, local_path)
-
     @property
     def modes(self):
         """List of supported topographic datasets"""
-        return list(self._SUPPORTED.keys())
+        return list(self.REGISTERED.keys())
     
     @property
     def supported(self):
@@ -572,68 +568,34 @@ class TopoDataAccess(object):
     
     def __deepcopy__(self, memo):
         return TopoDataAccess(self.mode, self.local_path)
-
-    def init_default_mode(self):
-        """Set default access mode"""
-        self.mode = "srtm"
-        self.topo_file = SRTMAccess()
     
-    def set_mode(self, mode="srtm", local_path=None, check_access=False,
-                 **kwargs):
-        """Change the current topography mode 
-        
-        Parameters
-        ----------
-        mode : str
-            the new mode
-        local_path : str 
-            option to update the current local_path variable (i.e. the location 
-            of etopo1 grid files)
-            
-        Raises
-        ------
-        InvalidTopoMode 
-            if input mode is not suppored
-        TopoAccessError 
-            if mode "etopo1" and corresponding data 
-            file cannot be found at ``self.local_path``
-        """
-        if not mode in self.modes:
-            raise InvalidTopoMode("Mode %s not supported...\nSupported modes:"
-                "%s\nCurrent mode: %s " %(mode, self.modes, self.mode))
-            
-        if local_path is not None: 
-            if not exists(local_path):
-                raise ValueError("Failed to set local topography path, path "
-                                 "does not exist: %s" %local_path)
-            self.local_path = local_path
-        
-        try:
-            acc = self._SUPPORTED[mode](local_path=local_path, 
-                                        check_access=check_access, **kwargs)
-            self.mode = mode
-            self.topo_file = acc
-        except:
-            self.init_default_mode()
-            raise TopoAccessError("Could not access Etopo1 data on local "
-                                  "machine, check local_path...")
-    
-    def get_data(self, lat0, lon0, lat1=None, lon1=None, try_mode='etopo1'):
+    def get_data(self, lat0, lon0, lat1=None, lon1=None, 
+                 mode=None, local_path=None, **access_opts):
         """Retrieve data from topography file
         
         Parameters
         ----------
-        lon0 : float 
-            start longitude for data extraction
         lat0 : float 
+            start longitude for data extraction
+        lon0 : float 
             start latitude for data extraction
-        lon1 : float 
+        lat1 : float 
             stop longitude for data extraction (default: None). If None only 
             data around lon0, lat0 will be extracted.
-        lat1 : float
+        lon1 : float
             stop latitude for data extraction (default: None). 
             If None only data around lon0, lat0 will be extracted
-            
+        mode : :obj:`str`, optional
+            mode specifying the topographic dataset that is supposed to be used
+        local_path : :obj:`str`, optional
+            local path where topography data is stored (can be dictionary or
+            filepath, is passed to corresponding access class and handled 
+            as implemented there)
+        **access_opts
+            additional access options that may be specific for the mode 
+            specified (e.g. search_database in case of etopo1)
+        
+        
         Returns
         -------
         TopoData
@@ -645,33 +607,15 @@ class TopoDataAccess(object):
             if access fails
         
         """
-        topo_data = None
-        try:
-            lat0, lon0 = float(lat0), float(lon0)
-        except Exception as e:
-            raise TopoAccessError(repr(e))
-        try:
-            topo_data = self.topo_file.get_data(lat0, lon0, lat1, lon1)
-        except Exception as e:
-            print(("Topo retrieval failed using mode {}".format(self.mode)))
-            msg = repr(e)
-            if try_mode is not None: 
-                try:
-                    self.set_mode(try_mode, check_access=True)
-                except (InvalidTopoMode, TopoAccessError) as err:
-                    msg = "Error loading topodata: " + msg + "\n" + repr(err)
-                    raise TopoAccessError(msg)
-            try:
-                topo_data = self.topo_file.get_data(lat0, lon0, lat1, lon1)
-                
-            except Exception as err:
-                msg = "Error loading topodata: %s\n%s" %(msg, repr(err))
-                raise TopoAccessError(msg)
-        try:
-            print("Important remarks while accessing topodata: %s" %msg)
-        except:
-            pass
-        return topo_data
+        if mode is not None:
+            if not mode in self.REGISTERED:
+                raise InvalidTopoMode(mode)
+            self.mode = mode
+        if local_path is not None and os.path.exists(local_path):
+            self.local_path=local_path
+        access = self.REGISTERED[self.mode](local_path=self.local_path,
+                                             **access_opts)
+        return access.get_data(lat0, lon0, lat1, lon1)
         
 class TopoData(object):
     """Class representing topography data
@@ -975,16 +919,41 @@ class TopoData(object):
             return False
         return True
     
+    def closest_index(self, lat, lon):
+        """Finds closest index to input coordinate
+        
+        Parameters
+        ----------
+        lat : float
+            latitude coordinate in decimal degrees
+        lon : float 
+            longitude coordinate in decimal degrees
+        
+        Returns
+        -------
+        tuple
+            2-element tuple containing closest index of lat and lon arrays to
+            to input index
+        
+        Raises
+        ------
+        ValueError
+            if input coordinate is not included in this dataset
+        """
+        if not self.includes_coordinate(lat, lon):
+            raise ValueError("Input values out of range...")
+        
+        idx_lat = np.argmin(abs(self.lats - lat))
+        idx_lon = np.argmin(abs(self.lons - lon))
+        return (idx_lat, idx_lon)
+        
     def get_altitude(self, lat, lon):
         """Get altitude value at input position
         
         :param float lat: latitude of point
         :param float lon: longitude of point
         """
-        if not self.includes_coordinate(lat, lon):
-            raise ValueError("Input values out of range...")
-        idx_lon = np.argmin(abs(self.lons - lon))
-        idx_lat = np.argmin(abs(self.lats - lat))
+        idx_lat, idx_lon = self.closest_index(lat, lon)
         dat = self.data[idx_lat, idx_lon]
         if np.isnan(dat):
             raise ValueError("Invalid value encountered in topodata...")
@@ -1013,7 +982,7 @@ def delete_all_local_srtm_files():
     #fh = FileHandler()
 #==============================================================================
 #     dir = fh.get_srtm_dir()
-#     filelist = [ f for f in os.listdir(dir) if f.endswith(".bak") ]
+#     filelist = [ f for f in os.os.listdir(dir) if f.endswith(".bak") ]
 #==============================================================================
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
@@ -1024,10 +993,6 @@ if __name__ == "__main__":
     
     acc = TopoDataAccess()
     
-    d1 = acc.get_data(0, 0)
-    print(d1.data_id)
-    print(d1.data)
-    
-    d2 = acc.get_data(45, 15)
+    d2 = acc.get_data(45, 15.2)
     print(d2.data_id)
     print(d2.data)
