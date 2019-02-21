@@ -27,10 +27,7 @@ Access and handling of topography data
     
 """
 
-# =============================================================================
-# from numpy import (argmin, mod, ceil, log2, poly1d, polyfit, arange, linspace, 
-#                    empty, nan, asarray, nanmax, nanmin, isnan, nanmean)
-# =============================================================================
+
 import numpy as np
 import os
 from warnings import warn
@@ -43,10 +40,8 @@ import abc
 from geonum import (NETCDF_AVAILABLE, CV2_AVAILABLE, LATLON_AVAILABLE, 
                     SRTM_AVAILABLE)
 if LATLON_AVAILABLE:
-    try:
-        from LatLon23 import LatLon
-    except:
-        from LatLon import LatLon
+    from LatLon23 import LatLon
+
         
 class TopoFile(with_metaclass(abc.ABCMeta, object)):
     """Abstract base class for topgraphy file implementations"""

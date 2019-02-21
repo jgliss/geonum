@@ -26,12 +26,9 @@ def check_requirements():
     try:
         from LatLon23 import LatLon
     except:
-        try:
-            from LatLon import LatLon
-        except:
-            warn('Neither LatLon23 nor LatLon are available. Many basic features '
-                 'will not be available (e.g. objects GeoPoint or GeoVector ')
-            LATLON_AVAILABLE = False
+        warn('Neither LatLon23 nor LatLon are available. Many basic features '
+             'will not be available (e.g. objects GeoPoint or GeoVector ')
+        LATLON_AVAILABLE = False
     try:
         import srtm
     except:

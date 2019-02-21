@@ -15,10 +15,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-try:
-    from LatLon23 import LatLon, GeoVector
-except:
-    from LatLon import LatLon, GeoVector
+
+from LatLon23 import LatLon, GeoVector
     
 from numpy import (radians, cos, sin, degrees, sqrt,tan, isnan, arctan2,
                    asarray, nanmin, nanmax)
