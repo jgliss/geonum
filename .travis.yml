@@ -7,7 +7,7 @@ language: python
 # set the operating systems to be tested
 os:
    - linux
-   - osx
+   - windows
 
 # Set the python versions
 python:
