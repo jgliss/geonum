@@ -31,34 +31,30 @@ You should have received a copy of the GNU General Public License along with thi
 Requirements
 ============
 
-It is recommended to use `Anaconda <https://www.continuum.io/downloads>`_ as Python package manager as it includes many of the required dependencies and makes life easier when it comes to the installation or upgrade of non-straight forward installations of additional requirements such as OpenCV or basemap.
+It is recommended to use `Anaconda <https://www.continuum.io/downloads>`_ as Python package manager.
 
-  - numpy
-  - matplotlib >= 1.4.3
-  - matplotlib `basemap <https://pypi.python.org/pypi/basemap/1.0.7>`_ (*installation of this module may not be straight forward - especially on Windows machines -, please follow the instructions provided on the web page*)
-  - LatLon23 >= 1.0.7
-
-    - LatLon23 requires installation of `pyproj <https://pypi.python.org/pypi/pyproj/>`_
-
-  - Scipy (including `scipy.ndimage <https://docs.scipy.org/doc/scipy-0.18.1/reference/ndimage.html>`_)
+Please see `requirements.txt <https://github.com/jgliss/geonum/blob/master/requirements.txt>`__ for a list of requirements. Note that these are only the minimum required dependencies. Further, optional requirements are listed below. Note, that dependent on your OS and python version, some of these may be tricky to install:
 
 **Optional dependencies (to use extra features)**
 
-  - OpenCV (used for changing resolution of topographic elevation maps, for installation remarks, see `here <http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_setup/py_setup_in_windows/py_setup_in_windows.html>`_)
-  - netCDF4 (needed in case `ETOPO1 <https://www.ngdc.noaa.gov/mgg/global/global.html>`_ data acess is required).
+- basemap (plotting of maps)
+- OpenCV
+- netCDF4
 
 Installation
 ============
+
+Please make sure to install all requirements beforehand (see above). You may do this by downloading the `requirements file <https://github.com/jgliss/geonum/blob/master/requirements.txt>`__ and calling from the command line::
+
+  pip install -r requirements.txt
 
 Geonum can be installed from `PyPi <https://pypi.python.org/pypi/geonum>`_ using::
 
   pip install geonum
 
-or from source by downloading and extracting the latest release. After navigating to the source folder (where the setup.py file is located) call::
+or from source by downloading and extracting the latest release or cloning the repository. After navigating to the source folder (where the setup.py file is located) call::
 
   python setup.py install
-
-If the installation fails make sure, that all dependencies (see above) are installed correctly. geonum is tested for Python 2.7.
 
 Instructions and code documentation
 ===================================
@@ -82,17 +78,17 @@ Tested and supported are the following two files (grid registered):
 The local installation folder can be accessed via::
 
   import geonum
-  print geonum.LOCAL_TOPO_PATH
+  print(geonum.LOCAL_TOPO_PATH)
 
 If a valid data file is stored in this folder, it will be detected automatically. It is also possible to store the topodata at another location (e.g. <data_path>). In this case, the local path to the folder containing the topograph files needs to be provided, e.g.::
 
   import geonum
-  access = geonum.topodata.TopoDataAccess(mode = "etopo1", local_path = <data_path>)
+  access = geonum.topodata.TopoDataAccess(mode="etopo1", local_path=<data_path>)
 
 If the path is valid, it will be added to the installation file *LOCAL_TOPO_PATHS.txt*
 
 .. |build-status| image:: https://travis-ci.com/jgliss/geonum.svg?branch=master
     :target: https://travis-ci.com/jgliss/geonum
-    
+
 .. |docs| image:: https://readthedocs.org/projects/geonum/badge/?version=latest
     :target: https://geonum.readthedocs.io/en/latest/?badge=latest
