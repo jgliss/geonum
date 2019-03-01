@@ -4,6 +4,11 @@ sudo: false
 # Set the build language to Python
 language: python
 
+# set the operating systems to be tested
+os:
+   - linux
+   - osx
+
 # Set the python versions
 python:
    - "2.7"
