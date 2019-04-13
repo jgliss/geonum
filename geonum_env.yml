@@ -1,0 +1,13 @@
+channels:
+  - anaconda
+  - conda-forge
+
+dependencies:
+  - scipy
+  - matplotlib
+  - netcdf4
+  - SRTM.py
+  - pip
+  - pip:
+    - LatLon23
+  
