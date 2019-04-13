@@ -189,7 +189,7 @@ class Map(Basemap):
         z = topo.data
         if not CV2_AVAILABLE:
             import warnings
-            warnings.warn("Could not reduce resolution of topographic data, 
+            warnings.warn("Could not reduce resolution of topographic data, "
                           "opencv library is not available")
         else:
             from cv2 import pyrDown
