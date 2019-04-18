@@ -4,7 +4,7 @@ from __future__ import (absolute_import, division)
 import numpy.testing as npt
 import pytest
 from geonum import SRTM_AVAILABLE
-import geonum.topodata as tp
+from geonum import TopoDataAccess
 
 # custom skipif marker that is used below for test functions that 
 # require SRTM.py to be installed
@@ -22,7 +22,7 @@ def guallatiri_data():
     lat1 = -18.35  
     lon1 = -69.0
     
-    acc = tp.TopoDataAccess()
+    acc = TopoDataAccess()
     
     return acc.get_data(lat0, lon0, lat1, lon1)
 

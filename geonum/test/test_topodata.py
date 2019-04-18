@@ -3,8 +3,7 @@
 from __future__ import (absolute_import, division)
 import numpy.testing as npt
 
-import geonum.topodata as tp
-
+import geonum.topodataaccess as tp
 
 def test_etopo1_init():
     acc = tp.Etopo1Access(check_access=False, search_database=False)
