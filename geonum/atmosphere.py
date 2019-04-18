@@ -25,21 +25,21 @@ from numpy import deg2rad, cos, ndarray, meshgrid, pi, exp, log
 #: Pressure at sea level [Pa] 
 p0 = 101325.0
 
-#: Avogadro constant [1/mol]
+#: Avogadro constant [mol-1]
 NA = 6.022140857e+23
 
 #: Standard sea level temperature [K]
 T0_STD = 288.15 
 
-#: Average molar mass of air, Unit: [g/mol]
+#: Average molar mass of air, Unit: [g mol-1]
 M_AIR_AVG = 28.9645 
 
-#: Gas constant (U.S. standard atmosphere) [Nm mol^-1 K^-1]
+#: Gas constant (U.S. standard atmosphere) [Nm mol-1 K-1]
 R_STD = 8.31432  
 
-#: Atmospheric lapse rate (Standard atmosphere) [K/m]
+#: Atmospheric lapse rate (Standard atmosphere) [K m-1]
 L_STD_ATM = -6.5e-3
-#: Atmospheric lapse rate (dry atmosphere) [K/m]
+#: Atmospheric lapse rate (dry atmosphere) [K m-1]
 L_DRY_AIR = -9.8e-3
 
 def _g0(phi=0.0):
@@ -50,12 +50,12 @@ def _g0(phi=0.0):
     
     Parameters
     ----------
-    phi : :obj:`float`, :obj:`array`
+    phi : float or ndarray
         latitude(s) in rads
     
     Returns
     -------
-    (:obj:`float` or :obj:`array`)
+    float or ndarray
         value(s) of Earth gravitational accelaration at sea level for input 
         latitude(s)
     """
@@ -76,14 +76,14 @@ def g(lat=45.0, alt=0.0):
 
     Parameters
     ----------
-    lat : :obj:`float`, :obj:`array`
+    lat : float or ndarray
         latitude(s) in degrees
-    alt : :obj:`float`, :obj:`array`
+    alt : float or ndarray
         altitude(s) in m
     
     Returns
     -------
-    (:obj:`float` or :obj:`array`)
+    float or ndarray
         value(s) of Earth gravitational accelaration at sea level for input 
         latitude(s) and altitude(s). If both inputs are arrays, then a 2D array
         is returned with the first axis (index 0) corresponding to altitudes 
@@ -97,10 +97,7 @@ def g(lat=45.0, alt=0.0):
     >>> alts = np.linspace(0, 1000, 100)
     >>> dat = geonum.atmosphere.g(lats, alts)
     >>> dat.shape
-    (100, 200)
-     
-    
-             
+    (100, 200)      
     """ 
     phi = deg2rad(lat)
     if all([isinstance(x, ndarray) for x in [phi, alt]]):
@@ -115,14 +112,14 @@ def g0(lat=45.0):
     
     Parameters
     ----------
-    lat : :obj:`float`, :obj:`array`
+    lat : float or ndarray
         latitude(s) in degrees
-    alt : :obj:`float`, :obj:`array`
+    alt : float or ndarray
         altitude(s) in m
     
     Returns
     -------
-    (:obj:`float` or :obj:`array`)
+    float or ndarray
         value(s) of Earth gravitational accelaration at sea level for input 
         latitude(s) and altitude(s). If both inputs are arrays, then a 2D array
         is returned with the first axis (index 0) corresponding to altitudes 
@@ -142,25 +139,24 @@ def temperature(alt=0.0, ref_temp=T0_STD, ref_alt=0.0, lapse_rate=L_STD_ATM):
     where:
         
         - :math:`$T_{ref}$` is a reference temperature
-        - :math:`$L$` is the atmospheric lapse-rate (cf. :attr:`L_STD_ATM`, \
-                                                     :attr:`L_DRY_AIR`)
+        - :math:`$L$` is the atmospheric lapse-rate
         - :math:`$h$` is the altitude in m
         - :math:`$h_{ref}$` is a reference altitude
         
     Parameters
     ----------
-    alt : :obj:`float`, :obj:`array`
+    alt : float or ndarray
         altitude(s) in m 
-    ref_temp : :obj:`float`, optional
+    ref_temp : float, optional
         reference temperature in K (default is std atm sea level)
-    ref_alt : :obj:`float`, optional
+    ref_alt : float, optional
         altitude corresponding to reference temperature (in m)
-    lapse_rate : :obj:`float`, optional
-        atmospheric lapse rate (in K / m)
+    lapse_rate : float, optional
+        atmospheric lapse rate (in K m-1)
     
     Returns
     -------
-    (:obj:`float` or :obj:`array`)
+    float or ndarray
         temperature(s) in K corresponding to altitudes 
     """    
     return float(ref_temp) + float(lapse_rate) * (alt - float(ref_alt))
@@ -182,21 +178,21 @@ def beta_exp(mol_mass=M_AIR_AVG, lapse_rate=L_STD_ATM, lat=45.0):
         - :math:`$g_{0}$` is the gravitational constant at sea level
         - :math:`$M_{Air}$` is the molar mass of air (defaults to standard atm)
         - :math:`$R$` is the gas constant (:attr:`R_STD`)
-        - :math:`$L$` is the atmospheric lapse-rate (cf. :attr:`L_STD_ATM`, \
-                                                     :attr:`L_DRY_AIR`)
+        - :math:`$L$` is the atmospheric lapse-rate (cf. :attr:`L_STD_ATM`, :attr:`L_DRY_AIR`)
     
     Parameters
     ----------
-    mol_mass : :obj:`float`, optional
+    mol_mass : float, optional
         molar mass of air M 
-    lapse_rate : :obj:`float`, optional
-        atmospheric lapse rate L (in K / m)
-    lat : :obj:`float`, optional
+    lapse_rate : float, optional
+        atmospheric lapse rate L (in K m-1)
+    lat : float, optional
         latitude for calculation of gravitational constant
         
     Returns
     -------
-    Beta Exponent for formula 
+    float 
+        Beta Exponent for formula 
     """
     return g0(lat) * mol_mass / (1000 * R_STD * lapse_rate)
 
@@ -216,8 +212,7 @@ def pressure(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
         - :math:`$p_{ref}$` is a reference pressure 
         - :math:`$T$` is the temperature  (cf. :func:`temperature`)
         - :math:`$T_{ref}$` is a reference temperature
-        - :math:`$L_{ref}$` is the atmospheric lapse-rate \
-           (cf. :attr:`L_STD_ATM`, :attr:`L_DRY_AIR`)
+        - :math:`$L_{ref}$` is the atmospheric lapse-rate 
         - :math:`$h$` is the altitude in m
         - :math:`$h_{ref}$` is a reference altitude
         
@@ -225,28 +220,28 @@ def pressure(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
     
     Parameters
     ----------
-    alt : :obj:`float`, :obj:`array`
+    alt : float or ndarray
         altitude(s) in m
-    ref_p : :obj:`float`, optional
+    ref_p : float, optional
         reference pressure (default is std atm sea level)
-    ref_temp : :obj:`float`, optional
+    ref_temp : float, optional
         reference temperature in K corresponding to `ref_p`
         (default is std atm sea level)
-    ref_alt : :obj:`float`, optional
+    ref_alt : float, optional
         altitude corresponding to `ref_p`
-    lapse_rate : :obj:`float`, optional
+    lapse_rate : float, optional
         atmospheric lapse rate (in K / m)
-    mol_mass : :obj:`float`, optional
+    mol_mass : float, optional
         molar mass of air 
-    lat : :obj:`float`, optional
+    lat : float, optional
         latitude for calculation of gravitational constant
-    temp : :obj:`float`, optional
+    temp : float, optional
         if unspecified (default), the temperature is calculated using
         :func:`temperature`
         
     Returns
     -------
-    (:obj:`float` or :obj:`array`)
+    float or ndarray
         pressure(s) corresponding to input altitude(s)
     """
     if temp is None:
@@ -262,28 +257,28 @@ def pressure_hPa(alt=0.0, *args, **kwargs):
     
     Parameters
     ----------
-    alt : :obj:`float`, :obj:`array`
+    alt : float or ndarray
         altitude(s) in m
-    ref_p : :obj:`float`, optional
+    ref_p : float, optional
         reference pressure (default is std atm sea level)
-    ref_temp : :obj:`float`, optional
+    ref_temp : float, optional
         reference temperature in K corresponding to `ref_p`
         (default is std atm sea level)
-    ref_alt : :obj:`float`, optional
+    ref_alt : float, optional
         altitude corresponding to `ref_p`
-    lapse_rate : :obj:`float`, optional
+    lapse_rate : float, optional
         atmospheric lapse rate (in K / m)
-    mol_mass : :obj:`float`, optional
+    mol_mass : float, optional
         molar mass of air 
-    lat : :obj:`float`, optional
+    lat : float, optional
         latitude for calculation of gravitational constant
-    temp : :obj:`float`, optional
+    temp : float, optional
         if unspecified (default), the temperature is calculated using
         :func:`temperature`
         
     Returns
     -------
-    (:obj:`float` or :obj:`array`)
+    float or ndarray
         pressure(s) in units of hPa corresponding to input altitude(s)
     """
     return pressure(alt, *args, **kwargs) / 100
@@ -302,8 +297,7 @@ def pressure2altitude(p, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
         
         - :math:`$h_{ref}$` is a reference altitude         
         - :math:`$T_{ref}$` is a reference temperature
-        - :math:`$L$` is the atmospheric lapse-rate (cf. :attr:`L_STD_ATM`, \
-                                                     :attr:`L_DRY_AIR`)
+        - :math:`$L$` is the atmospheric lapse-rate 
         - :math:`$p$` is the pressure (cf. :func:`pressure`)
         - :math:`$p_{ref}$` is a reference pressure
         - :math:`$\\beta$` is computed using :func:`beta_exp`
@@ -312,18 +306,18 @@ def pressure2altitude(p, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
     ----------
     p : float
         pressure in Pa
-    ref_p : :obj:`float`, optional
+    ref_p : float, optional
         reference pressure (default is std atm sea level)
-    ref_temp : :obj:`float`, optional
+    ref_temp : float, optional
         reference temperature in K corresponding to `ref_p`
         (default is std atm sea level)
-    ref_alt : :obj:`float`, optional
+    ref_alt : float, optional
         altitude corresponding to `ref_p`
-    lapse_rate : :obj:`float`, optional
+    lapse_rate : float, optional
         atmospheric lapse rate (in K / m)
-    mol_mass : :obj:`float`, optional
+    mol_mass : float, optional
         molar mass of air 
-    lat : :obj:`float`, optional
+    lat : float, optional
         latitude for calculation of gravitational constant
         
     Returns
@@ -351,8 +345,7 @@ def density(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
         
     .. math::
         
-        \\rho = p \\cdot \\frac{M_{Air}} {RT} \\quad \
-        \\left[ \\frac{g}{m^-3} \\right]
+        \\rho = p \\cdot \\frac{M_{Air}} {RT} \\quad \\left[ \\frac{g}{m^-3} \\right]
         
     where:
         
@@ -363,26 +356,26 @@ def density(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
     
     Parameters
     ----------
-    alt : :obj:`float`, :obj:`array`
+    alt : float or ndarray
         altitude(s) in m
-    ref_p : :obj:`float`, optional
+    ref_p : float, optional
         reference pressure (default is std atm sea level)
-    ref_temp : :obj:`float`, optional
+    ref_temp : float, optional
         reference temperature in K corresponding to `ref_p`
         (default is std atm sea level)
-    ref_alt : :obj:`float`, optional
+    ref_alt : float, optional
         altitude corresponding to `ref_p`
-    lapse_rate : :obj:`float`, optional
+    lapse_rate : float, optional
         atmospheric lapse rate (in K / m)
-    mol_mass : :obj:`float`, optional
+    mol_mass : float, optional
         molar mass of air 
-    lat : :obj:`float`, optional
+    lat : float, optional
         latitude for calculation of gravitational constant
     
     Returns
     -------
-    (:obj:`float` or :obj:`array`)
-        density corresponding to altitudes (in :math:`$g\,m^-3$`)
+    float or ndarray
+        density corresponding to altitudes (in g m-3)
     """
     temp = temperature(alt, ref_temp, ref_alt, lapse_rate)
     p = pressure(alt, mol_mass=mol_mass, lapse_rate=lapse_rate, temp=temp,
@@ -391,30 +384,30 @@ def density(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
     
 def number_density(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0, 
                    lapse_rate=L_STD_ATM, mol_mass=M_AIR_AVG, lat=45.0):
-    """Get atmospheric number density :math:`$[m^-3]$`
+    """Get atmospheric number density in m-3
     
     Parameters
     ----------
-    alt : :obj:`float`, :obj:`array`
+    alt : float or ndarray
         altitude(s) in m
-    ref_p : :obj:`float`, optional
+    ref_p : float, optional
         reference pressure (default is std atm sea level)
-    ref_temp : :obj:`float`, optional
+    ref_temp : float, optional
         reference temperature in K corresponding to `ref_p`
         (default is std atm sea level)
-    ref_alt : :obj:`float`, optional
+    ref_alt : float, optional
         altitude corresponding to `ref_p`
-    lapse_rate : :obj:`float`, optional
-        atmospheric lapse rate (in K / m)
-    mol_mass : :obj:`float`, optional
+    lapse_rate : float, optional
+        atmospheric lapse rate (in K m-1)
+    mol_mass : float, optional
         molar mass of air 
-    lat : :obj:`float`, optional
+    lat : float, optional
         latitude for calculation of gravitational constant
         
     Returns
     -------
-    (:obj:`float` or :obj:`array`)
-        number density in m^-3 corresponding to altitudes
+    float or ndarray
+        number density in m-3 corresponding to altitudes
     """
     rho = density(alt, ref_p, ref_temp, ref_alt, lapse_rate, mol_mass, lat)
     return rho * NA / mol_mass
@@ -428,7 +421,7 @@ def refr_idx_300ppm_co2(lbda_mu=0.300):
     
     Parameters 
     ----------
-    lbda_mu : (:obj:`float`, :obj:`array`)
+    lbda_mu : float or ndarray
         wavelength in microns
     
     Returns
@@ -458,14 +451,14 @@ def refr_idx(lbda_mu=0.300, co2_ppm=400.0):
     
     Parameters
     ----------
-    lbda_mu : (:obj:`float`, :obj:`array`)
+    lbda_mu : float or ndarray
         wavelength in micrometers
     co2_ppm : float
         atmospheric CO2 volume mixing ratio in ppm
     
     Returns
     -------
-    float
+    float or ndarray
         refractive index
     """
     n_300 = refr_idx_300ppm_co2(lbda_mu)
@@ -479,14 +472,13 @@ def _F_N2(lbda_mu=0.300):
     
     Parameters
     ----------
-    lbda_mu : (:obj:`float`, :obj:`array`)
+    lbda_mu : float or ndarray
         wavelength in micrometers
     
     Returns
     -------
-    (:obj:`float` or :obj:`array`)
-        depolarisation factor of N2
-        
+    float or ndarray
+        depolarisation factor of N2  
     """
     return 1.034 + 3.17e-4 / lbda_mu ** 2
 
@@ -498,12 +490,12 @@ def _F_O2(lbda_mu=0.300):
     
     Parameters
     ----------
-    lbda_mu : (:obj:`float`, :obj:`array`)
+    lbda_mu : float or ndarray
         wavelength in micrometers
     
     Returns
     -------
-    (:obj:`float` or :obj:`array`)
+    float or ndarray
         depolarisation factor of O2
         
     """
@@ -516,16 +508,15 @@ def F_AIR(lbda_mu=0.300, co2_ppm=400.0):
     
     Parameters
     ----------
-    lbda_mu : (:obj:`float`, :obj:`array`)
+    lbda_mu : float or ndarray
         wavelength in micrometers
     co2_ppm : float
         atmospheric CO2 volume mixing ratio in ppm
     
     Returns
     -------
-    (:obj:`float` or :obj:`array`)
-        depolarisation factor of O2
-        
+    float or ndarray
+        depolarisation factor of O2  
     """
     co2 = co2_ppm * 10**(-6)
     return (78.084 * _F_N2(lbda_mu) + 
@@ -560,7 +551,7 @@ def rayleigh_vol_sc_coeff(alt=0.0, lbda_mu=0.300, co2_ppm=400.0, **kwargs):
     
     Parameters
     ----------
-    alt : :obj:`float`, :obj:`array`
+    alt : float or ndarray
         altitude(s) in m
     lbda_mu : float
         wavelength in micrometers
@@ -569,7 +560,7 @@ def rayleigh_vol_sc_coeff(alt=0.0, lbda_mu=0.300, co2_ppm=400.0, **kwargs):
     
     Returns
     -------
-    (:obj:`float` or :obj:`array`)
+    float or ndarray
         vol. scattering coeff. in cm-1 corresponding to altitudes
     """
     num_dens = number_density(alt, **kwargs) * 100**(-3) # cm^-3
