@@ -21,7 +21,7 @@ except:
     print('Plotting of maps etc. is deactivated, please install Basemap')
     
 from numpy import (round, log10, floor, meshgrid, arange, array, zeros, ceil,
-                   log2, asarray, dot, diag)
+                   log2, asarray)
 
 from matplotlib.pyplot import subplots, Polygon
 import matplotlib.cm as colormaps
@@ -34,8 +34,7 @@ from os.path import join
 
 
 #from geonum.base import GeoPoint, GeoVector3D
-from geonum.topodata import TopoAccessError
-from geonum.topodata import TopoData, TopoDataAccess
+from geonum.topodata import TopoAccessError, TopoData, TopoDataAccess
 from geonum.helpers import haversine_formula, shifted_color_map, exponent
 
 from geonum import CV2_AVAILABLE

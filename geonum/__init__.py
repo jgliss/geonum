@@ -77,14 +77,11 @@ from . import atmosphere
 from .topodata import TopoData, TopoDataAccess
 
 if LATLON_AVAILABLE:
-    from .base import GeoPoint, GeoVector3D
+    from .geopoint import GeoPoint
+    from .geovector3d import GeoVector3D
     from .geosetup import GeoSetup
-    from . import base
-    from . import geosetup
     from .processing import LineOnGrid, ElevationProfile  
-    from . import processing
 
 if BASEMAP_AVAILABLE:
     from .mapping import Map
-    from . import mapping
     

@@ -2,7 +2,7 @@
 """Test environment for base.py module."""
 from __future__ import (absolute_import, division)
 import numpy.testing as npt
-from geonum.base import GeoPoint, GeoVector3D
+from geonum import GeoPoint, GeoVector3D
 
 def test_GeoPoint():
     """Test basic arithmetic operations on GeoPoints."""

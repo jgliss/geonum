@@ -31,7 +31,7 @@ from scipy.interpolate import interp1d
 
 from matplotlib.pyplot import subplots, tight_layout
 
-from geonum.base import GeoPoint
+from geonum.geopoint import GeoPoint
 
 class ElevationProfile(object):
     """Class for calculating elevation profiles

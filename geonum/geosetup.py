@@ -29,7 +29,8 @@ from traceback import print_exc
 from warnings import warn
 from matplotlib.pyplot import get_cmap, figure
 
-from geonum.base import GeoPoint, GeoVector3D
+from geonum.geopoint import GeoPoint
+from geonum.geovector3d import GeoVector3D
 from geonum.topodata import TopoDataAccess, TopoData
 
 class GeoSetup(object):
