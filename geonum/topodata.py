@@ -26,9 +26,14 @@ class TopoData(object):
     
     This object represents topographic data in a certain latitude and longitude 
     range, specified by the corner coordinates of the range 
-    (:attrs:`lon0, lat0, lon1, lat1`). It may be used for 2D and 3D plotting of 
+    (:attr:`lon0, lat0, lon1, lat1`). It may be used for 2D and 3D plotting of 
     the topographic data (cf. :func:`plot_2d`, :func:`plot_3d`) or for further
-    analysis (cf. :func:`get)
+    analysis such as coordinate based altitude retrievals 
+    (:func:`get_altitude`), change of the grid resolution (cf. 
+    :func:`increase_grid_resolution`) or for customised analysis by directly
+    using the numpy data array containing the topographic altitudes 
+    (:attr:`data`), together with the corresponding dimension coordinates 
+    which can be accessed via attributes :attr:`latitude`and :attr:`longitude`.
     
     To create an instance of this class, you may use the class 
     :class:`TopoDataAccess`.
@@ -43,21 +48,20 @@ class TopoData(object):
     Parameters
     ----------
     lats : ndarray 
-        numpy array with latitude coordinates of the topographic dataset
+        numpy array with latitude coordinates of the topographic dataset.
+        Accessible via :attr:`latitude`.
     lons : ndarray 
-        numpy array with longitude coordinates of the topographic dataset
+        numpy array with longitude coordinates of the topographic dataset.
+        Accessible via :attr:`longitude`.
     data : ndarray
-        2D numpy array containing elevation values
+        2D numpy array containing elevation values.
     data_id : str
-        ID of this data set
+        ID of this data set.
     repl_nan_minval : bool 
         coordinates containing NaN values are replaced with the minimum 
-        altitude in the range
+        altitude in the range.
     """
     def __init__(self, lats, lons, data, data_id="", repl_nan_minval=False):
-        """Class initialisation
-        
-        """
         self.data_id = data_id #: ID of topodata file
 
         self.lats = lats #
@@ -164,17 +168,26 @@ class TopoData(object):
         interpolation. Note, that this does not increase the actual resolution
         of the topographic data grid.
         
-        :param float res: desired grid resolution in km (default: 0.2)
-        :param int polyorder: order of polynomial used for interpolation
-            (default: 2)
-        :returns: 
-            - :class:`TopoData`, new object with desired grid resolution
-            
-        .. note::
+        Note
+        ----
+        Requires that opencv library is installed.
         
-            This functionality is only available, if :mod:`cv2` is installed
-            
-            
+        Parameters
+        ----------
+        res : int or float, optional
+            desired grid resolution in km (default: 0.2)
+        polyorder : int, optional 
+            order of polynomial used for interpolation (default: 2)
+        
+        Returns
+        -------
+        TopoData
+            new object with desired grid resolution
+        
+        Raises
+        ------
+        ImportError
+            if opencv is not installed.
         """
         if not CV2_AVAILABLE or not LATLON_AVAILABLE:
             raise ImportError('Feature disabled: Require opencv and '
@@ -275,9 +288,15 @@ class TopoData(object):
     def plot_3d(self, ax=None):
         """Creates 3D surface plot of data
         
-        :param Axes3D ax (None): 3D axes object
-        :return:
-            - :class:`geonum.mapping.Map` object
+        Parameters
+        ----------
+        ax
+            instance of matplotlib Axes3D object
+        
+        Returns
+        -------
+        geonum.mapping.Map
+            plotted map object.
             
         """
         from geonum.mapping import Map
@@ -325,10 +344,24 @@ class TopoData(object):
         return (idx_lat, idx_lon)
         
     def get_altitude(self, lat, lon):
-        """Get altitude value at input position
+        """Get altitude value at input coordinate
         
-        :param float lat: latitude of point
-        :param float lon: longitude of point
+        Parameters
+        ----------
+        lat : int or float 
+            latitude of coordinate
+        lon : int or float 
+            longitude of coordinate
+            
+        Returns
+        -------
+        float
+            altitude at input coordinate
+        
+        Raises
+        ------
+        ValueError
+            if retrieved altitude value is NaN
         """
         idx_lat, idx_lon = self.closest_index(lat, lon)
         dat = self.data[idx_lat, idx_lon]
