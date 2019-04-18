@@ -18,7 +18,7 @@ from numpy import testing as npt
 save_path = join(getcwd(), "scripts_out")
 
 def load_topo_oslo():
-    dat = geonum.topodata.TopoDataAccess(mode='srtm')
+    dat = geonum.TopoDataAccess(mode='srtm')
     topodata = dat.get_data(59.8728, 10.375, 60.026, 10.9144)
     return topodata
     
