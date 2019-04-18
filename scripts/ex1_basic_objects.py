@@ -3,7 +3,7 @@
 Introduction into the geonum base classes GeoPoint and GeoVector3D
 """
 
-from geonum.base import GeoPoint
+from geonum import GeoPoint
 from SETTINGS import OPTPARSE
 from numpy import testing as npt
 from matplotlib.pyplot import show

@@ -25,8 +25,8 @@ def load_topo_oslo():
     
 if __name__ == "__main__":
     topo_data = load_topo_oslo()
-    my_flat = geonum.base.GeoPoint(59.919386, 10.714970,
-                                   name="Somewhere in Frogner (Oslo)")
+    my_flat = geonum.GeoPoint(59.919386, 10.714970,
+                              name="Somewhere in Frogner (Oslo)")
     
     if geonum.BASEMAP_AVAILABLE:
         basemap = topo_data.plot_2d()
