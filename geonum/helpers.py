@@ -35,7 +35,6 @@ def all_topodata_search_dirs():
     list
         list containing all search directories (absolute paths)
     """
-    import os
     from geonum import TOPO_INFO_FILE, LOCAL_TOPO_PATH
     paths = [LOCAL_TOPO_PATH]
     with open(TOPO_INFO_FILE, "r") as f:

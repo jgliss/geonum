@@ -31,44 +31,54 @@ from matplotlib.pyplot import get_cmap, figure
 
 from geonum.geopoint import GeoPoint
 from geonum.geovector3d import GeoVector3D
-from geonum.topodata import TopoDataAccess, TopoData
+from geonum.topodataaccess import TopoDataAccess
+from geonum.topodata import TopoData
 
 class GeoSetup(object):
-    """The GeoSetup class represents acollection of GeoPoints and vectors
+    """The GeoSetup class represents a collection of GeoPoints and vectors
+    
+    Attributes
+    ----------
+    id : str
+        name of this setup
+    points : list
+        list of :class:`GeoPoint` objects assigned to this setup
+    vectors : list
+        list of :class:`GeoVector3D` objects assigned to this setup
+        
+    Parameters
+    ----------
+    points : list
+        list of :class:`GeoPoint` objects to be included in this setup
+    vectors : list
+        list of :class:`GeoVector3D` objects to be included in this setup
+    lat_ll : :obj:`float`, optional
+        lower left latitude of regime
+    lon_ll : :obj:`float`, optional
+        lower left longitude of regime
+    lat_tr : :obj:`float`, optional
+        top right latitude of regime
+    lon_tr : :obj:`float`, optional
+        top right longitude of regime
+    id : str 
+        identification string of this setup
+    topo_access_mode : str
+        topo data mode, default is SRTM
+        (see :class:`TopoDataAccess` for details)
+    local_topo_path : str 
+        local path were topography data (e.g. ETOPO1 data) is stored
+    cmap_vecs : str
+        String specifying a valid matplotlib colormap supposed to be
+        used for drawing :class:`GeoVector3D` objects into overview
+        maps
+    
+        
     """
     def __init__(self, points=[], vectors=[], lat_ll=None, lon_ll=None, 
                  lat_tr=None, lon_tr=None, id="MyGeoSetup", 
                  topo_access_mode="srtm", local_topo_path=None, 
                  cmap_vecs="Greens"):
-        """Init object
-        
-        Parameters
-        ----------
-        points : list
-            list of :class:`GeoPoint` objects to be included in this setup
-        vectors : list
-            list of :class:`GeoVector3D` objects to be included in this\
-            setup
-        lat_ll : :obj:`float`, optional
-            lower left latitude of regime
-        lon_ll : :obj:`float`, optional
-            lower left longitude of regime
-        lat_tr : :obj:`float`, optional
-            top right latitude of regime
-        lon_tr : :obj:`float`, optional
-            top right longitude of regime
-        id : str 
-            identification string of this setup
-        topo_access_mode : str
-            topo data mode, default is SRTM
-            (see :class:`TopoDataAccess` for details)
-        local_topo_path : str 
-            local path were topography data (e.g. ETOPO1 data) is stored
-        cmap_vecs : str
-            String specifying a valid matplotlib colormap supposed to be
-            used for drawing :class:`GeoVector3D` objects into overview
-            maps
-        """
+
         self.id = id
         self.points = {}
         self.vectors = {}

@@ -72,15 +72,19 @@ LOCAL_TOPO_PATH = join(_LIBDIR, "local_topo_data")
 
 TOPO_INFO_FILE = join(LOCAL_TOPO_PATH,  "LOCAL_TOPO_PATHS.txt")
 
+from . import exceptions
 from . import helpers
 from . import atmosphere
-from .topodata import TopoData, TopoDataAccess
+from .topodata import TopoData
+from .topodataaccess import TopoDataAccess
+from .topoaccessbase import delete_all_local_srtm_files
 
 if LATLON_AVAILABLE:
     from .geopoint import GeoPoint
     from .geovector3d import GeoVector3D
     from .geosetup import GeoSetup
-    from .processing import LineOnGrid, ElevationProfile  
+    from .elevationprofile import ElevationProfile
+    from .processing import LineOnGrid  
 
 if BASEMAP_AVAILABLE:
     from .mapping import Map

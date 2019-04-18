@@ -19,46 +19,40 @@ try:
     from mpl_toolkits.basemap import Basemap
 except:
     print('Plotting of maps etc. is deactivated, please install Basemap')
-    
-from numpy import (round, log10, floor, meshgrid, arange, array, zeros, ceil,
-                   log2, asarray)
 
-from matplotlib.pyplot import subplots, Polygon
+import matplotlib.pyplot as plt
 import matplotlib.cm as colormaps
-from random import randrange
-from mpl_toolkits.mplot3d.axes3d import Axes3D
-import mpl_toolkits.mplot3d.art3d as a3d
-from matplotlib.pyplot import figure, draw
-from os import getcwd
-from os.path import join
+from mpl_toolkits import mplot3d
+import numpy as np    
 
-
-#from geonum.base import GeoPoint, GeoVector3D
-from geonum.topodata import TopoAccessError, TopoData, TopoDataAccess
+from geonum.topodataaccess import TopoDataAccess
+from geonum.topodata import TopoData
+from geonum.exceptions import TopoAccessError
 from geonum.helpers import haversine_formula, shifted_color_map, exponent
 
 from geonum import CV2_AVAILABLE
 
 class Map(Basemap):
-    """Basemap object for drawing and plotting (on) a geographic map
+    """Basemap object for drawing and plotting (on) a map
     
     This object is initiated as `Basemap <http://matplotlib.org/basemap/
     users/examples.html>`_ and can therefore be used as such. 
     Added functionality mainly includes:
     
-        1. Including topography data
-        #. 2D and 3D plotting
-        #. Handle of :class:`GeoVector3D` and :class:`GeoPoint` objects
-        #. Some more high level functionality (i.e. draw text, points, 
-            polygons or plot data onto map)
+    1. Including topography data
+    #. 2D and 3D plotting
+    #. Handle of :class:`GeoVector3D` and :class:`GeoPoint` objects
+    #. Some more high level functionality (i.e. draw text, points, polygons \
+       or plot data onto map)
+
+    Note
+    ----
     
-    .. note::
-    
-        The mapping functionality was initally developed for geographical 
-        setups on local scales (i.e. several 10 km grids) including 
-        handling of high resolution topography data and was not tested to 
-        create large maps on global scales. In principle, this should work,
-        though.
+    The mapping functionality was initally developed for geographical 
+    setups on local scales (i.e. several 10 km grids) including 
+    handling of high resolution topography data and was not tested to 
+    create large maps on global scales. In principle, this should work,
+    though.
        
     """ 
     def __init__(self, *args, **kwargs):
@@ -179,11 +173,11 @@ class Map(Basemap):
     
         topo = self.topo_data
         # determine the nu
-        pyr_steps = int(ceil(log2(float(len(topo.lons)) / grid_points)))
+        pyr_steps = int(np.ceil(np.log2(float(len(topo.lons)) / grid_points)))
         z_max = float(topo.max)
         z_min = float(topo.min)
-        z_order = floor(log10(topo.alt_range))
-        X,Y = meshgrid(topo.lons, topo.lats)
+        z_order = np.floor(np.log10(topo.alt_range))
+        X,Y = np.meshgrid(topo.lons, topo.lats)
         x, y = self(X, Y)
         z = topo.data
         if not CV2_AVAILABLE:
@@ -214,9 +208,9 @@ class Map(Basemap):
         min_c = int(round(z_min / 10**(z_order - 1)) * 10**(z_order - 1))
         max_c = int(round(z_max / 10**(z_order - 1)) * 10**(z_order - 1))
         if include_seabed:
-            levels_contour = arange(min_c, max_c, separation_levels)
+            levels_contour = np.arange(min_c, max_c, separation_levels)
         else:
-            levels_contour = arange(0, max_c, separation_levels)
+            levels_contour = np.arange(0, max_c, separation_levels)
         
         CS1 = self.contour(x, y, z, levels_contour, linewidths=0.5,
                            colors=self.default_colors["contour_lines"])
@@ -237,16 +231,16 @@ class Map(Basemap):
     
     def _check_ax3d(self, ax):
         """Check if input is :class:`Axes3D`"""
-        if isinstance(ax, Axes3D):
+        if isinstance(ax, mplot3d.Axes3D):
             return True
         return False
     
     def set_ticks_topo_colorbar(self, start, stop, step):
         """Update ticks of topo colorbar"""
         cb = self.colorbars["topo"]
-        ticks = arange(start, stop, step)
+        ticks = np.arange(start, stop, step)
         cb.set_ticks(ticks)
-        draw()
+        plt.draw()
         
     def draw_topo(self, insert_colorbar=False, include_seabed=True,
                     max_grid_points=500, cmap_div=colormaps.coolwarm,
@@ -273,11 +267,11 @@ class Map(Basemap):
             if ax is None:
                 ax = self.ax
             if ax is None:
-                fig, ax = subplots(1, 1, figsize=(16,10))
+                fig, ax = plt.subplots(1, 1, figsize=(16,10))
                 self.ax = ax
     
-            x, y, z, z_min, z_max, z_order =\
-                self._prep_topo_data(grid_points=max_grid_points)
+            (x, y, z, z_min, z_max, 
+             z_order) = self._prep_topo_data(grid_points=max_grid_points)
                 
             
             delz = z_max - z_min #in m
@@ -291,7 +285,7 @@ class Map(Basemap):
                 start_alt = 0
             
             z_step = (stop_alt - start_alt) / 1000. 
-            levels_filled = arange(start_alt, stop_alt, z_step)
+            levels_filled = np.arange(start_alt, stop_alt, z_step)
             
             if levels_filled[0] < 0:          
                 shifted_cmap = shifted_color_map(z_min, z_max, cmap_div)
@@ -341,7 +335,7 @@ class Map(Basemap):
             if ax is None:
                 ax = self.ax
             if ax is None:
-                fig, ax = subplots(1, 1, figsize=(16,10))
+                fig, ax = plt.subplots(1, 1, figsize=(16,10))
                 self.ax = ax
     
             x, y, z, z_min, z_max, z_order =\
@@ -353,9 +347,9 @@ class Map(Basemap):
             z_step = (z_max - z_min) / 1000. 
             
             if include_seabed:
-                levels_filled = arange(z_min, z_max + z_step, z_step)
+                levels_filled = np.arange(z_min, z_max + z_step, z_step)
             else:
-                levels_filled = arange(0, z_max + 1, z_step)
+                levels_filled = np.arange(0, z_max + 1, z_step)
             if levels_filled[0] < 0:          
                 shifted_cmap = shifted_color_map(z_min, z_max, cmap_div)
                 
@@ -407,8 +401,8 @@ class Map(Basemap):
             if self._check_ax3d(self.ax):
                 ax = self.ax
             else:
-                fig = figure(figsize=figsize)
-                ax = Axes3D(fig)
+                fig = plt.figure(figsize=figsize)
+                ax = mplot3d.Axes3D(fig)
     
         x, y, z, z_min, z_max, z_order = self._prep_topo_data()
         tickformatter = "{:.2f}"    
@@ -502,17 +496,17 @@ class Map(Basemap):
             Will be set automatically if unspecified
         """
         if lon_tick is None:
-            pot_lon = floor(log10(self.delta_lon))
-            lon_tick = floor(self.delta_lon / 10**pot_lon) * 10**pot_lon / 4
+            pot_lon = np.floor(np.log10(self.delta_lon))
+            lon_tick = np.floor(self.delta_lon / 10**pot_lon) * 10**pot_lon / 4
         if lat_tick is None:
-            pot_lat = floor(log10(self.delta_lat))
-            lat_tick = floor(self.delta_lat / 10**pot_lat) * 10**pot_lat / 3
+            pot_lat = np.floor(np.log10(self.delta_lat))
+            lat_tick = np.floor(self.delta_lat / 10**pot_lat) * 10**pot_lat / 3
             
-        lon_tick_array = arange(lon_tick * int((self.lon_ll - self.delta_lon 
+        lon_tick_array = np.arange(lon_tick * int((self.lon_ll - self.delta_lon 
                                 * 0.3) / lon_tick), lon_tick * int((self.lon_tr 
                                 + self.delta_lon * 0.3) / lon_tick), lon_tick)
                                 
-        lat_tick_array = arange(lat_tick * int((self.lat_ll - self.delta_lat 
+        lat_tick_array = np.arange(lat_tick * int((self.lat_ll - self.delta_lat 
                                 * 0.3) / lat_tick), lat_tick * int((self.lat_tr 
                                 + self.delta_lat * 0.3) / lat_tick), lat_tick)
                                 
@@ -538,7 +532,7 @@ class Map(Basemap):
         if not "color" in kwargs:
             kwargs["color"] = "gray"
         if not "fmt" in kwargs:
-            digs = '%d' %(4 - int(floor(log10(self._len_diag()))))
+            digs = '%d' %(4 - int(np.floor(np.log10(self._len_diag()))))
             kwargs["fmt"] = "%." + digs + "f"
         lon_tick_array, lat_tick_array = self._prep_coord_ticks(lon_tick,
                                                                 lat_tick)
@@ -648,13 +642,14 @@ class Map(Basemap):
             except:
                 print("Failed to add %s to map" %p)
         if distances is not None and len(distances) == len(pts):
-            sc = self.ax.scatter(xs, ys, asarray(zs)+alt_offset_m, zdir='z', 
+            sc = self.ax.scatter(xs, ys, np.asarray(zs)+alt_offset_m, zdir='z', 
                                  s=20, c=distances, cmap="Oranges", 
                                  zorder=100000)
             zlabel = "Distance [%km]"
             self.insert_colorbar("dists", sc, label=zlabel)
         elif connect:
-            self.ax.plot(xs, ys, asarray(zs)+alt_offset_m, ls=connect_style, 
+            self.ax.plot(xs, ys, np.asarray(zs)+alt_offset_m, 
+                         ls=connect_style, 
                          c=color, lw=2, zorder=100000)   
                                                 
     def draw_geo_point_3d(self, p, ax=None, alt_offset_m=0.0, **kwargs):
@@ -679,7 +674,7 @@ class Map(Basemap):
         if not any([x in kwargs for x in ["c", "color"]]):
             kwargs["c"] = "lime"
 
-        if not isinstance(self.ax, Axes3D):
+        if not isinstance(self.ax, mplot3d.Axes3D):
             raise ValueError("Need :class:`Axes3D` object as input...")
         x0, y0 = self(p.longitude, p.latitude)
         z0 = p.altitude + alt_offset_m#*1000
@@ -700,7 +695,7 @@ class Map(Basemap):
         if ax is None:
             ax = self.ax
         try:
-            if not isinstance(ax, Axes3D):
+            if not isinstance(ax, mplot3d.Axes3D):
                 raise ValueError("Need :class:`Axes3D` object as input...")
             elif not vec.type() == "GeoVector3D":
                 raise AttributeError("Wrong input, need :class:`GeoVector3D` "
@@ -718,7 +713,7 @@ class Map(Basemap):
             x1, y1 = self(pf.longitude, pf.latitude)
             z1 = pf.altitude#*1000
     
-            l = a3d.Line3D((x0,x1), (y0,y1), (z0,z1), **kwargs)
+            l = mplot3d.art3d.Line3D((x0,x1), (y0,y1), (z0,z1), **kwargs)
             handle = ax.add_line(l)
             self.lines[vec.name] = handle
             return pf
@@ -744,7 +739,7 @@ class Map(Basemap):
                 coords.append(self(p.longitude, p.latitude))
             except Exception as e:
                 print("Failed to add one point to poly: " + repr(e))
-        polygon = Polygon(coords, **kwargs)
+        polygon = plt.Polygon(coords, **kwargs)
         ax.add_patch(polygon)
         
     def add_polygon_3d(self, points=[], poly_id="undefined", ax=None, **kwargs):
@@ -765,7 +760,7 @@ class Map(Basemap):
             ys.append(y)
             zs.append(p.altitude)#*1000)
         coords = [list(zip(xs, ys, zs))]
-        poly_coll = a3d.Poly3DCollection(coords, **kwargs)
+        poly_coll = mplot3d.art3d.Poly3DCollection(coords, **kwargs)
         ax.add_collection3d(poly_coll)
            
     def draw_line_2d(self,line_id, lat0, lon0, lat1, lon1, **kwargs):
@@ -886,7 +881,7 @@ class Map(Basemap):
             unit = 'n/d'
     
         x, y = self(lons, lats)
-        z = array(data)
+        z = np.array(data)
         sc = ax.scatter(x, y, c=z, **kwargs)
         zlabel = "%s [%s]" %(data_id, unit)
         self.insert_colorbar(data_id, sc, label=zlabel)
@@ -966,14 +961,14 @@ class Map(Basemap):
     """Other stuff"""
     def make_random_data(self,total_number=200, value_range=[-100, 100, 1]):
         """Create random data in the current regime"""
-        lons, lats = zeros(total_number), zeros(total_number)
-        data = zeros(total_number)
+        from random import randrange
+        lons, lats = np.zeros(total_number), np.zeros(total_number)
+        data = np.zeros(total_number)
         for k in range(total_number):
             lons[k] = 0.1 * randrange(self.lon_ll * 10, self.lon_tr * 10, 1)
             lats[k] = 0.1 * randrange(self.lat_ll * 10, self.lat_tr * 10, 1)
             data[k] = randrange(value_range[0], value_range[1], value_range[2])
             
-        
         return lons, lats, data
     
     """I/O, printing, etc...
@@ -993,11 +988,12 @@ class Map(Basemap):
         
     def save_as(self, save_dir=None, save_name=None, ftype="png"):
         """Save current figure as image"""
+        import os
         if save_dir is None:
-            save_dir = getcwd()
+            save_dir = os.getcwd()
         if save_name is None:
             save_name = "geonum_map"
-        self.fig.savefig(join(save_dir, save_name + ftype))
+        self.fig.savefig(os.path.join(save_dir, save_name + ftype))
         
 if __name__ == "__main__":
     from matplotlib.pyplot import close

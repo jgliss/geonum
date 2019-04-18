@@ -22,7 +22,6 @@ from numpy import (radians, cos, sin, degrees, sqrt,tan, isnan, arctan2,
                    asarray, nanmin, nanmax)
 
 from warnings import warn
-from geonum.topodata import TopoDataAccess, TopoData
 
 class GeoPoint(LatLon):
     """The Geopoint object represents a location in the atmosphere 
@@ -134,6 +133,7 @@ class GeoPoint(LatLon):
         topo_data : TopoData
             topography dataset
         """
+        from geonum.topodata import TopoData
         if not isinstance(topo_data, TopoData):
             return
         elif not topo_data.includes_coordinate(self.latitude, self.longitude):
@@ -300,7 +300,7 @@ class GeoPoint(LatLon):
             
         
         """
-        from geonum.processing import ElevationProfile
+        from geonum.elevationprofile import ElevationProfile
         data, pf = self.get_topo_data(geo_point, azimuth, dist_hor, lon1, 
                                       lat1)
         return ElevationProfile(data, self, pf, resolution=resolution,
@@ -405,6 +405,7 @@ class GeoPoint(LatLon):
     @property
     def _topo_access(self):
         """Topography data access class"""
+        from geonum.topodataaccess import TopoDataAccess
         return TopoDataAccess(mode=self.topo_access_mode,
                               local_path=self.local_topo_path)
         
