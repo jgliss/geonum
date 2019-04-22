@@ -7,6 +7,7 @@ Geonum features online access to topographic data from the SRTM dataset, using t
 News / Notifications
 ====================
 
+- Version 1.4.0 released (22/04/2019, [more information](https://github.com/jgliss/geonum/releases)) 
 - Now also available and tested in Python > 3
 - Changed requirement **LatLon** -> **LatLon23** to support Python 3
 
