@@ -3,16 +3,9 @@
 from __future__ import (absolute_import, division)
 import numpy.testing as npt
 import pytest
-from geonum import SRTM_AVAILABLE
+from geonum.test.markers import srtm_avail
 from geonum import TopoDataAccess
 
-# custom skipif marker that is used below for test functions that 
-# require SRTM.py to be installed
-srtm_avail = pytest.mark.skipif(SRTM_AVAILABLE==False,
-                   reason='Skipping SRTM database tests. srtm.py library is '
-                   'not installed')
-                    #allow_module_level=True)
-    
 @pytest.fixture(scope='session')
 @srtm_avail
 def guallatiri_data():

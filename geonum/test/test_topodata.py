@@ -2,7 +2,7 @@
 """Test environment for base.py module."""
 from __future__ import (absolute_import, division)
 import numpy.testing as npt
-
+from geonum.test.markers import srtm_avail
 import geonum.topodataaccess as tp
 
 def test_etopo1_init():
@@ -11,6 +11,7 @@ def test_etopo1_init():
     assert LOCAL_TOPO_PATH == acc.local_path
     assert acc.file_name == 'ETOPO1_Ice_g_gmt4.grd'
     
+@srtm_avail
 def test_srtm():
     acc = tp.SRTMAccess()
     d = acc.get_data(acc._TESTLAT, acc._TESTLON)
