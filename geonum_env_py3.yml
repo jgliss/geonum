@@ -1,5 +1,4 @@
 channels:
-  - anaconda
   - conda-forge
 
 dependencies:
@@ -8,9 +7,9 @@ dependencies:
   - matplotlib
   - basemap
   - netcdf4
+  - latlon23
   - pytest
   - pip
   - pip:
     - srtm.py
-    - LatLon23
   
