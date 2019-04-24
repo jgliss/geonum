@@ -114,6 +114,8 @@ def add_points_and_plot_map(basemap):
 if __name__ == "__main__":
     if not geonum.BASEMAP_AVAILABLE:
         raise ImportError('Cannot run script. Basemap is not installed')
+    elif not geonum.SRTM_AVAILABLE:
+        raise ImportError('Cannot run script. srtm.py is not installed')
     m = create_map_and_load_topodata()
     add_points_and_plot_map(m)
     
