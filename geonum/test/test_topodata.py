@@ -2,9 +2,10 @@
 """Test environment for base.py module."""
 from __future__ import (absolute_import, division)
 import numpy.testing as npt
-from geonum.test.markers import srtm_avail
+from geonum.test.markers import srtm_avail, netcdf4_avail
 import geonum.topodataaccess as tp
 
+@netcdf4_avail
 def test_etopo1_init():
     acc = tp.Etopo1Access(check_access=False, search_database=False)
     from geonum import LOCAL_TOPO_PATH
