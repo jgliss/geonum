@@ -19,7 +19,7 @@ setup(
     name        =   'geonum',
     version     =   version,
     author      =   'Jonas Gliss',
-    author_email=   'jg@nilu.no',
+    author_email=   'jonasgliss@gmail.com',
     license     =   'GPLv3',
     url         =   'https://github.com/jgliss/geonum',
     package_dir =   {'geonum'     :   'geonum'},
