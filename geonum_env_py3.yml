@@ -2,14 +2,12 @@ channels:
   - conda-forge
 
 dependencies:
-  - python>=3.7
+  - python>=3
   - scipy
   - matplotlib
   - basemap
   - netcdf4
   - latlon23
   - pytest
-  - pip
-  - pip:
-    - srtm.py
+  - srtm.py
   
