@@ -31,6 +31,9 @@ print(connection_vector)
 # activated from the command line when executing the script using the 
 # option --test 1
 if int(options.test):
+    from geonum import SRTM_AVAILABLE
+    if not SRTM_AVAILABLE:
+        raise ImportError('Skipping tests, since they require srtm.py to be installed')
     from os.path import basename
     
     actual = [connection_vector.azimuth,

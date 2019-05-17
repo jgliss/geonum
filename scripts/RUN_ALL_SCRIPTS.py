@@ -26,6 +26,7 @@ paths = sorted(glob.glob('ex*.py'))
 # init arrays, that store messages that are printed after execution of all 
 # scripts
 test_err_messages = []
+skipped_messages = []
 passed_messages = []
 
 for path in paths:
@@ -34,21 +35,29 @@ for path in paths:
         exec(open(path).read())
         passed_messages.append("All tests passed in script: %s" %basename(path))
     except AssertionError as e:
-        msg = ("\n\n"
+        msg = ("\n"
                "--------------------------------------------------------\n"
                "Tests in script %s failed.\n"
-               "Error traceback:\n %s\n"
+               "Reason:\n %s\n"
                "--------------------------------------------------------"
-               "\n\n"
+               "\n"
                %(basename(path), format_exc(e)))
         test_err_messages.append(msg)
     except ImportError as e:
-        msg = ("\n\n"
+        msg = ("\n"
                "--------------------------------------------------------\n"
                "Feature missing for executing {}.\n"
-               "Error traceback:\n{}\n"
+               "Reason:\n{}\n"
                "--------------------------------------------------------"
-               "\n\n".format(basename(path), repr(e)))
+               "\n".format(basename(path), repr(e)))
+        skipped_messages.append(msg)
+    except Exception as e:
+        msg = ("\n"
+               "--------------------------------------------------------\n"
+               "Error when executing {}.\n"
+               "Reason:\n{}\n"
+               "--------------------------------------------------------"
+               "\n".format(basename(path), repr(e)))
         test_err_messages.append(msg)
 (options, args) = OPTPARSE.parse_args()
 
@@ -62,6 +71,14 @@ if int(options.test):
           "\n----------------------------\n")  
     if test_err_messages:   
         for msg in test_err_messages:
+            print(msg)
+    else:
+        print("None")
+    print("\n----------------------------\n"
+          "T E S T S  S K I P P E D"
+          "\n----------------------------\n")  
+    if skipped_messages:   
+        for msg in skipped_messages:
             print(msg)
     else:
         print("None")
