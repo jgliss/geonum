@@ -27,7 +27,6 @@ from numpy import asarray, nanmin, nanmax
 from os.path import exists
 from traceback import print_exc
 from warnings import warn
-from matplotlib.pyplot import get_cmap, figure
 
 from geonum.geopoint import GeoPoint
 from geonum.geovector3d import GeoVector3D
@@ -82,7 +81,7 @@ class GeoSetup(object):
         self.id = id
         self.points = {}
         self.vectors = {}
-        
+        from matplotlib.pyplot import get_cmap
         try:
             cmap = get_cmap(cmap_vecs)
         except:
@@ -514,6 +513,7 @@ class GeoSetup(object):
                               "is not available")
         if not "ax" in kwargs:
             #fig, ax = subplots(1,1)
+            from matplotlib.pyplot import figure
             fig = figure(figsize=(10,8))
             ax = fig.add_axes([0.12,0.15,0.8,0.8])
             kwargs["ax"] = ax

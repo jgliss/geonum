@@ -20,9 +20,6 @@ try:
 except:
     print('Plotting of maps etc. is deactivated, please install Basemap')
 
-import matplotlib.pyplot as plt
-import matplotlib.cm as colormaps
-from mpl_toolkits import mplot3d
 import numpy as np    
 
 from geonum.topodataaccess import TopoDataAccess
@@ -231,6 +228,8 @@ class Map(Basemap):
     
     def _check_ax3d(self, ax):
         """Check if input is :class:`Axes3D`"""
+
+        from mpl_toolkits import mplot3d
         if isinstance(ax, mplot3d.Axes3D):
             return True
         return False
@@ -240,11 +239,10 @@ class Map(Basemap):
         cb = self.colorbars["topo"]
         ticks = np.arange(start, stop, step)
         cb.set_ticks(ticks)
-        plt.draw()
         
     def draw_topo(self, insert_colorbar=False, include_seabed=True,
-                    max_grid_points=500, cmap_div=colormaps.coolwarm,
-                    cmap_seq=colormaps.Oranges, alpha=0.5, ax=None):
+                    max_grid_points=500, cmap_div=None,
+                    cmap_seq=None, alpha=0.5, ax=None):
         """Draw topography into map
         
         :param bool insert_colorbar: draws a colorbar for altitude
@@ -263,11 +261,18 @@ class Map(Basemap):
             topography
         :param ax: matplotlib axes object
         """
+        import matplotlib.cm as colormaps
+        if cmap_div is None:
+            cmap_div = colormaps.coolwarm
+        if cmap_seq is None:
+            cmap_seq = colormaps.Oranges
+        
         try:  
             if ax is None:
                 ax = self.ax
             if ax is None:
-                fig, ax = plt.subplots(1, 1, figsize=(16,10))
+                from matplotlib.pyplot import subplots
+                fig, ax = subplots(1, 1, figsize=(16,10))
                 self.ax = ax
     
             (x, y, z, z_min, z_max, 
@@ -309,69 +314,7 @@ class Map(Basemap):
                  "etopo() instead...")
             print(msg + repr(e))
             self.etopo()
-            
-    def draw_topo_old(self, insert_colorbar=False, include_seabed=True,
-                    max_grid_points=500, cmap_div=colormaps.coolwarm,
-                    cmap_seq=colormaps.Oranges, alpha=0.5, ax=None):
-        """Draw topography into map
-        
-        :param bool insert_colorbar: draws a colorbar for altitude
-            range (default: False)
-        :param bool include_seabed: include seabed topography 
-            (default: True)
-        :param int max_grid_points: resolution of displayed topo data 
-            points (makes it faster in interactive mode, default: 500)
-        :param str cmap_div: name of a diverging colormap (this one is 
-            used if :arg:`include_seabed` is True, and the cmap is shifted 
-            such , that white colors correspond to sea level altitude, 
-            default: "coolwarm")
-        :param str cmap_seq: name of a sequential colormap (this one is 
-            used if :arg:`include_seabed` is False, default: "Oranges")
-        :param float alpha: Alpha value (transparency) of plotted 
-            topography
-        :param ax: matplotlib axes object
-        """
-        try:  
-            if ax is None:
-                ax = self.ax
-            if ax is None:
-                fig, ax = plt.subplots(1, 1, figsize=(16,10))
-                self.ax = ax
-    
-            x, y, z, z_min, z_max, z_order =\
-                self._prep_topo_data(grid_points=max_grid_points)
-                
-            if z_min > 0:
-                include_seabed = 1
-                
-            z_step = (z_max - z_min) / 1000. 
-            
-            if include_seabed:
-                levels_filled = np.arange(z_min, z_max + z_step, z_step)
-            else:
-                levels_filled = np.arange(0, z_max + 1, z_step)
-            if levels_filled[0] < 0:          
-                shifted_cmap = shifted_color_map(z_min, z_max, cmap_div)
-                
-                cs2 = ax.contourf(x, y, z, levels_filled, cmap=shifted_cmap,
-                                  extend="both", alpha=alpha)
-                                  
-            elif levels_filled[0] >= 0:        
-                print("HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEERE")
-                cs2 = ax.contourf(x, y, z, levels_filled, cmap=cmap_seq,
-                                  alpha=1.0, extend="min")
-                self.contour_filled = cs2
-                    
-            if insert_colorbar:              
-                self.insert_colorbar("topo", cs2, label="Altitude [m]")
-        
-        except Exception as e:
-            raise
-            msg=("Could not draw topography in high res, using default "
-                 "etopo() instead...")
-            print(msg + repr(e))
-            self.etopo()
-         
+                 
     def draw_topo_3d(self, num_ticks=4, cmap="Oranges", alpha=0.5,
                      contour_color="#708090", contour_antialiased=True, 
                      contour_lw=0.2, ax=None, figsize=(16,8)):
@@ -401,7 +344,9 @@ class Map(Basemap):
             if self._check_ax3d(self.ax):
                 ax = self.ax
             else:
-                fig = plt.figure(figsize=figsize)
+                from mpl_toolkits import mplot3d
+                from matplotlib.pyplot import figure
+                fig = figure(figsize=figsize)
                 ax = mplot3d.Axes3D(fig)
     
         x, y, z, z_min, z_max, z_order = self._prep_topo_data()
@@ -673,7 +618,7 @@ class Map(Basemap):
             kwargs["marker"] = "^"
         if not any([x in kwargs for x in ["c", "color"]]):
             kwargs["c"] = "lime"
-
+        from mpl_toolkits import mplot3d
         if not isinstance(self.ax, mplot3d.Axes3D):
             raise ValueError("Need :class:`Axes3D` object as input...")
         x0, y0 = self(p.longitude, p.latitude)
@@ -695,6 +640,7 @@ class Map(Basemap):
         if ax is None:
             ax = self.ax
         try:
+            from mpl_toolkits import mplot3d
             if not isinstance(ax, mplot3d.Axes3D):
                 raise ValueError("Need :class:`Axes3D` object as input...")
             elif not vec.type() == "GeoVector3D":
@@ -739,7 +685,8 @@ class Map(Basemap):
                 coords.append(self(p.longitude, p.latitude))
             except Exception as e:
                 print("Failed to add one point to poly: " + repr(e))
-        polygon = plt.Polygon(coords, **kwargs)
+        from matplotlib.pyplot import Polygon
+        polygon = Polygon(coords, **kwargs)
         ax.add_patch(polygon)
         
     def add_polygon_3d(self, points=[], poly_id="undefined", ax=None, **kwargs):
@@ -749,6 +696,7 @@ class Map(Basemap):
         :param str poly_id: string ID of this object (e.g. for 
             deletion, default: "undefined")
         """
+        from mpl_toolkits import mplot3d
         if ax is None:
             ax = self.ax
         if not "label" in kwargs:

@@ -21,9 +21,6 @@ Helper methods for geonum library
 """
 import os
 import numpy as np
-import matplotlib.cm as colormaps
-import matplotlib.colors as colors
-from matplotlib.pyplot import draw
 
 exponent = lambda num: np.int(np.floor(np.log10(np.abs(num))))
 
@@ -72,11 +69,10 @@ def isnum(val):
 
 def rotate_xtick_labels(ax, deg=30, ha="right"):
     """Rotate xtick labels in matplotlib axes object"""
-    draw()
+    
     lbls = ax.get_xticklabels()
     lbls = [lbl.get_text() for lbl in lbls]
     ax.set_xticklabels(lbls, rotation = 30, ha = "right")
-    draw()
     return ax
     
 def haversine_formula(lon0, lat0, lon1, lat1, radius=6371.0):
@@ -142,6 +138,8 @@ def shifted_color_map(vmin, vmax, cmap=None):
         - shifted colormap
         
     """
+    import matplotlib.cm as colormaps
+    import matplotlib.colors as colors
     #midpoint = 1 - np.abs(im.max())/(np.abs(im.max()) + np.abs(im.min()))
     if cmap is None:
         cmap = colormaps.seismic

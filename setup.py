@@ -50,7 +50,6 @@ setup(
         # that you indicate whether you support Python 2, Python 3 or both.,
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3'
-        'Programming Language :: Python :: 3.7'
     ],
     
     #dependency_links    =   ["https://github.com/tkrajina/srtm.py/archive/v.0.3.1.zip#egg=srtm"],
