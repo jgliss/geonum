@@ -7,7 +7,7 @@ Geonum features online access to topographic data from the SRTM dataset, using t
 News / Notifications
 ====================
 
-- Version 1.4.3 released: Geonum can now easily be installed via `conda install -c conda-forge geonum`
+- Version 1.4.3 released (20/05/2019)
 - Version 1.4.0 released (22/04/2019, `more information <https://github.com/jgliss/geonum/releases>`__)
 - Now also available and tested in Python > 3
 - Changed requirement **LatLon** -> **LatLon23** to support Python 3
@@ -57,7 +57,7 @@ Please make sure to install all requirements beforehand (see above). You may do 
 
   pip install -r requirements.txt
 
-or - if you use Python 3 - by creating a new conda environment using the provided `conda environment file (only tested for ) <https://github.com/jgliss/geonum/blob/master/geonum_env_py3.yml>`_::
+or - if you use Python 3 - by creating a new conda environment using the provided `conda environment file <https://github.com/jgliss/geonum/blob/master/geonum_env_py3.yml>`_::
 
   conda env create -n geonum_env -f geonum_env_py3.yml
 
