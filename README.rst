@@ -1,22 +1,16 @@
 |build-status| |docs|
 
-`geonum <https://github.com/jgliss/geonum>`__ provides functionality for geographical calculations in three dimensions and includes interfaces for accessing and processing of topographic data. Most of the features (e.g. distance retrievals) are based on the two fundamental objects *GeoPoint* and *GeoVector3D* which are inherited from the respective 2D base classes of the `LatLon23 module <https://pypi.org/project/LatLon23>`_ and were expanded including the 3rd dimension (altitude).
+`geonum <https://github.com/jgliss/geonum>`__ provides functionality for geographical calculations in three dimensions and includes interfaces for accessing and processing of topographic data. Most of the features (e.g. distance retrievals) are based on the two fundamental objects *GeoPoint* and *GeoVector3D* which are inherited from the respective 2D base classes of the `LatLon23 module <https://pypi.org/project/LatLon23>`_ and were expanded to support also the vertical dimension.
 Geonum features online access to topographic data from the SRTM dataset, using the
 `SRTM module <https://pypi.python.org/pypi/SRTM.py/>`_. Furthermore, topographic data from the `ETOPO1 Dataset <https://www.ngdc.noaa.gov/mgg/global/global.html>`_ is supported.
 
 News / Notifications
 ====================
 
-- Version 1.4.0 released (22/04/2019, `more information <https://github.com/jgliss/geonum/releases>`__) 
+- Version 1.4.3 released: Geonum can now easily be installed via `conda install -c conda-forge geonum`
+- Version 1.4.0 released (22/04/2019, `more information <https://github.com/jgliss/geonum/releases>`__)
 - Now also available and tested in Python > 3
 - Changed requirement **LatLon** -> **LatLon23** to support Python 3
-
-Planned changes
-===============
-
-- Refactoring of ``basemap`` dependency to ``cartopy``
-- ``TopoData`` should be based on ``xarray.DataArray``
-- Support for more topographic datasets, interpolation of gaps in topodata
 
 Copyright
 =========
@@ -45,11 +39,29 @@ Please see `requirements.txt <https://github.com/jgliss/geonum/blob/master/requi
 Installation
 ============
 
+Geonum is tested and can be installed both for Python 2.7 and Python >= 3.6 and on all common OS (Windows, linux and OSX).
+
+Installation via conda
+----------------------
+
+The easiest way to install geonum is to install the `latest release via the conda-forge channel <https://anaconda.org/conda-forge/geonum>`_::
+
+  conda install -c conda-forge geonum
+
+This will install all the requirements as well.
+
+Installation via pip or from source
+-------------------------------------
+
 Please make sure to install all requirements beforehand (see above). You may do this by downloading the `requirements file <https://github.com/jgliss/geonum/blob/master/requirements.txt>`__ and calling from the command line::
 
   pip install -r requirements.txt
 
-Geonum can be installed from `PyPi <https://pypi.python.org/pypi/geonum>`_ using::
+or - if you use Python 3 - by creating a new conda environment using the provided `conda environment file (only tested for ) <https://github.com/jgliss/geonum/blob/master/geonum_env_py3.yml>`_::
+
+  conda env create -n geonum_env -f geonum_env_py3.yml
+
+After installing the requirements, geonum can be installed from `PyPi <https://pypi.python.org/pypi/geonum>`_ using::
 
   pip install geonum
 
@@ -60,10 +72,10 @@ or from source by downloading and extracting the latest release or cloning the r
 Instructions and code documentation
 ===================================
 
-The code documentation of geonum is hosted on `Read The Docs <http://geonum.readthedocs.io/en/latest/index.html>`_
+The code documentation of geonum is hosted on `Read The Docs <http://geonum.readthedocs.io/>`_
 
-Get started
-===========
+Getting started
+===============
 
 After installation try running the `example scripts <http://geonum.readthedocs.io/en/latest/examples.html>`_ in order to test the installation. The scripts are also meant to provide an easy start into the main features of geonum.
 
@@ -87,6 +99,13 @@ If a valid data file is stored in this folder, it will be detected automatically
   access = geonum.topodata.TopoDataAccess(mode="etopo1", local_path=<data_path>)
 
 If the path is valid, it will be added to the installation file *LOCAL_TOPO_PATHS.txt*
+
+Planned changes
+===============
+
+- Refactoring of ``basemap`` dependency to ``cartopy``
+- Base ``TopoData`` on ``xarray.DataArray``
+- Support for more topographic datasets, interpolation of gaps in topodata
 
 .. |build-status| image:: https://travis-ci.com/jgliss/geonum.svg?branch=master
     :target: https://travis-ci.com/jgliss/geonum
