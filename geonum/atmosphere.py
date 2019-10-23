@@ -197,7 +197,7 @@ def beta_exp(mol_mass=M_AIR_AVG, lapse_rate=L_STD_ATM, lat=45.0):
     return g0(lat) * mol_mass / (1000 * R_STD * lapse_rate)
 
 def pressure(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0, 
-             lapse_rate=L_STD_ATM, mol_mass=M_AIR_AVG, lat=45.0, temp=None):
+             lapse_rate=L_STD_ATM, mol_mass=M_AIR_AVG, lat=45.0):
     """Get atmospheric pressure in units of Pascal
     
     **Formula:**
@@ -235,17 +235,13 @@ def pressure(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
         molar mass of air 
     lat : float, optional
         latitude for calculation of gravitational constant
-    temp : float, optional
-        if unspecified (default), the temperature is calculated using
-        :func:`temperature`
         
     Returns
     -------
     float or ndarray
         pressure(s) corresponding to input altitude(s)
     """
-    if temp is None:
-        temp = temperature(alt, ref_temp, ref_alt, lapse_rate)
+    temp = temperature(alt, ref_temp, ref_alt, lapse_rate)
     exp = beta_exp(mol_mass, lapse_rate, lat)
     return ref_p * (ref_temp / temp) ** exp
 
@@ -284,7 +280,7 @@ def pressure_hPa(alt=0.0, *args, **kwargs):
     return pressure(alt, *args, **kwargs) / 100
 
 def pressure2altitude(p, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0, 
-            lapse_rate=L_STD_ATM, mol_mass=M_AIR_AVG, lat=45.0):
+                      lapse_rate=L_STD_ATM, mol_mass=M_AIR_AVG, lat=45.0):
     """General formula to convert atm. pressure to altitude
     
     **Formula:**
@@ -337,7 +333,7 @@ def pressure2altitude(p, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
     beta = beta_exp(mol_mass, lapse_rate, lat=lat)
     return (ref_temp / lapse_rate * (exp(-log(p / ref_p) / beta) - 1) + ref_alt)
 
-def density(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0, 
+def density(alt=0.0, temp=None, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0, 
             lapse_rate=L_STD_ATM, mol_mass=M_AIR_AVG, lat=45.0):
     """Get atmospheric density in units of :math:`$g\,m^-3$`
     
@@ -358,6 +354,9 @@ def density(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
     ----------
     alt : float or ndarray
         altitude(s) in m
+    temp : float, optional
+        temperature in K, if None, :func:`temperature` is used to compute 
+        temperature.
     ref_p : float, optional
         reference pressure (default is std atm sea level)
     ref_temp : float, optional
@@ -377,9 +376,9 @@ def density(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
     float or ndarray
         density corresponding to altitudes (in g m-3)
     """
-    temp = temperature(alt, ref_temp, ref_alt, lapse_rate)
-    p = pressure(alt, mol_mass=mol_mass, lapse_rate=lapse_rate, temp=temp,
-                 lat=lat)
+    if temp is None:
+        temp = temperature(alt, ref_temp, ref_alt, lapse_rate)
+    p = pressure(alt, mol_mass=mol_mass, lapse_rate=lapse_rate, lat=lat)
     return p * mol_mass / (R_STD * temp)
     
 def number_density(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0, 
@@ -565,3 +564,15 @@ def rayleigh_vol_sc_coeff(alt=0.0, lbda_mu=0.300, co2_ppm=400.0, **kwargs):
     """
     num_dens = number_density(alt, **kwargs) * 100**(-3) # cm^-3
     return num_dens * sigma_rayleigh(lbda_mu, co2_ppm)
+
+if __name__ == '__main__':
+    print('No input temp')
+    print(density(0))
+    
+    T1 = 273
+    print('input temp', T1)
+    print(density(0, temp=T1))
+    
+    T2 = 253
+    print('input temp', T2)
+    print(density(0, temp=T2))
