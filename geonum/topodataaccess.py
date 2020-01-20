@@ -19,9 +19,10 @@
 """
 Access and handling of topographic data
 """
+import numpy as np
 import os
 
-from geonum.exceptions import InvalidTopoMode
+from geonum.exceptions import InvalidTopoMode, TopoAccessError
 from geonum.topoaccessbase import SRTMAccess, Etopo1Access
 
 class TopoDataAccess(object):
@@ -88,7 +89,8 @@ class TopoDataAccess(object):
         return TopoDataAccess(self.mode, self.local_path)
     
     def get_data(self, lat0, lon0, lat1=None, lon1=None, 
-                 mode=None, local_path=None, **access_opts):
+                 mode=None, local_path=None, check_allnan=True, 
+                 **access_opts):
         """Retrieve data from topography file
         
         Parameters
@@ -109,6 +111,8 @@ class TopoDataAccess(object):
             local path where topography data is stored (can be dictionary or
             filepath, is passed to corresponding access class and handled 
             as implemented there)
+        check_allnan : bool
+            if True and all retrieved values are NaN, then an error is thrown
         **access_opts
             additional access options that may be specific for the mode 
             specified (e.g. search_database in case of etopo1)
@@ -133,4 +137,9 @@ class TopoDataAccess(object):
             self.local_path=local_path
         access = self.REGISTERED[self.mode](local_path=self.local_path,
                                              **access_opts)
-        return access.get_data(lat0, lon0, lat1, lon1)
+
+        data = access.get_data(lat0, lon0, lat1, lon1)
+        if check_allnan and np.isnan(data.data).all():
+            raise TopoAccessError('Failed to retrieve TopoData ({}): '
+                                  'all values are NaN'.format(self.mode))
+        return data
