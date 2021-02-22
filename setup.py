@@ -12,9 +12,9 @@ with open('README.rst') as file:
 with open("VERSION.rst") as f:
     version = f.readline()
     f.close()
- 
+
 #with open(join("geonum","local_topo_data", "LOCAL_TOPO_PATHS.txt"), 'w'): pass
-       
+
 setup(
     name        =   'geonum',
     version     =   version,
@@ -24,7 +24,7 @@ setup(
     url         =   'https://github.com/jgliss/geonum',
     package_dir =   {'geonum'     :   'geonum'},
     packages    =   find_packages(exclude=['contrib', 'docs', 'tests*']),
-    include_package_data    =   True,  
+    include_package_data    =   True,
     package_data=   {'geonum'     :   ['local_topo_data/*.rst',
                                        'local_topo_data/*.txt']},
     install_requires  =   [],
@@ -48,14 +48,13 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.,
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3'
     ],
-    
+
     #dependency_links    =   ["https://github.com/tkrajina/srtm.py/archive/v.0.3.1.zip#egg=srtm"],
     #package_data={'geonum':['suppl/*.dat']},
     description = 'Toolbox for 3D geonumerical calculations',
     long_description = readme,
-    
+
     #requires=['python (>= 2.7)', 'numpy', 'astropy'],
 )

@@ -7,7 +7,7 @@ Geonum features online access to topographic data from the SRTM dataset, using t
 Copyright
 =========
 
-Copyright (C) 2017 Jonas Gliss (jonasgliss@gmail.com)
+Copyright (C) 2017 Jonas Gliß (jonasgliss@gmail.com)
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License a published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
