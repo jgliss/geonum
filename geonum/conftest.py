@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Test environment for base.py module."""
 import pytest
+from contextlib import contextmanager
 from geonum import NETCDF_AVAILABLE
 
 
@@ -27,6 +27,11 @@ skip_srtm = pytest.mark.skipif(not srtm_works(),
 
 skip_netcdf4 = pytest.mark.skipif(NETCDF_AVAILABLE==False,
                                   reason='Skipping tests requiring NetCDF4 library.')
+
+
+@contextmanager
+def does_not_raise_exception():
+    yield
 
 if __name__ == '__main__':
     print(srtm_works())

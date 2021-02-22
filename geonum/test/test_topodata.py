@@ -8,8 +8,8 @@ import geonum.topodataaccess as tp
 @skip_netcdf4
 def test_etopo1_init():
     acc = tp.Etopo1Access(check_access=False, search_database=False)
-    from geonum import LOCAL_TOPO_PATH
-    assert LOCAL_TOPO_PATH == acc.local_path
+    from geonum import LOCAL_TOPO_DIR
+    assert LOCAL_TOPO_DIR == acc.local_path
     assert acc.file_name == 'ETOPO1_Ice_g_gmt4.grd'
 
 @skip_srtm

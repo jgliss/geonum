@@ -22,13 +22,11 @@ Access and handling of topographic data
 import numpy as np
 import os
 from warnings import warn
-# python 2 and 3 support see e.g.
-# http://python-future.org/compatible_idioms.html#metaclasses
 from six import with_metaclass
 import srtm
 import abc
 
-from geonum import NETCDF_AVAILABLE
+from geonum import NETCDF_AVAILABLE, LOCAL_TOPO_DIR
 from geonum.exceptions import (TopoAccessError, SRTMNotCoveredError)
 
 class TopoAccessBase(with_metaclass(abc.ABCMeta, object)):
@@ -240,8 +238,7 @@ class Etopo1Access(TopoAccessBase):
     search_database : bool
         if True and topodata file :attr:`file_path` does not exist, then
         a valid topography file is searched in all paths that are specified
-        in file `LOCAL_TOPO_PATHS.txt` that is shipped with this library and
-        can be found in installation subdirectory local_topo_data.
+        in file `~/.geonum/LOCAL_TOPO_PATHS`.
 
     Raises
     ------
@@ -260,17 +257,17 @@ class Etopo1Access(TopoAccessBase):
                  search_database=True):
 
         if not NETCDF_AVAILABLE:
-            raise ImportError("Etopo1Access class cannot be initiated. "
+            raise ModuleNotFoundError("Etopo1Access class cannot be initiated. "
                                       "Please install netCDF4 library first")
-        self._local_path = None
-        self._file_name = None
+        self._local_path = LOCAL_TOPO_DIR
+        self._file_name = "ETOPO1_Ice_g_gmt4.grd"
 
         from netCDF4 import Dataset
 
         self.loader = Dataset
 
-        self.local_path = local_path
-        self.file_name = file_name
+        if file_name is not None:
+            self.file_name = file_name
 
         if not os.path.exists(self.file_path) and search_database:
             self.search_topo_file_database()
@@ -292,11 +289,9 @@ class Etopo1Access(TopoAccessBase):
 
     @local_path.setter
     def local_path(self, val):
-        if val is None or not os.path.exists(val):
-            from geonum import LOCAL_TOPO_PATH
-            print('Invalid input for local_path, setting default: '
-                  '{}'.format(LOCAL_TOPO_PATH))
-            val = LOCAL_TOPO_PATH
+        if not os.path.exists(val) or not os.path.isdir(val):
+            raise ValueError(f'Input directory {val} does not exist or is not '
+                             f'a directory...')
         self._check_topo_path(val)
         self._local_path = val
 
@@ -308,11 +303,9 @@ class Etopo1Access(TopoAccessBase):
     @file_name.setter
     def file_name(self, val):
         if not val in self.supported_topo_files:
-
-            _val = self.supported_topo_files[0]
-            print('Invalid input for file_name ({})), setting default: '
-                  '{}'.format(val, _val))
-            val = _val
+            raise ValueError(
+                f'Invalid file name for Etopo1 dataset {val}. Valid filenames '
+                f'are: {self.supported_topo_files}')
         self._file_name = val
 
     @property
@@ -349,7 +342,7 @@ class Etopo1Access(TopoAccessBase):
         """
         if path is None:
             path = self.local_path
-        print(("Searching valid topo file in folder: %s" %path))
+        print(f'Searching valid topo file in folder: {path}')
         fnames = os.listdir(path)
         for name in fnames:
             if name in self.supported_topo_files:
@@ -578,9 +571,10 @@ def delete_all_local_srtm_files():
     import glob
     from srtm.utils import FileHandler
     fh = FileHandler()
-    for file in glob.glob('{}/*.hgt'.format(fh.get_srtm_dir())):
+    for file in glob.glob(f'{fh.local_cache_dir}/*.hgt'):
         print('Deleting SRTM data file at {}'.format(file))
         os.remove(file)
 
 if __name__ == '__main__':
     delete_all_local_srtm_files()
+    ecc = Etopo1Access()

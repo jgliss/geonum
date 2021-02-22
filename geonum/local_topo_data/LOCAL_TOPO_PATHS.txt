@@ -1,3 +1,0 @@
-
-.
-/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/PYAEROCOM/topodata/etopo1

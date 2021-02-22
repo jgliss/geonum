@@ -39,21 +39,36 @@ def check_requirements():
             CV2_AVAILABLE,
             NETCDF_AVAILABLE)
 
-from os.path import abspath, dirname, join
-from pkg_resources import get_distribution
+def init_local_topodir():
+    import os
+    home = os.path.expanduser('~')
+    LOCAL_TOPO_DIR = os.path.join(home, '.geonum')
+    if not os.path.exists(LOCAL_TOPO_DIR):
+        os.mkdir(LOCAL_TOPO_DIR)
+    TOPO_INFO_FILE = os.path.join(LOCAL_TOPO_DIR,  "LOCAL_TOPO_PATHS")
+    if not os.path.exists(TOPO_INFO_FILE):
+        with open(TOPO_INFO_FILE,'w') as f:
+            f.write(f'{LOCAL_TOPO_DIR}\n')
+    return (LOCAL_TOPO_DIR, TOPO_INFO_FILE)
+
+try:
+    LOCAL_TOPO_DIR, TOPO_INFO_FILE = init_local_topodir()
+except Exception as e:
+    print('Failed to create local topo directory for geonum '
+          f'{LOCAL_TOPO_DIR}')
+    LOCAL_TOPO_DIR, TOPO_INFO_FILE =  None, None
 
 (BASEMAP_AVAILABLE,
  CV2_AVAILABLE,
  NETCDF_AVAILABLE) = check_requirements()
 
-__dir__ = abspath(dirname(__file__))
-__version__ = get_distribution('geonum').version
+def init_dir_and_version():
+    import os
+    from pkg_resources import get_distribution
+    return (os.path.abspath(os.path.dirname(__file__)),
+            get_distribution('geonum').version)
 
-_LIBDIR = __dir__ #from older version
-
-LOCAL_TOPO_PATH = join(_LIBDIR, "local_topo_data")
-
-TOPO_INFO_FILE = join(LOCAL_TOPO_PATH,  "LOCAL_TOPO_PATHS.txt")
+__dir__, __version__ = init_dir_and_version()
 
 from . import exceptions
 from . import helpers
