@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Test environment for base.py module."""
-from __future__ import (absolute_import, division)
 import numpy.testing as npt
 import pytest
 from geonum.conftest import skip_srtm
