@@ -16,29 +16,16 @@
 
 def check_requirements():
     from warnings import warn
-    
+
     BASEMAP_AVAILABLE = True
     CV2_AVAILABLE = True
     NETCDF_AVAILABLE = True
-    LATLON_AVAILABLE = True
-    SRTM_AVAILABLE = True
-    
-    try:
-        from LatLon23 import LatLon
-    except:
-        warn('Neither LatLon23 nor LatLon are available. Many basic features '
-             'will not be available (e.g. objects GeoPoint or GeoVector ')
-        LATLON_AVAILABLE = False
-    try:
-        import srtm
-    except:
-        SRTM_AVAILABLE = False
     try:
         from mpl_toolkits.basemap import Basemap
     except:
         warn('Plotting of maps etc. is deactivated, please install Basemap')
         BASEMAP_AVAILABLE = False
-    
+
     try:
         from cv2 import pyrUp
     except:
@@ -47,20 +34,16 @@ def check_requirements():
         from netCDF4 import Dataset
     except:
         NETCDF_AVAILABLE = False
-        
-    return (LATLON_AVAILABLE, 
-            SRTM_AVAILABLE, 
-            BASEMAP_AVAILABLE, 
-            CV2_AVAILABLE, 
+
+    return (BASEMAP_AVAILABLE,
+            CV2_AVAILABLE,
             NETCDF_AVAILABLE)
-        
+
 from os.path import abspath, dirname, join
 from pkg_resources import get_distribution
 
-(LATLON_AVAILABLE, 
- SRTM_AVAILABLE, 
- BASEMAP_AVAILABLE, 
- CV2_AVAILABLE, 
+(BASEMAP_AVAILABLE,
+ CV2_AVAILABLE,
  NETCDF_AVAILABLE) = check_requirements()
 
 __dir__ = abspath(dirname(__file__))
@@ -79,13 +62,13 @@ from .topodata import TopoData
 from .topodataaccess import TopoDataAccess
 from .topoaccessbase import delete_all_local_srtm_files
 
-if LATLON_AVAILABLE:
-    from .geopoint import GeoPoint
-    from .geovector3d import GeoVector3D
-    from .geosetup import GeoSetup
-    from .elevationprofile import ElevationProfile
-    from .processing import LineOnGrid  
+
+from .geopoint import GeoPoint
+from .geovector3d import GeoVector3D
+from .geosetup import GeoSetup
+from .elevationprofile import ElevationProfile
+from .processing import LineOnGrid
 
 if BASEMAP_AVAILABLE:
     from .mapping import Map
-    
+

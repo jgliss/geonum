@@ -5,9 +5,6 @@ dependencies:
   - python>=3
   - scipy
   - matplotlib
-  - basemap
-  - netcdf4
   - latlon23
-  - pytest
   - srtm.py
-  
+
