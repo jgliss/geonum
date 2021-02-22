@@ -49,9 +49,9 @@ Please make sure to install all requirements beforehand (see above). You may do 
 
   pip install -r requirements.txt
 
-or - if you use Python 3 - by creating a new conda environment using the provided `conda environment file <https://github.com/jgliss/geonum/blob/master/geonum_env_py3.yml>`_::
+or - if you use Python 3 - by creating a new conda environment using the provided `conda environment file <https://github.com/jgliss/geonum/blob/master/geonum_env.yml>`_::
 
-  conda env create -n geonum_env -f geonum_env_py3.yml
+  conda env create -n geonum_env -f geonum_env.yml
 
 After installing the requirements, geonum can be installed from `PyPi <https://pypi.python.org/pypi/geonum>`_ using::
 
