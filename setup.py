@@ -28,9 +28,7 @@ setup(
     package_data=   {'geonum'     :   ['local_topo_data/*.rst',
                                        'local_topo_data/*.txt']},
     install_requires  =   [],
-    extras_require={
-        'cv2':      ["opencv-python>=2.4.11"],
-        'netCDF4':  ["netCDF4>=1.1.8"]},
+    extras_require={},
 
     classifiers=[
         # How mature is this project? Common values are
