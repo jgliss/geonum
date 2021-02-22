@@ -6,7 +6,7 @@
 Welcome to Geonum
 =================
 
-Official code documentation web page of Geonum (`GitHub <https://github.com/jgliss/geonum>`__). 
+Official code documentation web page of geonum (`GitHub <https://github.com/jgliss/geonum>`__). 
 
 .. figure::  _graphics/topo_lines_guallatiri.png
   :width: 600px
