@@ -155,8 +155,39 @@ def test_pressure_hPa(alt,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat,should_
     val = atm.pressure_hPa(alt,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat)
     npt.assert_allclose(val, should_be, rtol=1e-7)
 
-def test_pressure2altitude():
-    pass
+@pytest.mark.parametrize('p, ref_p, ref_temp, ref_alt, lapse_rate, mol_mass, lat, should_be', [
+    (atm.p0, atm.p0, atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,0),
+    (100000, atm.p0, atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,110.889658),
+    (50000, atm.p0, atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,5574.679741),
+
+    (atm.p0, atm.p0, 42,0,42,42,42,0),
+    (50000, 50000, atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,0),
+    (50000, 80000, atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,3792.338559),
+
+    (atm.p0, atm.p0, 273.15,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,0),
+    (50000, atm.p0, 273.15,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,5284.482982),
+    (50000, atm.p0, 300,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,5803.935181),
+
+    (atm.p0, atm.p0, atm.T0_STD,100,atm.L_STD_ATM,atm.M_AIR_AVG,45,100),
+
+    (atm.p0, atm.p0, atm.T0_STD,0,atm.L_DRY_AIR,atm.M_AIR_AVG,45,0),
+    (50000, atm.p0, atm.T0_STD,0,atm.L_DRY_AIR,atm.M_AIR_AVG,45,5392.870582),
+
+    (atm.p0, atm.p0, atm.T0_STD,0,atm.L_STD_ATM,20,45,0),
+    (50000, atm.p0, atm.T0_STD,0,atm.L_STD_ATM,20,45,7840.324557),
+
+    (atm.p0, atm.p0, atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,0),
+    (atm.p0, atm.p0, atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,0,0),
+    (atm.p0, atm.p0, atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,90,0),
+
+    (50000, atm.p0, atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,0,5588.419043),
+    (50000, atm.p0, atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,90,5560.946563),
+
+    ])
+def test_pressure2altitude(p, ref_p, ref_temp, ref_alt, lapse_rate, mol_mass, lat, should_be):
+    val = atm.pressure2altitude(p, ref_p, ref_temp, ref_alt, lapse_rate,
+                                mol_mass, lat)
+    npt.assert_allclose(val, should_be, rtol=1e-7)
 
 def test_density():
     pass
