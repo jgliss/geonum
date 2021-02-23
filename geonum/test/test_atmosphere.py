@@ -105,6 +105,83 @@ def test_g0(lat,should_be):
 def test_temperature(alt,ref_temp,ref_alt,lapse_rate,should_be):
     val = atm.temperature(alt,ref_temp,ref_alt,lapse_rate)
     npt.assert_allclose(val, should_be, rtol=1e-7)
+
+@pytest.mark.parametrize('mol_mass, lapse_rate, lat, should_be',[
+    (atm.M_AIR_AVG, atm.L_STD_ATM, 45, -5.255632),
+    (atm.M_AIR_AVG, atm.L_STD_ATM, 0, -5.241802),
+    (atm.M_AIR_AVG, atm.L_STD_ATM, 90, -5.269523),
+    (atm.M_AIR_AVG, atm.L_DRY_AIR, 45, -3.485878),
+    ])
+def test_beta_exp(mol_mass, lapse_rate, lat, should_be):
+    val = atm.beta_exp(mol_mass, lapse_rate,lat)
+    npt.assert_allclose(val, should_be, rtol=1e-7)
+
+@pytest.mark.parametrize('alt,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat,should_be', [
+    (0.0, atm.p0, atm.T0_STD, 0.0,atm.L_STD_ATM,atm.M_AIR_AVG,45.0,101325),
+    (100.0, atm.p0, atm.T0_STD, 0.0,atm.L_STD_ATM,atm.M_AIR_AVG,45.0,100129.493856),
+    (1000.0, atm.p0, atm.T0_STD, 0.0,atm.L_STD_ATM,atm.M_AIR_AVG,45.0,89875.07181),
+
+    (0.0, 42, atm.T0_STD, 0.0,atm.L_STD_ATM,atm.M_AIR_AVG,45.0,42),
+    (0.0, 42, 273.15, 0.0,atm.L_STD_ATM,atm.M_AIR_AVG,45.0,42),
+    (100.0, 42, 273.15, 0.0,atm.L_STD_ATM,atm.M_AIR_AVG,45.0,41.477378),
+
+    (0.0, atm.p0, 273.15, 0.0,atm.L_STD_ATM,atm.M_AIR_AVG,45.0,101325),
+    (100.0, atm.p0, 273.15, 0.0,atm.L_STD_ATM,atm.M_AIR_AVG,45.0,100064.17512),
+
+    (0.0, atm.p0, 273.15, 100.0,atm.L_STD_ATM,atm.M_AIR_AVG,45.0,102598.657973),
+
+    (0.0, atm.p0, 273.15, 0,atm.L_DRY_AIR,atm.M_AIR_AVG,45.0,101325),
+    (100.0, atm.p0, atm.T0_STD, 0.0,atm.L_DRY_AIR,atm.M_AIR_AVG,45.0,100128.81154),
+
+    (0.0, atm.p0, atm.T0_STD, 0.0,atm.L_STD_ATM,20,45.0,101325),
+    (100.0, atm.p0, atm.T0_STD, 0.0,atm.L_STD_ATM,20,45.0,100497.98743),
+
+    (0.0, atm.p0, atm.T0_STD, 0.0,atm.L_STD_ATM,atm.M_AIR_AVG,0,101325),
+    (100.0, atm.p0, atm.T0_STD, 0.0,atm.L_STD_ATM,atm.M_AIR_AVG,0,100132.621128),
+    (0.0, atm.p0, atm.T0_STD, 0.0,atm.L_STD_ATM,atm.M_AIR_AVG,90,101325),
+    (100.0, atm.p0, atm.T0_STD, 0.0,atm.L_STD_ATM,atm.M_AIR_AVG,90,100126.352659),
+    ])
+def test_pressure(alt,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat,should_be):
+    val = atm.pressure(alt,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat)
+    npt.assert_allclose(val, should_be, rtol=1e-7)
+
+
+@pytest.mark.parametrize('alt,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat,should_be', [
+    (0.0, atm.p0, atm.T0_STD, 0.0,atm.L_STD_ATM,atm.M_AIR_AVG,45.0,101325/100),
+    (100.0, atm.p0, atm.T0_STD, 0.0,atm.L_STD_ATM,atm.M_AIR_AVG,45.0,100129.493856/100),
+    (1000.0, atm.p0, atm.T0_STD, 0.0,atm.L_STD_ATM,atm.M_AIR_AVG,45.0,89875.07181/100),
+    ])
+def test_pressure_hPa(alt,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat,should_be):
+    val = atm.pressure_hPa(alt,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat)
+    npt.assert_allclose(val, should_be, rtol=1e-7)
+
+def test_pressure2altitude():
+    pass
+
+def test_density():
+    pass
+
+def test_number_density():
+    pass
+
+def test_refr_idx_300ppm_co2():
+    pass
+
+def test_refr_idx():
+    pass
+
+def test__F_O2():
+    pass
+
+def test_F_AIR():
+    pass
+
+def test_sigma_rayleigh():
+    pass
+
+def test_rayleigh_vol_sc_coeff():
+    pass
+
 if __name__ == '__main__':
     import sys
     pytest.main(sys.argv)
