@@ -51,8 +51,9 @@ setup(
 
     #dependency_links    =   ["https://github.com/tkrajina/srtm.py/archive/v.0.3.1.zip#egg=srtm"],
     #package_data={'geonum':['suppl/*.dat']},
-    description = 'Toolbox for 3D geonumerical calculations',
+    description = 'Toolbox for 3D geonumerical calculations and atmospheric composition',
     long_description = readme,
+    long_description_content_type='text/x-rst'
 
     #requires=['python (>= 2.7)', 'numpy', 'astropy'],
 )
