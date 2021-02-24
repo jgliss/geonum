@@ -205,8 +205,8 @@ def test_pressure2altitude(p, ref_p, ref_temp, ref_alt, lapse_rate, mol_mass, la
 
     #(1000,None,50000,atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,1225.0033852145957),
     ])
-def test_density(alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat,should_be):
-    val = atm.density(alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat)
+def test_air_density(alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat,should_be):
+    val = atm.air_density(alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat)
     npt.assert_allclose(val, should_be, rtol=1e-7)
 
 def test_number_density():
