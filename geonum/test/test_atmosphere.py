@@ -200,36 +200,74 @@ def test_pressure2altitude(p, ref_p, ref_temp, ref_alt, lapse_rate, mol_mass, la
     (0,300,atm.p0,atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,1176.615751),
 
     (0,None,50000,atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,604.492171),
-    (-3000,None,50000,atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,798.755002),
+    (0,None,50000,251.9145816835,5574.679741,atm.L_STD_ATM,atm.M_AIR_AVG,45,1225.0033852145957),
 
-
-    #(1000,None,50000,atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,1225.0033852145957),
     ])
 def test_air_density(alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat,should_be):
     val = atm.air_density(alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat)
     npt.assert_allclose(val, should_be, rtol=1e-7)
 
-def test_number_density():
-    pass
+@pytest.mark.parametrize('alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat,should_be', [
 
+    (0,None,atm.p0,atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,2.5469602223632817e+25),
+    (10000,None,atm.p0,atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,8.581329e+24),
+    ])
+def test_air_number_density(alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat,should_be):
+    val = atm.air_number_density(alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat)
+    npt.assert_allclose(val, should_be, rtol=1e-7)
+
+# ToDo: add more tests for the functions below (so far only default input is tested)
 def test_refr_idx_300ppm_co2():
-    pass
+    val = atm.refr_idx_300ppm_co2()
+    should_be=1.000291554210872
+    npt.assert_allclose(val, should_be, rtol=1e-7)
 
 def test_refr_idx():
-    pass
+    val = atm.refr_idx()
+    should_be=1.000291554210872
+    npt.assert_allclose(val, should_be, rtol=1e-7)
+
+def test__F_N2():
+    val = atm._F_N2()
+    should_be=1.037522
+    npt.assert_allclose(val, should_be, rtol=1e-5)
 
 def test__F_O2():
-    pass
+    val = atm._F_O2()
+    should_be=1.129265
+    npt.assert_allclose(val, should_be, rtol=1e-5)
 
 def test_F_AIR():
-    pass
+    val = atm.F_AIR()
+    should_be=1.056395
+    npt.assert_allclose(val, should_be, rtol=1e-5)
 
-def test_sigma_rayleigh():
-    pass
+@pytest.mark.parametrize('lbda_mu,co2_ppm,should_be', [
+    (0.3, 400,2.443366e+19),
+    (0.5, 400,2.879508e+18),
+    (0.9, 400,2.651503e+17),
 
-def test_rayleigh_vol_sc_coeff():
-    pass
+    (0.5, 500,2.879819e+18),
 
+    (0.5, 100,2.878574e+18),
+    ])
+def test_sigma_rayleigh(lbda_mu,co2_ppm,should_be):
+    val = atm.sigma_rayleigh(lbda_mu,co2_ppm)
+    npt.assert_allclose(val, should_be, rtol=1e-5)
+
+@pytest.mark.parametrize('alt,lbda_mu,co2_ppm,should_be', [
+    (0,0.3,400,2.993132e+16),
+    (1000,0.3,400,2.716173e+16),
+    (10000,0.3,400,1.008459e+16),
+
+    (0,0.5,400,3.527406e+15),
+    (0,0.9,400,3.2481e+14),
+
+    (0,0.3,400,2.993132e+16),
+    ])
+def test_rayleigh_vol_sc_coeff(alt,lbda_mu,co2_ppm,should_be):
+    val = atm.rayleigh_vol_sc_coeff(alt,lbda_mu,co2_ppm)
+    npt.assert_allclose(val, should_be, rtol=1e-5)
 if __name__ == '__main__':
     import sys
     pytest.main(sys.argv)

@@ -381,7 +381,7 @@ def air_density(alt=0.0, temp=None, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
     p = pressure(alt, ref_p, ref_temp, ref_alt, lapse_rate,mol_mass, lat)
     return p * mol_mass / (R_STD * temp)
 
-def number_density(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
+def air_number_density(alt=0.0, temp=None, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
                    lapse_rate=L_STD_ATM, mol_mass=M_AIR_AVG, lat=45.0):
     """Get atmospheric number density in m-3
 
@@ -389,6 +389,9 @@ def number_density(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
     ----------
     alt : float or ndarray
         altitude(s) in m
+    temp : float, optional
+        temperature in K, if None, :func:`temperature` is used to compute
+        temperature.
     ref_p : float, optional
         reference pressure (default is std atm sea level)
     ref_temp : float, optional
@@ -406,9 +409,9 @@ def number_density(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
     Returns
     -------
     float or ndarray
-        number density in m-3 corresponding to altitudes
+        number density of air in #particles m-3 corresponding to altitude
     """
-    rho = air_density(alt, ref_p, ref_temp, ref_alt, lapse_rate, mol_mass, lat)
+    rho = air_density(alt, temp, ref_p, ref_temp, ref_alt, lapse_rate, mol_mass, lat)
     return rho * NA / mol_mass
 
 def refr_idx_300ppm_co2(lbda_mu=0.300):
@@ -571,6 +574,14 @@ def density(*args,**kwargs):
     warn(DeprecationWarning(
         'method geonum.atmosphere.density was renamed to '
         'geonum.atmosphere.air_density, please use the new name'
+        ))
+    return air_density(*args, **kwargs)
+
+def number_density(*args,**kwargs):
+    from warnings import warn
+    warn(DeprecationWarning(
+        'method geonum.atmosphere.number_density was renamed to '
+        'geonum.atmosphere.air_number_density, please use the new name'
         ))
     return air_density(*args, **kwargs)
 
