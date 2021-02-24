@@ -6,10 +6,9 @@ language: python
 
 # Set the python versions
 python:
-   - "2.7"
-   - "3.5"
    - "3.6"
-   - "3.7-dev"
+   - "3.7"
+   - "3.8"
 
 # set the operating systems to be tested
 
@@ -23,5 +22,5 @@ install:
 script:
    - python setup.py develop
    - py.test
-   
+
 

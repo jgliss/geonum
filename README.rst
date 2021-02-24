@@ -4,18 +4,10 @@
 Geonum features online access to topographic data from the SRTM dataset, using the
 `SRTM module <https://pypi.python.org/pypi/SRTM.py/>`_. Furthermore, topographic data from the `ETOPO1 Dataset <https://www.ngdc.noaa.gov/mgg/global/global.html>`_ is supported.
 
-News / Notifications
-====================
-
-- Version 1.4.3 released (20/05/2019)
-- Version 1.4.0 released (22/04/2019, `more information <https://github.com/jgliss/geonum/releases>`__)
-- Now also available and tested in Python > 3
-- Changed requirement **LatLon** -> **LatLon23** to support Python 3
-
 Copyright
 =========
 
-Copyright (C) 2017 Jonas Gliss (jonasgliss@gmail.com)
+Copyright (C) 2017 Jonas Gliß (jonasgliss@gmail.com)
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License a published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
@@ -26,7 +18,7 @@ You should have received a copy of the GNU General Public License along with thi
 Requirements
 ============
 
-It is recommended to use `Anaconda <https://www.continuum.io/downloads>`_ as Python package manager.
+It is recommended to use the *conda* Python package manager (get it e.g. via `miniconda <https://docs.conda.io/en/latest/miniconda.html>`__)
 
 Please see `requirements.txt <https://github.com/jgliss/geonum/blob/master/requirements.txt>`__ for a list of requirements. Note that these are only the minimum required dependencies. Further, optional requirements are listed below. Note, that dependent on your OS and python version, some of these may be tricky to install:
 
@@ -39,7 +31,7 @@ Please see `requirements.txt <https://github.com/jgliss/geonum/blob/master/requi
 Installation
 ============
 
-Geonum is tested and can be installed both for Python 2.7 and Python >= 3.6 and on all common OS (Windows, linux and OSX).
+geonum is tested and can be installed both for Python >= 3.6 and on all common OS (Windows, linux and OSX).
 
 Installation via conda
 ----------------------
@@ -48,7 +40,7 @@ The easiest way to install geonum is to install the `latest release via the cond
 
   conda install -c conda-forge geonum
 
-This will install all the requirements as well.
+This will install all requirements as well.
 
 Installation via pip or from source
 -------------------------------------
@@ -57,9 +49,9 @@ Please make sure to install all requirements beforehand (see above). You may do 
 
   pip install -r requirements.txt
 
-or - if you use Python 3 - by creating a new conda environment using the provided `conda environment file <https://github.com/jgliss/geonum/blob/master/geonum_env_py3.yml>`_::
+or - if you use Python 3 - by creating a new conda environment using the provided `conda environment file <https://github.com/jgliss/geonum/blob/master/geonum_env.yml>`_::
 
-  conda env create -n geonum_env -f geonum_env_py3.yml
+  conda env create -n geonum_env -f geonum_env.yml
 
 After installing the requirements, geonum can be installed from `PyPi <https://pypi.python.org/pypi/geonum>`_ using::
 
@@ -100,12 +92,14 @@ If a valid data file is stored in this folder, it will be detected automatically
 
 If the path is valid, it will be added to the installation file *LOCAL_TOPO_PATHS.txt*
 
-Planned changes
-===============
+Planned changes (for v2.0.0)
+============================
+
+See below for my (@jgliss) personal wish-list of new features, help is more than welcome as I have to work on geonum mostly in my spare time.
 
 - Refactoring of ``basemap`` dependency to ``cartopy``
 - Base ``TopoData`` on ``xarray.DataArray``
-- Support for more topographic datasets, interpolation of gaps in topodata
+- Support for more topographic datasets, interpolation of gaps in topodata, merging and interpolation of different topographic datasets
 
 .. |build-status| image:: https://travis-ci.com/jgliss/geonum.svg?branch=master
     :target: https://travis-ci.com/jgliss/geonum
