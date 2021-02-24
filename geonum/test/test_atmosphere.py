@@ -189,8 +189,25 @@ def test_pressure2altitude(p, ref_p, ref_temp, ref_alt, lapse_rate, mol_mass, la
                                 mol_mass, lat)
     npt.assert_allclose(val, should_be, rtol=1e-7)
 
-def test_density():
-    pass
+@pytest.mark.parametrize('alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat,should_be', [
+
+    (0,None,atm.p0,atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,1225.0033852145957),
+    (100,None,atm.p0,atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,1213.286799),
+    (1000,None,atm.p0,atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,1111.65185),
+    (10000,None,atm.p0,atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,412.733471),
+
+    (0,273.15,atm.p0,atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,1292.274301),
+    (0,300,atm.p0,atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,1176.615751),
+
+    (0,None,50000,atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,604.492171),
+    (-3000,None,50000,atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,798.755002),
+
+
+    #(1000,None,50000,atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,1225.0033852145957),
+    ])
+def test_density(alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat,should_be):
+    val = atm.density(alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat)
+    npt.assert_allclose(val, should_be, rtol=1e-7)
 
 def test_number_density():
     pass
