@@ -243,27 +243,27 @@ def test_F_AIR():
     npt.assert_allclose(val, should_be, rtol=1e-5)
 
 @pytest.mark.parametrize('lbda_mu,co2_ppm,should_be', [
-    (0.3, 400,2.443366e+19),
-    (0.5, 400,2.879508e+18),
-    (0.9, 400,2.651503e+17),
+    (0.3, 400,5.652217e-26),
+    (0.5, 400,6.661139e-27),
+    (0.9, 400,6.133698e-28),
 
-    (0.5, 500,2.879819e+18),
+    (0.5, 500,6.661859e-27),
 
-    (0.5, 100,2.878574e+18),
+    (0.5, 100,6.658979e-27),
     ])
 def test_sigma_rayleigh(lbda_mu,co2_ppm,should_be):
     val = atm.sigma_rayleigh(lbda_mu,co2_ppm)
     npt.assert_allclose(val, should_be, rtol=1e-5)
 
 @pytest.mark.parametrize('alt,lbda_mu,co2_ppm,should_be', [
-    (0,0.3,400,2.993132e+16),
-    (1000,0.3,400,2.716173e+16),
-    (10000,0.3,400,1.008459e+16),
+    (0,0.3,400,1.439597e-06),
+    (1000,0.3,400,1.306389e-06),
+    (10000,0.3,400,4.850354e-07),
 
-    (0,0.5,400,3.527406e+15),
-    (0,0.9,400,3.2481e+14),
+    (0,0.5,400,1.696566e-07),
+    (0,0.9,400,1.562228e-08),
 
-    (0,0.3,400,2.993132e+16),
+    (0,0.3,400,1.439597e-06),
     ])
 def test_rayleigh_vol_sc_coeff(alt,lbda_mu,co2_ppm,should_be):
     val = atm.rayleigh_vol_sc_coeff(alt,lbda_mu,co2_ppm)

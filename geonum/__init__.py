@@ -15,15 +15,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 def check_requirements():
-    from warnings import warn
-
     BASEMAP_AVAILABLE = True
     CV2_AVAILABLE = True
     NETCDF_AVAILABLE = True
     try:
         from mpl_toolkits.basemap import Basemap
     except:
-        warn('Plotting of maps etc. is deactivated, please install Basemap')
         BASEMAP_AVAILABLE = False
 
     try:

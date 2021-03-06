@@ -1,0 +1,34 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.5, 3.6, 3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2.3.4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - uses: s-weigand/setup-conda@v1.0.5
+    - name: Conda info
+      run: |
+        conda --version
+        which python
+    - name: Display current environments
+      run: conda info --envs
+    - name: Update environment
+      run: |
+        conda env update -n base -f ./geonum_env.yml
+    - name: Install pytest
+      run: |
+        conda install -c conda-forge pytest pytest-cov
+    - name: Install genum
+      run: python ./setup.py install
+    - name: Run pytest
+      run: pytest --cov=geonum/
