@@ -538,11 +538,11 @@ def sigma_rayleigh(lbda_mu=0.300, co2_ppm=400.0):
     Returns
     -------
     float
-        value of Rayleigh scattering cross section in cm-2
+        value of Rayleigh scattering cross section in cm2
     """
     n = refr_idx(lbda_mu, co2_ppm)
     lbda = lbda_mu * 10**(-6)
-    num_dens = number_density()
+    num_dens = air_number_density()
     refr_fac = (n**2 - 1)**2 / (n**2 + 2)**2
     F = F_AIR(lbda_mu, co2_ppm)
     return 24 * pi**3 / (lbda**4 * num_dens**2) * refr_fac * F * 100 ** 2
@@ -565,7 +565,7 @@ def rayleigh_vol_sc_coeff(alt=0.0, lbda_mu=0.300, co2_ppm=400.0, **kwargs):
     float or ndarray
         vol. scattering coeff. in cm-1 corresponding to altitudes
     """
-    num_dens = number_density(alt, **kwargs) * 100**(-3) # cm^-3
+    num_dens = air_number_density(alt, **kwargs) * 100**(-3) # cm^-3
     return num_dens * sigma_rayleigh(lbda_mu, co2_ppm)
 
 ### deprecated stuff
@@ -583,7 +583,7 @@ def number_density(*args,**kwargs):
         'method geonum.atmosphere.number_density was renamed to '
         'geonum.atmosphere.air_number_density, please use the new name'
         ))
-    return air_density(*args, **kwargs)
+    return air_number_density(*args, **kwargs)
 
 if __name__ == '__main__':
     print('No input temp')

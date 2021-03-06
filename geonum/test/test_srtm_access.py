@@ -5,9 +5,11 @@ import pytest
 from geonum.conftest import skip_srtm
 from geonum import TopoDataAccess
 
-@skip_srtm
+#@skip_srtm
 @pytest.mark.parametrize('lat0, lon0, lat1, lon1, dsh, dmin, dmax, dmean', [
-    (-18.55, -69.2, -18.35, -69.0, (242, 122), 4084., 6057., 4690.692827)
+    (60.052, 7.414, None, None, (2, 2), 1153., 1183., 1167.5),
+    (-18.55, -69.2, -18.35, -69.0, (242, 122), 4084., 6057., 4690.692827),
+
     ])
 def test_srtm_access(lat0, lon0, lat1, lon1, dsh, dmin, dmax, dmean):
     acc = TopoDataAccess(mode='srtm')
