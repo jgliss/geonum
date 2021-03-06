@@ -31,10 +31,6 @@ jobs:
     - name: Install genum
       run: python ./setup.py install
     - name: Run pytest
-      run: pytest --cov=geonum/ --cov-report=xml
+      run: pytest --cov=geonum/
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1.0.3
-      with:
-        file: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella

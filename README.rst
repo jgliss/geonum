@@ -1,4 +1,4 @@
-|build-status| |docs|
+|build-status| |docs| |cov|
 
 `geonum <https://github.com/jgliss/geonum>`__ provides functionality for geographical calculations in three dimensions and includes interfaces for accessing and processing of topographic data. Most of the features (e.g. distance retrievals) are based on the two fundamental objects *GeoPoint* and *GeoVector3D* which are inherited from the respective 2D base classes of the `LatLon23 module <https://pypi.org/project/LatLon23>`_ and were expanded to support also the vertical dimension.
 Geonum features online access to topographic data from the SRTM dataset, using the
@@ -106,3 +106,6 @@ See below for my (@jgliss) personal wish-list of new features, help is more than
 
 .. |docs| image:: https://readthedocs.org/projects/geonum/badge/?version=latest
     :target: https://geonum.readthedocs.io/en/latest/?badge=latest
+
+.. |cov| image:: https://codecov.io/gh/jgliss/geonum/branch/master/graph/badge.svg?token=802DAZA1W9
+    :target: https://codecov.io/gh/jgliss/geonum
