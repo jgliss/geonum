@@ -4,7 +4,10 @@ import numpy.testing as npt
 import pytest
 from geonum.conftest import skip_srtm
 import numpy as np
-from geonum import GeoPoint
+from geonum import GeoPoint, ElevationProfile
+
+def test_ElevationProfile_wrong_input():
+    ElevationProfile('bla', 1, 'blub')
 
 @skip_srtm
 def test_ElevationProfile():

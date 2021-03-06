@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytest
+import numpy as np
 from contextlib import contextmanager
 from geonum import NETCDF_AVAILABLE
 
@@ -32,6 +33,11 @@ skip_netcdf4 = pytest.mark.skipif(NETCDF_AVAILABLE==False,
 @contextmanager
 def does_not_raise_exception():
     yield
+
+@pytest.fixture
+def topodata_2x2():
+    pass
+
 
 if __name__ == '__main__':
     print(srtm_works())

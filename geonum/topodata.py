@@ -60,16 +60,16 @@ class TopoData(object):
         coordinates containing NaN values are replaced with the minimum
         altitude in the range.
     """
-    def __init__(self, lats, lons, data, data_id="", repl_nan_minval=False):
-        self.data_id = data_id #: ID of topodata file
+    def __init__(self, lats, lons, data, data_id=None, repl_nan_minval=False):
+        if data_id is None:
+            data_id = ''
+        self.data_id = data_id #: ID of topodata
 
         self.lats = lats #
         self.lons = lons #asarray(lons)
-
+        self.data = data
         if repl_nan_minval:
             self.replace_nans()
-
-        self.data = data
 
     @property
     def latitude(self):
@@ -78,8 +78,8 @@ class TopoData(object):
 
     @property
     def longitude(self):
-        """Wrapper for :attr:`lats`"""
-        return self.lats
+        """Wrapper for :attr:`lons`"""
+        return self.lons
 
     def replace_nans(self, fillval=None):
         """Replace NaNs in topographic data with a fill value
