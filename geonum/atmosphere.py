@@ -584,15 +584,3 @@ def number_density(*args,**kwargs):
         'geonum.atmosphere.air_number_density, please use the new name'
         ))
     return air_number_density(*args, **kwargs)
-
-if __name__ == '__main__':
-    print('No input temp')
-    print(density(0))
-
-    T1 = 273
-    print('input temp', T1)
-    print(density(0, temp=T1))
-
-    T2 = 253
-    print('input temp', T2)
-    print(density(0, temp=T2))

@@ -574,7 +574,3 @@ def delete_all_local_srtm_files():
     for file in glob.glob(f'{fh.local_cache_dir}/*.hgt'):
         print('Deleting SRTM data file at {}'.format(file))
         os.remove(file)
-
-if __name__ == '__main__':
-    delete_all_local_srtm_files()
-    ecc = Etopo1Access()

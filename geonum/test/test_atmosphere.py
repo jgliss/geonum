@@ -268,6 +268,7 @@ def test_sigma_rayleigh(lbda_mu,co2_ppm,should_be):
 def test_rayleigh_vol_sc_coeff(alt,lbda_mu,co2_ppm,should_be):
     val = atm.rayleigh_vol_sc_coeff(alt,lbda_mu,co2_ppm)
     npt.assert_allclose(val, should_be, rtol=1e-5)
+
 if __name__ == '__main__':
     import sys
     pytest.main(sys.argv)
