@@ -2,3 +2,4 @@
 omit =
   geonum/mapping.py
   geonum/test/*
+  geonum/conftest.py

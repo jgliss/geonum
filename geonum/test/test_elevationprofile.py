@@ -6,6 +6,7 @@ from geonum.conftest import skip_srtm
 import numpy as np
 from geonum import GeoPoint, ElevationProfile
 
+@pytest.mark.filterwarnings("ignore:Failed to compute elevation profile.")
 def test_ElevationProfile_wrong_input():
     ElevationProfile('bla', 1, 'blub')
 
