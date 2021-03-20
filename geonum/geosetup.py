@@ -140,8 +140,10 @@ class GeoSetup(object):
 
     def create_test_data(self):
         """Create exemplary test data set"""
-        source = GeoPoint(37.751005,  14.993435, name="Etna")
-        instrument = GeoPoint(37.765755,  15.016696, name="Observatory")
+        source = GeoPoint(37.751005,  14.993435, name="Etna",
+                          auto_topo_access=True)
+        instrument = GeoPoint(37.765755,  15.016696, name="Observatory",
+                              auto_topo_access=True)
         self.add_geo_points(source, instrument)
         self.set_borders_from_points()
         plume = GeoVector3D(azimuth=83, dist_hor = self.magnitude,
