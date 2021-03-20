@@ -52,6 +52,6 @@ def test_topoaccess_invalid_mode():
         all_ok = False
     assert all_ok
 
-if __name__=='__main__':
+if __name__ == "__main__":
     import sys
     pytest.main(sys.argv)

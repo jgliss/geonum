@@ -36,7 +36,6 @@ def test_GeoSetup__init__(points,vectors,lat_ll,lon_ll,lat_tr,lon_tr,
     assert stp.topo_access_mode == topo_access_mode
     assert stp.local_topo_path == local_topo_path
 
-if __name__=='__main__':
-
+if __name__ == "__main__":
     import sys
     pytest.main(sys.argv)

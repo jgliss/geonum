@@ -16,7 +16,8 @@ def test_ElevationProfile():
     lat_taranaki = -39.296571
     lon_observer = 173.9224
 
-    obs = GeoPoint(lat_taranaki, lon_observer)
+    obs = GeoPoint(lat_taranaki, lon_observer,
+                   auto_topo_access=True)
 
     npt.assert_almost_equal(obs.altitude, 324)
 
@@ -36,6 +37,6 @@ def test_ElevationProfile():
                                   [2482.598405, 176.008484, 583.012202,
                                    486.57815, 50.033677, 1005.208932, 0.])
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
     pytest.main(sys.argv)

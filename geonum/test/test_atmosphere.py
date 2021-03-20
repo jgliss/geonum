@@ -296,6 +296,6 @@ def test_number_density(alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat,
     val = atm.number_density(alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat)
     npt.assert_allclose(val, should_be, rtol=1e-7)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
     pytest.main(sys.argv)

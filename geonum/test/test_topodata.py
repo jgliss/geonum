@@ -10,6 +10,7 @@ import numpy as np
 import numpy.testing as npt
 
 from geonum import topodata as td
+from geonum.conftest import does_not_raise_exception
 arr = np.array([[647., 647.], [651., 651.]])
 lats = np.array([48., 48.00083333])
 lons = np.array([11., 11.00083333])
@@ -21,28 +22,37 @@ def topodata():
         np.array([11., 11.00083333]),
         np.array([[647., 647.], [651., 651.]]),None,False)
 
-@pytest.mark.parametrize(
-    'lats, lons, data, data_id, repl_nan_minval', [
+@pytest.mark.parametrize('lats,lons,data,data_id,repl_nan_minval,raises', [
         (np.array([48., 48.00083333]), np.array([11., 11.00083333]),
-         np.array([[647., 647.], [651., 651.]]),None,False),
+         np.array([[647., 647.], [651., 651.]]),None,False,
+         does_not_raise_exception()),
         (np.array([48., 48.00083333]), np.array([11., 11.00083333]),
-         np.array([[647., 647.], [651., np.nan]]),None,False),
+         np.array([[647., 647.], [651., np.nan]]),None,False,
+         does_not_raise_exception()),
          (np.array([48., 48.00083333]), np.array([11., 11.00083333]),
-         np.array([[647., 647.], [651., np.nan]]),None,True),
+         np.array([[647., 647.], [651., np.nan]]),None,True,
+         does_not_raise_exception()),
         (np.array([48., 48.00083333]), np.array([11., 11.00083333]),
-         np.array([[647., 647.], [651., np.nan]]),'great_data',True),
+         np.array([[647., 647.], [651., np.nan]]),'great_data',True,
+         does_not_raise_exception()),
+        ('blaa',[1,2],[[1,2],[1,2]],None,False,pytest.raises(ValueError)),
+        ([1,2,3],[1,2],[[1,2],[1,2]],None,False,pytest.raises(ValueError)),
+        ([1,2],[1,2,3],[[1,2,3],[1,2,3]],None,False,does_not_raise_exception()),
+        ([1,2,3],[1,2],[[1,2,3],[1,2,3]],None,False,pytest.raises(ValueError))
         ])
-def test_TopoData__init__(lats, lons, data, data_id, repl_nan_minval):
-    topo = td.TopoData(lats, lons, data, data_id, repl_nan_minval)
-    npt.assert_array_equal(topo.lats, lats)
-    npt.assert_array_equal(topo.lons, lons)
+def test_TopoData__init__(lats, lons, data, data_id, repl_nan_minval,
+                          raises):
+    with raises:
+        topo = td.TopoData(lats, lons, data, data_id, repl_nan_minval)
+        npt.assert_array_equal(topo.lats, lats)
+        npt.assert_array_equal(topo.lons, lons)
 
-    if data_id is None:
-        data_id=''
-    assert topo.data_id == data_id
-    if repl_nan_minval:
-        data[np.isnan(data)] = np.nanmin(arr)
-    npt.assert_array_equal(topo.data, data)
+        if data_id is None:
+            data_id='undefined'
+        assert topo.data_id == data_id
+        if repl_nan_minval:
+            data[np.isnan(data)] = np.nanmin(arr)
+        npt.assert_array_equal(topo.data, data)
 
 def test_TopoData_latitude(topodata):
     assert topodata.latitude is topodata.lats
@@ -58,10 +68,6 @@ def test_TopoData_replace_nans():
     topo.replace_nans(1000.)
     assert not np.any(np.isnan(topo.data))
 
-if __name__=='__main__':
-
-    data = td.TopoData(lats, lons, arr)
-
-
+if __name__ == "__main__":
     import sys
     pytest.main(sys.argv)
