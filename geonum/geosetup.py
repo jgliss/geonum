@@ -21,6 +21,7 @@ This module contains the GeoSetup class, a high level object for managing
 muliple geo point and geo vector objects.
 """
 from geonum import BASEMAP_AVAILABLE
+from matplotlib.pyplot import get_cmap
 if BASEMAP_AVAILABLE:
     from geonum.mapping import Map
 from numpy import asarray, nanmin, nanmax
@@ -83,15 +84,11 @@ class GeoSetup(object):
             topo_access_mode = "srtm"
         if cmap_vecs is None:
             cmap_vecs = 'Greens'
+
+        self._cmap_vecs = cmap_vecs
         self.id = id
         self.points = {}
         self.vectors = {}
-        from matplotlib.pyplot import get_cmap
-        try:
-            cmap = get_cmap(cmap_vecs)
-        except:
-            cmap = get_cmap("Greens")
-        self.cmap = cmap
 
         self.topo_access_mode = topo_access_mode
         self.local_topo_path = local_topo_path
@@ -132,6 +129,12 @@ class GeoSetup(object):
         """Topograph data access class"""
         return TopoDataAccess(self.topo_access_mode,
                               self.local_topo_path)
+
+    @property
+    def cmap_vecs(self):
+        """Default colormap used for drawing vectors"""
+        return get_cmap(self._cmap_vecs)
+
     def has_points(self):
         """Returns True, if this setup includes GeoPoints, False if not"""
         if not bool(self.points):
@@ -551,7 +554,7 @@ class GeoSetup(object):
             for i, vec in enumerate(self.vectors.values()):
                 m.draw_geo_vector_2d(vec,
                                      ls="-",
-                                     c=self.cmap(nums[i]),
+                                     c=self.cmap_vecs(nums[i]),
                                      label=vec.name)
         if draw_legend:
             try:
@@ -630,7 +633,7 @@ class GeoSetup(object):
             for i, vec in enumerate(self.vectors.values()):
                 try:
                     m.draw_geo_vector_3d(vec, label=vec.name,
-                                         c=self.cmap(nums[i]),
+                                         c=self.cmap_vecs(nums[i]),
                                          ls="-",
                                          **kwargs)
                 except Exception as e:
