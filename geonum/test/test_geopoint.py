@@ -11,7 +11,7 @@ import numpy as np
 from geonum.conftest import does_not_raise_exception
 from LatLon23 import LatLon
 from geonum.geopoint import GeoPoint
-from geonum.exceptions import OutOfTopoDomain
+from geonum.exceptions import OutOfDomain
 from geonum import TopoData
 
 FAKE_TOPO = TopoData(lats=[-0.5,0.5],
@@ -54,7 +54,7 @@ def test_GeoPoint__init__(args, eval_args, raises):
 @pytest.mark.parametrize('topo_data,gp,raises', [
     ('blaa', GeoPoint(), pytest.raises(ValueError)),
     (FAKE_TOPO, GeoPoint(), does_not_raise_exception()),
-    (FAKE_TOPO, GeoPoint(10,10), pytest.raises(OutOfTopoDomain))
+    (FAKE_TOPO, GeoPoint(10,10), pytest.raises(OutOfDomain))
     ])
 def test_GeoPoint_set_topo_data(topo_data, gp, raises):
     with raises:

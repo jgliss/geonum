@@ -21,7 +21,7 @@ import numpy as np
 
 from geonum.topodataaccess import TopoDataAccess
 from geonum.topodata import TopoData
-from geonum.exceptions import OutOfTopoDomain
+from geonum.exceptions import OutOfDomain
 
 class GeoPoint(LatLon):
     """The Geopoint object represents a location in the atmosphere
@@ -156,7 +156,7 @@ class GeoPoint(LatLon):
         if not isinstance(topo_data, TopoData):
             raise ValueError('need instance of geonum.TopoData')
         elif not topo_data.includes_coordinate(self.latitude, self.longitude):
-            raise OutOfTopoDomain(
+            raise OutOfDomain(
                 f'Cannot assign input TopoData {topo_data} to {self}. '
                 f'The location of {self} are outside the borders of TopoData'
                 )

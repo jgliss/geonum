@@ -26,5 +26,5 @@ class TopoAccessError(IOError):
 class InvalidTopoMode(IOError):
     pass
 
-class OutOfTopoDomain(ValueError):
+class OutOfDomain(ValueError):
     pass
