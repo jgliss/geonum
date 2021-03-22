@@ -26,9 +26,9 @@ if BASEMAP_AVAILABLE:
     from geonum.mapping import Map
 from numpy import asarray, nanmin, nanmax
 from os.path import exists
-from traceback import print_exc
 from warnings import warn
 
+from geonum.exceptions import OutOfDomain
 from geonum.geopoint import GeoPoint
 from geonum.geovector3d import GeoVector3D
 from geonum.topodataaccess import TopoDataAccess
@@ -103,7 +103,7 @@ class GeoSetup(object):
 
         for pt in points:
             if isinstance(pt, GeoPoint):
-                self.add_geo_point(pt)
+                self.add_geo_point(pt, assert_in_domain=False)
 
         if vectors is None:
             vectors = []
@@ -116,13 +116,16 @@ class GeoSetup(object):
             if isinstance(vec, GeoVector3D):
                 self.add_geo_vector(vec)
 
-        self.set_borders_from_points()
-        #temporary creation of points ll and tr in case there is some valid input
-        try:
-            self.new_geo_point(lat_ll, lon_ll, name="ll")
-            self.new_geo_point(lat_tr, lon_tr, name="tr")
-        except (TypeError, ValueError):
-            pass
+        borders_set = False
+        if lat_ll is not None:
+            try:
+                self.new_geo_point(lat_ll, lon_ll, name="ll")
+                self.new_geo_point(lat_tr, lon_tr, name="tr")
+                borders_set = True
+            except (TypeError, ValueError):
+                pass
+        if not borders_set:
+            self.set_borders_from_points()
 
     @property
     def topo_access(self):
@@ -137,24 +140,27 @@ class GeoSetup(object):
 
     def has_points(self):
         """Returns True, if this setup includes GeoPoints, False if not"""
-        if not bool(self.points):
-            return False
-        return True
+        if len(self.points) > 0:
+            return True
+        return False
 
-    def create_test_data(self):
-        """Create exemplary test data set"""
-        source = GeoPoint(37.751005,  14.993435, name="Etna",
-                          auto_topo_access=True)
-        instrument = GeoPoint(37.765755,  15.016696, name="Observatory",
-                              auto_topo_access=True)
-        self.add_geo_points(source, instrument)
-        self.set_borders_from_points()
-        plume = GeoVector3D(azimuth=83, dist_hor = self.magnitude,
+    @staticmethod
+    def create_test_setup():
+        """Initiate  example test data set"""
+        gs = GeoSetup()
+        source = GeoPoint(latitude=37.751005,  longitude=14.993435,
+                          name="Etna", auto_topo_access=True)
+        instrument = GeoPoint(latitude=37.765755,  longitude=15.016696,
+                              name="Observatory", auto_topo_access=True)
+        gs.add_geo_points(source, instrument)
+        gs.set_borders_from_points()
+        plume = GeoVector3D(azimuth=83, dist_hor=gs.magnitude,
                             elevation=0, anchor=source, name="plume")
-        view_dir = GeoVector3D(azimuth=160, dist_hor=self.magnitude,
+        view_dir = GeoVector3D(azimuth=160, dist_hor=gs.magnitude,
                                elevation=8, anchor=instrument, name="cfov")
 
-        self.add_geo_vectors(plume, view_dir)
+        gs.add_geo_vectors(plume, view_dir)
+        return gs
 
     def set_local_topo_path(self, p):
         """Sets local path for Etopo1 data files can be found
@@ -218,10 +224,11 @@ class GeoSetup(object):
     @property
     def ll(self):
         """Return lower left point of topo data range """
-        try:
-            return self.points["ll"]
-        except AttributeError:
-            print("Lower left corner (GeoPoint) not yet defined in GeoSetup")
+        if not 'll' in self.points:
+            raise AttributeError(
+                'Lower left corner of GeoSetup domain is not defined'
+                )
+        return self.points["ll"]
 
     @ll.setter
     def ll(self, value):
@@ -233,11 +240,11 @@ class GeoSetup(object):
     @property
     def tr(self):
         """Return lower left point of topo data range"""
-        try:
-            return self.points["tr"]
-        except AttributeError:
-            print("Top right corner (GeoPoint) not yet defined in GeoSetup")
-            pass
+        if not 'tr' in self.points:
+            raise AttributeError(
+                'Top right corner of GeoSetup domain is not defined'
+                )
+        return self.points["tr"]
 
     @tr.setter
     def tr(self, value):
@@ -282,13 +289,13 @@ class GeoSetup(object):
         return (self.lat_ll + self.delta_lat / 2.,
                 self.lon_ll + self.delta_lon / 2.)
 
-    def add_geo_points(self, *args):
+    def add_geo_points(self, *args, assert_in_domain=False):
         """Add multiple GeoPoints to the collection
 
         :param *args: arbitrary amount of new geo points
         """
         for arg in args:
-            self.add_geo_point(arg)
+            self.add_geo_point(arg, assert_in_domain)
 
     def has_point(self, name):
         """Checks if point with input name exists
@@ -306,27 +313,44 @@ class GeoSetup(object):
             return True
         return False
 
-    def add_geo_point(self, pt):
+    def contains_coordinate(self, lat, lon):
+        """
+        Check if input coordinate is within domain of this GeoSetup
+
+        Parameters
+        ----------
+        lat : float
+            latitude of coordinate
+        lon : float
+            longitude of coordinate
+
+        Returns
+        -------
+        bool
+
+        """
+        latok = self.lat_ll <= lat <= self.lat_tr
+        lonok = self.lon_ll <= lon <= self.lon_tr
+        return True if latok and lonok else False
+
+    def add_geo_point(self, pt, assert_in_domain=True):
         """Add :class:`GeoPoint` to this collection
 
         :param GeoPoint pt: the new point
         """
-        try:
-            if pt.name in self.points:
-                print(("Point ID %s already exists in GeoSetup" %(pt.name)))
-                pt2 = self.points[pt.name]
-                if pt.almost_equal(pt2) and pt.altitude == pt2.altitude:
-                    print("Point is unchanged")
-                    return
-                print("Updating name of existing GeoPoint to: %s_old" %pt.name)
-                pt2.name = pt2.name + "_old"
-                self.points[pt2.name] = pt2
-            self.points[pt.name] = pt
-            if not isinstance(pt.topo_data, TopoData):
-                pt.set_topo_data(self.topo_data)
-
-        except Exception as e:
-            print("Geopoint could not be added: " + repr(e))
+        if pt.name in self.points:
+            raise ValueError(
+                f'GeoPoint with name {pt.name} already exists in GeoSetup. '
+                )
+        if assert_in_domain and not self.contains_coordinate(pt.latitude,
+                                                             pt.longitude):
+            raise OutOfDomain(
+                f'{pt} is not within domain of GeoSetup'
+                )
+        self.points[pt.name] = pt
+        if (isinstance(self.topo_data, TopoData) and
+            not isinstance(pt.topo_data, TopoData)):
+            pt.set_topo_data(self.topo_data)
 
     def set_geo_point(self, p_id, pt):
         """Update an existing GeoPoint in the collection
@@ -384,12 +408,7 @@ class GeoSetup(object):
 
         :param **kwargs: see :class:`GeoPoint` for initiation info
         """
-        try:
-            self.add_geo_point(GeoPoint(*args, **kwargs))
-        except (TypeError, ValueError):
-            return
-        except:
-            raise Exception(print_exc())
+        self.add_geo_point(GeoPoint(*args, **kwargs))
 
     def _all_lats_lons(self):
         """Get 2 arrays including all latitudes and all longitudes of all
@@ -414,8 +433,10 @@ class GeoSetup(object):
         return (self.tr - self.ll).norm
 
     def set_borders_from_points(self, extend_km=1, to_square=True):
-        """Set range of setup (lower left and upper right coordinates)
-        considering all points in this collection
+        """Set lower left (ll) and top right (tr) corners of domain
+
+        The domain is inferred from all points associated with this
+        setup.
 
         :param float extend_km: extend range from the outermost points by
             this number in km
@@ -436,11 +457,11 @@ class GeoSetup(object):
             v = ptr - pll
             add = (abs(v.dx) - abs(v.dy)) / 2
             if add > 0: #E/W extend (dx) is smaller than N/S extend (dy)
-                pll = pll.offset(azimuth = 180, dist_hor = add)
-                ptr = ptr.offset(azimuth = 0, dist_hor = add)
+                pll = pll.offset(azimuth=180, dist_hor=add)
+                ptr = ptr.offset(azimuth=0, dist_hor=add)
             else:
-                pll = pll.offset(azimuth = 270, dist_hor = -add)
-                ptr = ptr.offset(azimuth = 90, dist_hor = -add)
+                pll = pll.offset(azimuth=270, dist_hor=-add)
+                ptr = ptr.offset(azimuth=90, dist_hor=-add)
 
         self.set_geo_point("ll", pll.offset(azimuth=-135,
                                             dist_hor=float(extend_km),

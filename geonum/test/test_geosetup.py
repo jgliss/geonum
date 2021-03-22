@@ -42,9 +42,9 @@ def test_GeoSetup__init__(points,vectors,lat_ll,lon_ll,lat_tr,lon_tr,
         assert stp.local_topo_path == local_topo_path
 
 @skip_srtm
-def test_GeoSetup_create_test_data():
-    stp = gs.GeoSetup()
-    stp.create_test_data()
+def test_GeoSetup_create_test_setup():
+    stp = gs.GeoSetup.create_test_setup()
+    assert isinstance(stp, gs.GeoSetup)
     assert len(stp.points) == 4
     assert len(stp.vectors) == 2
 
@@ -62,7 +62,7 @@ def test_GeoSetup_topo_access(empty_setup):
 
 def test_has_points(empty_setup):
     assert not empty_setup.has_points()
-    empty_setup.add_geo_point(GeoPoint(name='null'))
+    empty_setup.add_geo_point(GeoPoint(name='null'), assert_in_domain=False)
     assert empty_setup.has_points()
     empty_setup.delete_geo_point('null')
     assert not empty_setup.has_points()
