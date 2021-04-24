@@ -87,6 +87,18 @@ class TopoData(object):
         if repl_nan_minval:
             self.replace_nans()
 
+    def __str__(self):
+        return (
+            f'geonum.TopoData (data_id: {self.data_id})\n'
+            f'Dimensions: {self.dims}, shape: {self.shape}\n'
+            f'latitude range: {self.lat0} - {self.lat1}\n'
+            f'longitude range: {self.lon0} - {self.lon1}\n'
+            f'data: {type(self.data)}\n{self.data}'
+            )
+
+    def __repr__(self):
+        return (f'geonum.TopoData (data_id: {self.data_id}, shape: {self.shape})\n')
+
     @property
     def latitude(self):
         """Wrapper for :attr:`lats`"""
@@ -96,6 +108,13 @@ class TopoData(object):
     def longitude(self):
         """Wrapper for :attr:`lons`"""
         return self.lons
+
+    @property
+    def dims(self):
+        """
+        list: List of dimension names
+        """
+        return ['latitude', 'longitude']
 
     def replace_nans(self, fillval=None):
         """Replace NaNs in topographic data with a fill value
