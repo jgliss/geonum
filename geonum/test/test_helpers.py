@@ -64,13 +64,7 @@ def test_haversine_formula(lon0,lat0,lon1,lat1,radius,value):
     npt.assert_allclose(val, value, rtol=1e-5)
 
 
-
-
-
-
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
     pytest.main(sys.argv)
 

@@ -1,44 +1,73 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Test environment for base.py module."""
+"""
+Created on Sat Mar  6 21:15:34 2021
+
+@author: jonasg
+"""
 import pytest
+import numpy as np
 import numpy.testing as npt
-from geonum.conftest import skip_srtm, skip_netcdf4
-import geonum.topodataaccess as tp
 
-@skip_netcdf4
-def test_etopo1_init():
-    acc = tp.Etopo1Access(check_access=False, search_database=False)
-    from geonum import LOCAL_TOPO_DIR
-    assert LOCAL_TOPO_DIR == acc.local_path
-    assert acc.file_name == 'ETOPO1_Ice_g_gmt4.grd'
+from geonum import topodata as td
+from geonum.conftest import does_not_raise_exception
+arr = np.array([[647., 647.], [651., 651.]])
+lats = np.array([48., 48.00083333])
+lons = np.array([11., 11.00083333])
 
-@skip_srtm
-def test_srtm():
-    acc = tp.SRTMAccess()
-    d = acc.get_data(acc._TESTLAT, acc._TESTLON)
-    npt.assert_equal(d.data.shape, (2, 2))
-    vals = [d.data.std(), d.data.mean(), d.data.min(), d.data.max()]
+@pytest.fixture(scope='module')
+def topodata():
+    return td.TopoData(
+        np.array([48., 48.00083333]),
+        np.array([11., 11.00083333]),
+        np.array([[647., 647.], [651., 651.]]),None,False)
 
-    npt.assert_array_almost_equal(vals, [4.0, 857.0, 853.0, 861.0])
+@pytest.mark.parametrize('lats,lons,data,data_id,repl_nan_minval,raises', [
+        (np.array([48., 48.00083333]), np.array([11., 11.00083333]),
+         np.array([[647., 647.], [651., 651.]]),None,False,
+         does_not_raise_exception()),
+        (np.array([48., 48.00083333]), np.array([11., 11.00083333]),
+         np.array([[647., 647.], [651., np.nan]]),None,False,
+         does_not_raise_exception()),
+         (np.array([48., 48.00083333]), np.array([11., 11.00083333]),
+         np.array([[647., 647.], [651., np.nan]]),None,True,
+         does_not_raise_exception()),
+        (np.array([48., 48.00083333]), np.array([11., 11.00083333]),
+         np.array([[647., 647.], [651., np.nan]]),'great_data',True,
+         does_not_raise_exception()),
+        ('blaa',[1,2],[[1,2],[1,2]],None,False,pytest.raises(ValueError)),
+        ([1,2,3],[1,2],[[1,2],[1,2]],None,False,pytest.raises(ValueError)),
+        ([1,2],[1,2,3],[[1,2,3],[1,2,3]],None,False,does_not_raise_exception()),
+        ([1,2,3],[1,2],[[1,2,3],[1,2,3]],None,False,pytest.raises(ValueError))
+        ])
+def test_TopoData__init__(lats, lons, data, data_id, repl_nan_minval,
+                          raises):
+    with raises:
+        topo = td.TopoData(lats, lons, data, data_id, repl_nan_minval)
+        npt.assert_array_equal(topo.lats, lats)
+        npt.assert_array_equal(topo.lons, lons)
 
-def test_topoaccess_invalid_mode():
-    all_ok = True
-    try:
-        tp.TopoDataAccess('bla')
-    except tp.InvalidTopoMode:
-        pass
-    except:
-        all_ok = False
+        if data_id is None:
+            data_id='undefined'
+        assert topo.data_id == data_id
+        if repl_nan_minval:
+            data[np.isnan(data)] = np.nanmin(arr)
+        npt.assert_array_equal(topo.data, data)
 
-    acc = tp.TopoDataAccess()
-    try:
-        acc.get_data(0,0, mode='bla')
-    except tp.InvalidTopoMode:
-        pass
-    except:
-        all_ok = False
-    assert all_ok
+def test_TopoData_latitude(topodata):
+    assert topodata.latitude is topodata.lats
 
-if __name__=='__main__':
+def test_TopoData_longitude(topodata):
+    assert topodata.longitude is topodata.lons
+
+def test_TopoData_replace_nans():
+    topo = td.TopoData(
+        np.array([48., 48.00083333]),
+        np.array([11., 11.00083333]),
+        np.array([[647., 647.], [np.nan, 651.]]),None,False)
+    topo.replace_nans(1000.)
+    assert not np.any(np.isnan(topo.data))
+
+if __name__ == "__main__":
     import sys
     pytest.main(sys.argv)

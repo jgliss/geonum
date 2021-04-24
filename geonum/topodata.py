@@ -53,23 +53,39 @@ class TopoData(object):
         numpy array with longitude coordinates of the topographic dataset.
         Accessible via :attr:`longitude`.
     data : ndarray
-        2D numpy array containing elevation values.
+        2D numpy array containing elevation values, first index denotes
+        latitude dimension, 2nd index denotes longitude dimension.
     data_id : str
         ID of this data set.
     repl_nan_minval : bool
-        coordinates containing NaN values are replaced with the minimum
-        altitude in the range.
+        if True, then coordinates containing NaN values are replaced with the
+        minimum altitude in `data`.
     """
-    def __init__(self, lats, lons, data, data_id="", repl_nan_minval=False):
-        self.data_id = data_id #: ID of topodata file
+    def __init__(self, lats, lons, data, data_id=None, repl_nan_minval=False):
+        if data_id is None:
+            data_id = 'undefined'
+        self.data_id = data_id
 
-        self.lats = lats #
-        self.lons = lons #asarray(lons)
+        lats = np.asarray(lats)
+        lons = np.asarray(lons)
+        if not lats.ndim == 1:
+            raise ValueError('lats needs to be 1 dimensional')
+        if not lons.ndim == 1:
+            raise ValueError('lons needs to be 1 dimensional')
+
+        data = np.asarray(data)
+        if not data.shape == (len(lats), len(lons)):
+            raise ValueError(
+                'shape mismatch between input lats and lons and data...'
+                )
+
+        self.lats = lats
+        self.lons = lons
+        self.data = data
+
 
         if repl_nan_minval:
             self.replace_nans()
-
-        self.data = data
 
     @property
     def latitude(self):
@@ -78,8 +94,8 @@ class TopoData(object):
 
     @property
     def longitude(self):
-        """Wrapper for :attr:`lats`"""
-        return self.lats
+        """Wrapper for :attr:`lons`"""
+        return self.lons
 
     def replace_nans(self, fillval=None):
         """Replace NaNs in topographic data with a fill value

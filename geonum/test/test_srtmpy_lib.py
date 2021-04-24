@@ -22,6 +22,6 @@ def test_get_data():
     acc = srtm.get_data()
     assert isinstance(acc, srtm.data.GeoElevationData)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
     pytest.main(sys.argv)

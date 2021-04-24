@@ -32,6 +32,3 @@ skip_netcdf4 = pytest.mark.skipif(NETCDF_AVAILABLE==False,
 @contextmanager
 def does_not_raise_exception():
     yield
-
-if __name__ == '__main__':
-    print(srtm_works())
