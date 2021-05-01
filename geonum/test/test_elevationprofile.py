@@ -4,7 +4,15 @@ import numpy.testing as npt
 import pytest
 from geonum.conftest import skip_srtm, does_not_raise_exception
 import numpy as np
-from geonum import GeoPoint, ElevationProfile
+from geonum import GeoPoint, ElevationProfile, TopoData
+
+LAT0, LON0 = -39.296571, 173.9224
+LAT1, LON1 = -39.3538, 174.4383
+
+@pytest.fixture(scope='module')
+def profile():
+    return ElevationProfile(GeoPoint(LAT0, LON0), GeoPoint(LAT1, LON1),
+                            calc_on_init=False)
 
 @pytest.mark.filterwarnings("ignore:Failed to compute elevation profile.")
 def test_ElevationProfile_wrong_input():
@@ -23,19 +31,95 @@ def test_ElevationProfile___init__(args,raises):
         prof = ElevationProfile(**args)
         assert isinstance(prof, ElevationProfile)
 
+def test_ElevationProfile_observer(profile):
+    # test getter
+    val = profile.observer
+    assert isinstance(val, GeoPoint)
+    # test setter
+    profile.observer = val
+    assert profile.observer is val
+
+def test_ElevationProfile_endpoint(profile):
+    # test getter
+    val = profile.endpoint
+    assert isinstance(val, GeoPoint)
+    # test setter
+    profile.endpoint = val
+    assert profile.endpoint is val
+
+def test_ElevationProfile_topo_data(profile):
+    # test getter
+    val = profile.topo_data
+    assert isinstance(val, TopoData)
+    # test setter
+    profile.topo_data = val
+    assert profile.topo_data is val
+
+def test_ElevationProfile_observer_topogrid(profile):
+    profile._coords_topo = None
+    val = profile.observer_topogrid
+    assert isinstance(val, GeoPoint)
+
+def test_ElevationProfile_endpoint_topogrid(profile):
+    profile._coords_topo = None
+    val = profile.endpoint_topogrid
+    assert isinstance(val, GeoPoint)
+
+def test_ElevationProfile_azimuth(profile):
+    val = profile.azimuth
+    npt.assert_allclose(val, 98.3, atol=0.1)
+
+def test_ElevationProfile_profile_unavail(profile):
+    with pytest.raises(AttributeError):
+        profile.profile
+
+def test_ElevationProfile_dists_unavail(profile):
+    with pytest.raises(AttributeError):
+        profile.dists
+
+@pytest.mark.parametrize('args,num,avg', [
+    ({}, 9222, 576),
+    ({'interpolate' : False},319, 575),
+    ({'interpolate' : True, 'resolution' : 1000},319, 575),
+    ])
+def test_ElevationProfile_det_profile(profile, args, num, avg):
+    val = profile.det_profile(**args)
+    assert isinstance(val, np.ndarray)
+    assert len(val) == num
+    mean = np.nanmean(val)
+    npt.assert_allclose(mean, avg, atol=1)
+
+def test_ElevationProfile_resolution(profile):
+    npt.assert_allclose(profile.resolution, 0.14, atol=0.1)
+
+def test_ElevationProfile_gradient(profile):
+    grad = profile.gradient
+    assert len(grad) == 319
+    npt.assert_allclose(np.mean(grad), -0.43, atol=0.1)
+
+@pytest.mark.parametrize('elev_angle,view_above_topo_m,num,avg', [
+    (0, 0, 319, 318),
+    (0, 10, 319, 328),
+    (2, 10, 319, 1114),
+    ])
+def test_ElevationProfile_get_altitudes_view_dir(profile, elev_angle,
+                                                 view_above_topo_m,num,avg):
+    alts = profile.get_altitudes_view_dir(elev_angle, view_above_topo_m)
+    assert isinstance(alts, np.ndarray)
+    assert len(alts) == num
+    mean = np.mean(alts)
+    npt.assert_allclose(mean, avg, atol=1)
+
 @skip_srtm
 def test_ElevationProfile_via_GeoPoint():
 
-    lat_taranaki = -39.296571
-    lon_observer = 173.9224
 
-    obs = GeoPoint(lat_taranaki, lon_observer,
+    obs = GeoPoint(LAT0, LON0,
                    auto_topo_access=True)
 
     npt.assert_almost_equal(obs.altitude, 324)
 
     prof = obs.get_elevation_profile(azimuth=90, dist_hor=50)
-    prof.plot()
 
     prof_nans = obs.get_elevation_profile(azimuth=45, dist_hor=50)
     prof2 = obs.get_elevation_profile(azimuth=45, dist_hor=50, order=1)

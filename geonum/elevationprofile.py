@@ -49,8 +49,8 @@ class ElevationProfile(object):
         additional keyword args passed to :func:`det_profile` (only relevant
         if `calc_on_init` is True)
     """
-    def __init__(self, observer, endpoint, topo_data=None, calc_on_init=True,
-                 **kwargs):
+    def __init__(self, observer, endpoint, topo_data=None,
+                 calc_on_init=True, **kwargs):
 
         self._topo_data = None
         self._observer = None #: coordinate of observer (start of profile)
@@ -59,10 +59,8 @@ class ElevationProfile(object):
         self._check_set_observer(observer)
         self._check_set_endpoint(endpoint)
 
-        if topo_data is None:
-            topo_data, _ = self.observer.get_topo_data(geo_point=self.endpoint)
-
-        self._check_set_topo_data(topo_data)
+        if topo_data is not None:
+            self.topo_data = topo_data
 
         self._init_attrs()
 
@@ -98,6 +96,9 @@ class ElevationProfile(object):
         """
         TopoData: topographic data used to extract elevation profile
         """
+        if self._topo_data is None:
+            topo, _ = self.observer.get_topo_data(geo_point=self.endpoint)
+            self._topo_data = topo
         return self._topo_data
 
     @topo_data.setter
