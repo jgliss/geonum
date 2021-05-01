@@ -398,31 +398,6 @@ class ElevationProfile(object):
         return (1000 * np.tan(np.radians(elev_angle)) * self.dists +
                 self.profile[0] + view_above_topo_m)
 
-    def find_horizon_elev(self, elev_start=0.0, elev_stop=60.0, step_deg=0.1,
-                          **kwargs):
-        """Find first elevation angle which does not intersect with topo
-
-        :param float elev_start: start search elevation angle
-        :param float elev_stop: stop search elevation angle
-        :param float step_deg: angle step for search (coarser is faster)
-        :param **kwargs: additional keyword agruments passed to
-            :func:`get_first_intersection`
-        """
-        elevs = np.arange(elev_start, elev_stop + step_deg, step_deg)
-        elev_sects = []
-        dists_sects = []
-        for elev in elevs:
-            (dist,
-             dist_err,
-             intersect,
-             view_elevations,
-             _) = self.get_first_intersection(elev, **kwargs)
-            if dist is None:
-                return elev, elev_sects, dists_sects
-            else:
-                dists_sects.append(dist), elev_sects.append(elev)
-        raise Exception("Unexpected exception..")
-
     def get_first_intersection(self, elev_angle, view_above_topo_m=1.5,
                                min_dist=None, local_tolerance=3, plot=False):
 
@@ -514,6 +489,31 @@ class ElevationProfile(object):
                 "dist =%.1f km" %(self.azimuth, elev_angle, dist))
 
         return dist, dist_err, intersect, view_elevations, ax
+
+    def find_horizon_elev(self, elev_start=0.0, elev_stop=60.0, step_deg=0.1,
+                          **kwargs):
+        """Find first elevation angle which does not intersect with topo
+
+        :param float elev_start: start search elevation angle
+        :param float elev_stop: stop search elevation angle
+        :param float step_deg: angle step for search (coarser is faster)
+        :param **kwargs: additional keyword agruments passed to
+            :func:`get_first_intersection`
+        """
+        elevs = np.arange(elev_start, elev_stop + step_deg, step_deg)
+        elev_sects = []
+        dists_sects = []
+        for elev in elevs:
+            (dist,
+             dist_err,
+             intersect,
+             view_elevations,
+             _) = self.get_first_intersection(elev, plot=False, **kwargs)
+            if np.isnan(dist):
+                return elev, elev_sects, dists_sects
+            else:
+                dists_sects.append(dist), elev_sects.append(elev)
+        raise ValueError("Failed to find elevation angle of horizon...")
 
     def get_altitude_at_distance(self, dist):
         """Returns altitude at a ceratain distance from observer

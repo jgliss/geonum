@@ -139,12 +139,21 @@ def test_ElevationProfile_get_first_intersection(profile,
     if plot:
         assert isinstance(ax, Axes)
 
+@pytest.mark.parametrize(
+    'elev_start,elev_stop,step_deg,raises,num,elev', [
+    (0,10,0.1,does_not_raise_exception(),69,6.9),
+    (6.8,7,0.01,does_not_raise_exception(),10,6.9)
+    ])
+def test_ElevationProfile_find_horizon_elev(profile,
+    elev_start,elev_stop,step_deg,raises,num,elev):
+    with raises:
+        (_elev,
+         elev_sects,
+         dists_sects) = profile.find_horizon_elev(elev_start, elev_stop,
+                                                  step_deg)
 
-
-
-
-
-
+        npt.assert_allclose(_elev, elev, atol=0.1)
+        assert len(elev_sects) == len(dists_sects) == num
 
 @skip_srtm
 def test_ElevationProfile_via_GeoPoint():
