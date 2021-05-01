@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import matplotlib
+matplotlib.use('Agg')
 import pytest
 from contextlib import contextmanager
 from geonum import NETCDF_AVAILABLE

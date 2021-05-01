@@ -60,6 +60,15 @@ def test_TopoData_latitude(topodata):
 def test_TopoData_longitude(topodata):
     assert topodata.longitude is topodata.lons
 
+def test_TopoData_dims(topodata):
+    assert topodata.dims == ['latitude', 'longitude']
+
+def test_TopoData___str__(topodata):
+    assert str(topodata).startswith('geonum.TopoData')
+
+def test_TopoData___repr__(topodata):
+    assert repr(topodata).startswith('geonum.TopoData')
+
 def test_TopoData_replace_nans():
     topo = td.TopoData(
         np.array([48., 48.00083333]),

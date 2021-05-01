@@ -261,11 +261,7 @@ class GeoPoint(LatLon):
         lat0, lon0 = ll.latitude, ll.longitude
         lat1, lon1 = tr.latitude, tr.longitude
         if not (self.check_topo(lat1, lon1) and self.check_topo(lat0, lon0)):
-            print(("Topo data not avaialable in geo point %s, loading topodata"
-                        %self.name))
             self._load_topo_data(lat0, lon0, lat1, lon1)
-        else:
-            print ("Topo data avaialable in geo point %s")
         return self.topo_data, pf
 
     def check_topo(self, lat1=None, lon1=None):
@@ -342,9 +338,12 @@ class GeoPoint(LatLon):
             the profile object
         """
         from geonum.elevationprofile import ElevationProfile
-        data, pf = self.get_topo_data(geo_point, azimuth, dist_hor, lon1,
-                                      lat1)
-        return ElevationProfile(data, self, pf, resolution=resolution,
+        topo, pf = self.get_topo_data(geo_point, azimuth, dist_hor, lon1, lat1)
+        return ElevationProfile(observer=self,
+                                endpoint=pf,
+                                topo_data=topo,
+                                calc_on_init=True,
+                                resolution=resolution,
                                 **mapping_opts)
 
     def get_altitude(self):
