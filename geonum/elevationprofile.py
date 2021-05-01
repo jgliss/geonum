@@ -461,7 +461,7 @@ class ElevationProfile(object):
 
         """
 
-        if min_dist == None:
+        if min_dist is None:
             min_dist = self.dist_hor*.01
         max_diff = self.resolution * 1000
         view_elevations = self.get_altitudes_view_dir(elev_angle,
@@ -506,12 +506,10 @@ class ElevationProfile(object):
 
         except IndexError as e:
             print(("No intersections could be detected, err: %s" %repr(e)))
-
+            dist, dist_err = np.nan, np.nan
         ax = None
         if plot:
             ax = self._plot_intersect_search_result(view_elevations, dist)
-            if dist == None:
-                dist = np.nan
             ax.set_title("Azim: %.1f, Elev: %.1f, Intersect @ "
                 "dist =%.1f km" %(self.azimuth, elev_angle, dist))
 

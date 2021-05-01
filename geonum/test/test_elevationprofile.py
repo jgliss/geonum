@@ -5,6 +5,7 @@ import pytest
 from geonum.conftest import skip_srtm, does_not_raise_exception
 import numpy as np
 from geonum import GeoPoint, ElevationProfile, TopoData
+from matplotlib.axes import Axes
 
 LAT0, LON0 = -39.296571, 173.9224
 LAT1, LON1 = -39.3538, 174.4383
@@ -109,6 +110,41 @@ def test_ElevationProfile_get_altitudes_view_dir(profile, elev_angle,
     assert len(alts) == num
     mean = np.mean(alts)
     npt.assert_allclose(mean, avg, atol=1)
+
+@pytest.mark.parametrize(
+    'elev_angle,view_above_topo_m,min_dist,local_tolerance,plot,d,derr,alt', [
+    (0,0,0,3,True,31.1,0.3,319.2),
+    (0,0,0,10,True,31.1,0.9,319.2),
+    (6,0,0,10,True,10.8,0.7,1399.7),
+    (10,0,0,10,True,np.nan,np.nan,None)
+    ]
+    )
+def test_ElevationProfile_get_first_intersection(profile,
+    elev_angle,view_above_topo_m,min_dist,local_tolerance,plot,
+    d,derr,alt):
+
+    val = profile.get_first_intersection(elev_angle,view_above_topo_m,min_dist,
+                                         local_tolerance,plot)
+    dist, dist_err, intersect, view_elevations, ax = val
+
+    assert isinstance(view_elevations, np.ndarray)
+    if np.isnan(d):
+        assert intersect is None
+        assert np.isnan(dist)
+        assert np.isnan(dist_err)
+    else:
+        assert isinstance(intersect, GeoPoint)
+        npt.assert_allclose([dist,dist_err,intersect.altitude], [d, derr, alt],
+                        atol=0.1)
+    if plot:
+        assert isinstance(ax, Axes)
+
+
+
+
+
+
+
 
 @skip_srtm
 def test_ElevationProfile_via_GeoPoint():
