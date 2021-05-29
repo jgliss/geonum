@@ -17,11 +17,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 try:
     from mpl_toolkits.basemap import Basemap
+    basemap_avail = True
 except:
-    print('Plotting of maps etc. is deactivated, please install Basemap')
+    Basemap = object
+    basemap_avail = False
 
 import numpy as np
-
 from geonum.topodataaccess import TopoDataAccess
 from geonum.topodata import TopoData
 from geonum.exceptions import TopoAccessError
@@ -69,6 +70,10 @@ class Map(Basemap):
             input (i.e. :class:`TopoData`) and will be used for plotting
             topography
         """
+        if not basemap_avail:
+            raise ModuleNotFoundError(
+                'Plotting of maps etc. is deactivated, please install Basemap'
+                )
         super(Map, self).__init__(*args, **kwargs)
 
         self.topo_data = None
