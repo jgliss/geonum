@@ -18,6 +18,13 @@ def profile():
     return ElevationProfile(P0, P1,
                             calc_on_init=False)
 
+@pytest.fixture(scope='module')
+def profile1():
+    prof = ElevationProfile(P0, P1,
+                            calc_on_init=False)
+    prof.det_profile(**{'interpolate': True, 'resolution': 1000})
+    return prof
+
 @pytest.mark.filterwarnings("ignore:Failed to compute elevation profile.")
 def test_ElevationProfile_wrong_input():
     with pytest.raises(ValueError):
@@ -119,16 +126,35 @@ def test_ElevationProfile_slope(profile):
     assert isinstance(sl, np.ndarray)
     npt.assert_allclose(np.mean(sl), -0.003, atol=0.001)
 
+def test_ElevationProfile_start_point(profile):
+    assert profile.start_point == P0
+
+def test_ElevationProfile_min(profile1):
+    npt.assert_allclose(profile1.min, 166.831, atol=0.01)
+
+def test_ElevationProfile_max(profile1):
+    npt.assert_allclose(profile1.max, 1858.777, atol=0.01)
+
+def test_ElevationProfile_alt_range(profile1):
+    npt.assert_allclose(profile1.alt_range, 1858.777-166.831, atol=0.01)
+
+@pytest.mark.parametrize('decimal_degree,avg', [
+    (False, -0.0027),
+    (True, -0.158)
+])
+def test_ElevationProfile_slope_angles(profile1,decimal_degree,avg):
+    sla = profile1.slope_angles(decimal_degree)
+    npt.assert_allclose(np.nanmean(sla),avg,rtol=1e-1)
 
 @pytest.mark.parametrize('elev_angle,view_above_topo_m,num,avg', [
     (0, 0, 319, 318),
     (0, 10, 319, 328),
     (2, 10, 319, 1114),
     ])
-def test_ElevationProfile_get_altitudes_view_dir(profile, elev_angle,
+def test_ElevationProfile_get_altitudes_view_dir(profile1, elev_angle,
                                                  view_above_topo_m,num,avg):
-    profile.det_profile(**{'interpolate': True, 'resolution': 1000})
-    alts = profile.get_altitudes_view_dir(elev_angle, view_above_topo_m)
+
+    alts = profile1.get_altitudes_view_dir(elev_angle, view_above_topo_m)
     assert isinstance(alts, np.ndarray)
     assert len(alts) == num
     mean = np.mean(alts)

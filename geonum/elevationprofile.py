@@ -264,17 +264,17 @@ class ElevationProfile(object):
 
     @property
     def min(self):
-        """Return minimum altitude in profile"""
+        """Minimum altitude in profile"""
         return np.nanmin(self.profile)
 
     @property
     def max(self):
-        """Return maximum altitude in profile"""
+        """Maximum altitude in profile"""
         return np.nanmax(self.profile)
 
     @property
     def alt_range(self):
-        """Return altitude range of profile
+        """Altitude range of profile (dh = max - min)
         """
         return self.max - self.min
 
