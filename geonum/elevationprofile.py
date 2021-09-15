@@ -224,6 +224,11 @@ class ElevationProfile(object):
         ----
         Only works if profile was already determined
 
+        Returns
+        -------
+        float
+            average resolution along horizontal dimension
+
         """
         return abs((self.dists[1:] - self.dists[:-1]).mean())
 
@@ -231,7 +236,12 @@ class ElevationProfile(object):
     def gradient(self):
         """Return gradient of profile
 
-        Uses numpy function ``gradient``
+        Uses numpy function ``gradient`` on :attr:`profile`
+
+        Returns
+        -------
+        ndarray
+
         """
         return np.gradient(self.profile)
 

@@ -10,9 +10,12 @@ from matplotlib.axes import Axes
 LAT0, LON0 = -39.296571, 173.9224
 LAT1, LON1 = -39.3538, 174.4383
 
+P0 = GeoPoint(LAT0, LON0)
+P1 = GeoPoint(LAT1, LON1)
+
 @pytest.fixture(scope='module')
 def profile():
-    return ElevationProfile(GeoPoint(LAT0, LON0), GeoPoint(LAT1, LON1),
+    return ElevationProfile(P0, P1,
                             calc_on_init=False)
 
 @pytest.mark.filterwarnings("ignore:Failed to compute elevation profile.")
@@ -90,13 +93,32 @@ def test_ElevationProfile_det_profile(profile, args, num, avg):
     mean = np.nanmean(val)
     npt.assert_allclose(mean, avg, atol=1)
 
+def test_ElevationProfile_dists_fail():
+    with pytest.raises(AttributeError):
+        p = ElevationProfile(P0,P1,calc_on_init=False)
+        p.dists
+    p.det_profile()
+    assert isinstance(p.dists, np.ndarray)
+
 def test_ElevationProfile_resolution(profile):
-    npt.assert_allclose(profile.resolution, 0.14, atol=0.1)
+    profile.det_profile()
+    res = profile.resolution
+    assert isinstance(res, float)
+    npt.assert_allclose(res, 0.005, atol=0.01)
 
 def test_ElevationProfile_gradient(profile):
+    profile.det_profile()
     grad = profile.gradient
-    assert len(grad) == 319
-    npt.assert_allclose(np.mean(grad), -0.43, atol=0.1)
+    assert isinstance(grad, np.ndarray)
+    assert len(grad) == 9222
+    npt.assert_allclose(np.mean(grad), -0.015, atol=0.01)
+
+def test_ElevationProfile_slope(profile):
+    profile.det_profile()
+    sl = profile.slope
+    assert isinstance(sl, np.ndarray)
+    npt.assert_allclose(np.mean(sl), -0.003, atol=0.001)
+
 
 @pytest.mark.parametrize('elev_angle,view_above_topo_m,num,avg', [
     (0, 0, 319, 318),
@@ -105,6 +127,7 @@ def test_ElevationProfile_gradient(profile):
     ])
 def test_ElevationProfile_get_altitudes_view_dir(profile, elev_angle,
                                                  view_above_topo_m,num,avg):
+    profile.det_profile(**{'interpolate': True, 'resolution': 1000})
     alts = profile.get_altitudes_view_dir(elev_angle, view_above_topo_m)
     assert isinstance(alts, np.ndarray)
     assert len(alts) == num
@@ -122,7 +145,7 @@ def test_ElevationProfile_get_altitudes_view_dir(profile, elev_angle,
 def test_ElevationProfile_get_first_intersection(profile,
     elev_angle,view_above_topo_m,min_dist,local_tolerance,plot,
     d,derr,alt):
-
+    profile.det_profile(**{'interpolate': True, 'resolution': 1000})
     val = profile.get_first_intersection(elev_angle,view_above_topo_m,min_dist,
                                          local_tolerance,plot)
     dist, dist_err, intersect, view_elevations, ax = val
