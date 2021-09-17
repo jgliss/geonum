@@ -259,7 +259,9 @@ class Etopo1Access(TopoAccessBase):
         if not NETCDF_AVAILABLE:
             raise ModuleNotFoundError("Etopo1Access class cannot be initiated. "
                                       "Please install netCDF4 library first")
-        self._local_path = LOCAL_TOPO_DIR
+        if local_path is None:
+            local_path = LOCAL_TOPO_DIR
+        self._local_path = local_path
         self._file_name = "ETOPO1_Ice_g_gmt4.grd"
 
         from netCDF4 import Dataset
