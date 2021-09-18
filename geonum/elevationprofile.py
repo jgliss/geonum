@@ -433,8 +433,8 @@ class ElevationProfile(object):
         with respect to the topography altitude at the observer position
         can be controlled on input (arg ``view_above_topo_m``) as well as
         the elevation angle of the viewing direction. The azimuth angle
-        corresponds to the profile azimuth (i.e. azimuth between observer
-        position and endpoint of this profile).
+        corresponds to the profile azimuth (i.e. azimuth between
+        :attr:`observer` and :attr:`endpoint` of this profile).
 
         The signal analysed for finding the intersection is a vector
         containing relative elevation positions of the viewing direction
@@ -445,19 +445,42 @@ class ElevationProfile(object):
         The first intersection of the viewing direction with the topography
         is identified by the first zero crossing of this ``diff_signal``.
 
-        :param float elev_angle: elevation angle of viewing direction (in
-            decimal degrees)
-        :param int view_above_topo_m: altitude offset of start point
-            (``observer``) in m (default: 1.5)
-        :param float min_dist: minimum distance (in km) of first
-            considered intersection with topography from observer. If None,
-            use 1% of distance between ``observer`` and ``endpoint``.
-        :param float local_tolerance: tolerance factor to estimate
-            distance uncertainty based on topo grid resolution  (default: 3)
-        :param bool plot: creates a plot of the profile including the
-            intersection information
+        Parameters
+        ----------
+        elev_angle : float
+            elevation angle of viewing direction (in decimal degrees)
+        view_above_topo_m : float
+            altitude offset in m relative to altitude of start point (
+            :attr:`observer`) in m. Defaults to 1.5 m.
+        min_dist : float
+            minimum distance (in km) of first considered intersection with
+            topography from observer. If None, use 1% of distance between
+            :attr:`observer` and :attr:`endpoint`.
+        local_tolerance : int
+            tolerance factor to estimate distance uncertainty based on topo
+            grid resolution. Defaults to 3.
+        max_diff : float, optional
+            maximum allowed altitude difference in m between vector specifying
+            viewing direction and the topography. Default to None, in which
+            case the value assigned to :attr:`resolution` x 1000.
+        plot : bool
+            If true, the profile is plotted, including the intersection
+            result.
 
-
+        Returns
+        -------
+        float
+            retrieved horizontal distance of intersection point.
+        float
+            error of retrieved horizontal distance of intersection point.
+        GeoPoint
+            location of intersect
+        ndarray
+            elevations along viewing direction vector arising from input
+            elevation and altitude offset as well as the azimuth of the
+            profile
+        Axes or None
+            matplotlib axes instance if input arg `plot` is True, else None.
         """
 
         if min_dist is None:
