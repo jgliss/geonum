@@ -171,32 +171,35 @@ def test_ElevationProfile_get_altitudes_view_dir(profile1, elev_angle,
     npt.assert_allclose(mean, avg, atol=1)
 
 @pytest.mark.parametrize(
-    'elev_angle,view_above_topo_m,min_dist,local_tolerance,plot,d,derr,alt', [
-    (0,0,0,3,True,31.1,0.3,319.2),
-    (0,0,0,10,True,31.1,0.9,319.2),
-    (6,0,0,10,True,10.8,0.7,1399.7),
-    (10,0,0,10,True,np.nan,np.nan,None)
+    'elev_angle,view_above_topo_m,min_dist,local_tolerance,max_diff,plot,d,'
+    'derr,alt,raises', [
+    (0,0,0,3,0,True,31.1,0.3,319.2,pytest.raises(ValueError)),
+    (0,0,0,3,None,True,31.1,0.3,319.2,does_not_raise_exception()),
+    (0,0,0,10,None,True,31.1,0.9,319.2,does_not_raise_exception()),
+    (6,0,0,10,None,True,10.8,0.7,1399.7,does_not_raise_exception()),
+    (10,0,0,10,None,True,np.nan,np.nan,None,does_not_raise_exception())
     ]
     )
 def test_ElevationProfile_get_first_intersection(profile,
-    elev_angle,view_above_topo_m,min_dist,local_tolerance,plot,
-    d,derr,alt):
+    elev_angle,view_above_topo_m,min_dist,local_tolerance,max_diff,plot,
+    d,derr,alt,raises):
     profile.det_profile(**{'interpolate': True, 'resolution': 1000})
-    val = profile.get_first_intersection(elev_angle,view_above_topo_m,min_dist,
-                                         local_tolerance,plot)
-    dist, dist_err, intersect, view_elevations, ax = val
+    with raises:
+        val = profile.get_first_intersection(elev_angle,view_above_topo_m,min_dist,
+                                             local_tolerance,max_diff,plot)
+        dist, dist_err, intersect, view_elevations, ax = val
 
-    assert isinstance(view_elevations, np.ndarray)
-    if np.isnan(d):
-        assert intersect is None
-        assert np.isnan(dist)
-        assert np.isnan(dist_err)
-    else:
-        assert isinstance(intersect, GeoPoint)
-        npt.assert_allclose([dist,dist_err,intersect.altitude], [d, derr, alt],
-                        atol=0.1)
-    if plot:
-        assert isinstance(ax, Axes)
+        assert isinstance(view_elevations, np.ndarray)
+        if np.isnan(d):
+            assert intersect is None
+            assert np.isnan(dist)
+            assert np.isnan(dist_err)
+        else:
+            assert isinstance(intersect, GeoPoint)
+            npt.assert_allclose([dist,dist_err,intersect.altitude], [d, derr, alt],
+                            atol=0.1)
+        if plot:
+            assert isinstance(ax, Axes)
 
 @pytest.mark.parametrize(
     'elev_start,elev_stop,step_deg,raises,num,elev', [
