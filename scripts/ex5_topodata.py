@@ -17,19 +17,15 @@ from numpy import testing as npt
 ### Set save directory for figures
 save_path = join(getcwd(), "scripts_out")
 
-def load_topo_oslo():
-    dat = geonum.TopoDataAccess(mode='srtm')
-    topodata = dat.get_data(59.8728, 10.375, 60.026, 10.9144)
-    return topodata
-
-
 if __name__ == "__main__":
-    topo_data = load_topo_oslo()
+    topo_access = geonum.TopoDataAccess(mode='srtm')
+    topodata = topo_access.get_data(59.8728, 10.375, 60.026, 10.9144)
     my_flat = geonum.GeoPoint(59.919386, 10.714970,
-                              name="Somewhere in Frogner (Oslo)")
+                              name="Somewhere in Frogner (Oslo)",
+                              auto_topo_access=True)
 
     if geonum.BASEMAP_AVAILABLE:
-        basemap = topo_data.plot_2d()
+        basemap = topodata.plot_2d()
         basemap.ax.set_title("SRTM topo data Oslo")
         basemap.draw_mapscale_auto()
 

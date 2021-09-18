@@ -34,14 +34,14 @@ for path in paths:
     try:
         exec(open(path).read())
         passed_messages.append("All tests passed in script: %s" %basename(path))
-    except AssertionError as e:
+    except AssertionError:
         msg = ("\n"
                "--------------------------------------------------------\n"
                "Tests in script %s failed.\n"
                "Reason:\n %s\n"
                "--------------------------------------------------------"
                "\n"
-               %(basename(path), format_exc(e)))
+               %(basename(path), format_exc()))
         test_err_messages.append(msg)
     except ImportError as e:
         msg = ("\n"
