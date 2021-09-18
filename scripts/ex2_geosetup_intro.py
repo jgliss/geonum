@@ -17,8 +17,8 @@ def create_geosetup():
     s = GeoSetup()
 
     #Create two GeoPoints for source and instrument
-    source = GeoPoint(37.751005,  14.993435, name="source")
-    camera = GeoPoint(37.73122,  15.1129, name="cam")
+    source = GeoPoint(37.751005,  14.993435, name="source", auto_topo_access=True)
+    camera = GeoPoint(37.73122,  15.1129, name="cam", auto_topo_access=True)
 
     # Add the two GeoPoints to the GeoSetup
     s.add_geo_points(source, camera)
@@ -65,9 +65,6 @@ if __name__ == "__main__":
     # activated from the command line when executing the script using the
     # option --test 1
     if int(options.test):
-        from geonum import SRTM_AVAILABLE
-        if not SRTM_AVAILABLE:
-            raise ImportError('Skipping tests, since they require srtm.py to be installed')
         from os.path import basename
         npt.assert_array_equal([4, 2, True],
                                [len(s.points),

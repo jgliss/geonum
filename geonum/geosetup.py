@@ -548,7 +548,10 @@ class GeoSetup(object):
             kwargs["ax"] = ax
         m = self.create_map(*args, **kwargs)
         if draw_coastline:
-            m.drawcoastlines()
+            try:
+                m.drawcoastlines()
+            except ValueError:
+                pass # see https://github.com/jgliss/geonum/issues/5
         if draw_topo:
             m.draw_topo(insert_colorbar=True)
             m.draw_topo_contour()

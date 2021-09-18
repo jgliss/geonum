@@ -50,7 +50,7 @@ def add_points_and_plot_map(basemap):
 
     # create a geopoint for Guallatiri summit region
     # (here, altitude is set manually)
-    summit = geonum.GeoPoint(lat=-18.423672, lon=-69.090369,
+    summit = geonum.GeoPoint(latitude=-18.423672, longitude=-69.090369,
                              altitude=6071.0, name="Guallatiri")
 
     # draw this point and a text into the map
@@ -61,8 +61,10 @@ def add_points_and_plot_map(basemap):
 
     # create two more objects (without specifying altitude -> is retrieved
     # automatically from topo data)
-    p1 = geonum.GeoPoint(-18.45, -69.12, name="Tourist (breathing hard)")
-    p2 = geonum.GeoPoint(-18.40, -69.12, name="Llamas")
+    p1 = geonum.GeoPoint(-18.45, -69.12, name="Tourist (breathing hard)",
+                         auto_topo_access=True)
+    p2 = geonum.GeoPoint(-18.40, -69.12, name="Llamas",
+                         auto_topo_access=True)
 
 
     # points can also be drawn directly into the map (here including the
@@ -114,8 +116,6 @@ def add_points_and_plot_map(basemap):
 if __name__ == "__main__":
     if not geonum.BASEMAP_AVAILABLE:
         raise ImportError('Cannot run script. Basemap is not installed')
-    elif not geonum.SRTM_AVAILABLE:
-        raise ImportError('Cannot run script. srtm.py is not installed')
     m = create_map_and_load_topodata()
     add_points_and_plot_map(m)
 

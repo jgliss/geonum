@@ -726,9 +726,13 @@ class Map(Basemap):
         :param float lat1: stop latitude
         :returns: line object
         """
-        line = self.drawgreatcircle(lon0, lat0, lon1, lat1, **kwargs)
-        self.lines[line_id] = line
-        return line
+        from pyproj.exceptions import GeodError
+        try:
+            line = self.drawgreatcircle(lon0, lat0, lon1, lat1, **kwargs)
+            self.lines[line_id] = line
+            return line
+        except GeodError:
+            pass #if npoints ends up 0 in basemap.drawgreatcircle body
 
     def write_point_name_2d(self, p, dist=0, angle=0, ax=None, **kwargs):
         """Annotate name of point to point in map

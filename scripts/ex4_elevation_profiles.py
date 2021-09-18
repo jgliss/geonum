@@ -15,10 +15,7 @@ from ex2_geosetup_intro import create_geosetup
 ### Set save directory for figures
 save_path = join(getcwd(), "scripts_out")
 
-def calc_profile():
-    """Not very explanatory function name..."""
-
-
+if __name__ == "__main__":
     # create Etna GeoSetup from example 2
     s = create_geosetup()
 
@@ -28,13 +25,7 @@ def calc_profile():
 
     # calculate elevation profile between camera and source (Etna summit)
     # the camera altitude is 15 m above topography
-    elev_profile = cam.get_elevation_profile(geo_point=s.points["source"])
-
-
-    return elev_profile
-
-if __name__ == "__main__":
-    profile = calc_profile()
+    profile = cam.get_elevation_profile(geo_point=s.points["source"])
 
     (dist,
      dist_err,

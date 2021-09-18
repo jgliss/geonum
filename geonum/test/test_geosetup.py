@@ -68,7 +68,6 @@ def test_has_points(empty_setup):
     assert not empty_setup.has_points()
 
 
-
 if __name__ == "__main__":
     import sys
     pytest.main(sys.argv)
