@@ -25,18 +25,18 @@ def check_requirements():
 
     try:
         from cv2 import pyrUp
-    except:
+    except: # pragma: no cover
         CV2_AVAILABLE = False
     try:
         from netCDF4 import Dataset
-    except:
+    except: # pragma: no cover
         NETCDF_AVAILABLE = False
 
     return (BASEMAP_AVAILABLE,
             CV2_AVAILABLE,
             NETCDF_AVAILABLE)
 
-def init_local_topodir():
+def _init_local_topodir():
     import os
     home = os.path.expanduser('~')
     LOCAL_TOPO_DIR = os.path.join(home, '.geonum')
@@ -49,8 +49,8 @@ def init_local_topodir():
     return (LOCAL_TOPO_DIR, TOPO_INFO_FILE)
 
 try:
-    LOCAL_TOPO_DIR, TOPO_INFO_FILE = init_local_topodir()
-except Exception as e:
+    LOCAL_TOPO_DIR, TOPO_INFO_FILE = _init_local_topodir()
+except Exception as e: # pragma: no cover
     print('Failed to create local topo directory for geonum '
           f'{LOCAL_TOPO_DIR}')
     LOCAL_TOPO_DIR, TOPO_INFO_FILE =  None, None
@@ -81,6 +81,6 @@ from .geosetup import GeoSetup
 from .elevationprofile import ElevationProfile
 from .processing import LineOnGrid
 
-if BASEMAP_AVAILABLE:
+if BASEMAP_AVAILABLE: # pragma: no cover
     from .mapping import Map
 
