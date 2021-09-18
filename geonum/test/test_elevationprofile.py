@@ -146,6 +146,16 @@ def test_ElevationProfile_slope_angles(profile1,decimal_degree,avg):
     sla = profile1.slope_angles(decimal_degree)
     npt.assert_allclose(np.nanmean(sla),avg,rtol=1e-1)
 
+@pytest.mark.parametrize('dist,val,raises', [
+    (1, 2.29, does_not_raise_exception()),
+    (-1, 2.29, pytest.raises(ValueError)),
+    (1999, 2.29, pytest.raises(ValueError))
+])
+def test_ElevationProfile_slope_angle(profile1,dist,val,raises):
+    with raises:
+        sla = profile1.slope_angle(dist)
+        npt.assert_allclose(np.nanmean(sla),val,rtol=1e-1)
+
 @pytest.mark.parametrize('elev_angle,view_above_topo_m,num,avg', [
     (0, 0, 319, 318),
     (0, 10, 319, 328),

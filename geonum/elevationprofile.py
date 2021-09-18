@@ -309,6 +309,8 @@ class ElevationProfile(object):
         float
             retrieved slope at input distance.
         """
+        if not dist >= 0 or dist > np.nanmax(self.dists):
+            raise ValueError('invalid input: dist must be positive')
         idx = np.argmin(abs(self.dists - dist))
         return self.slope_angles()[idx]
 
