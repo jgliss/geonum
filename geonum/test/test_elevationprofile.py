@@ -4,6 +4,7 @@ import numpy.testing as npt
 import pytest
 from geonum.conftest import skip_srtm, does_not_raise_exception
 import numpy as np
+from geonum.exceptions import IntersectNotFound
 from geonum import GeoPoint, ElevationProfile, TopoData
 from matplotlib.axes import Axes
 
@@ -173,11 +174,11 @@ def test_ElevationProfile_get_altitudes_view_dir(profile1, elev_angle,
 @pytest.mark.parametrize(
     'elev_angle,view_above_topo_m,min_dist,local_tolerance,max_diff,plot,d,'
     'derr,alt,raises', [
-    (0,0,0,3,0,True,31.1,0.3,319.2,pytest.raises(ValueError)),
+    (0,0,0,3,0,True,31.1,0.3,319.2,pytest.raises(IntersectNotFound)),
     (0,0,0,3,None,True,31.1,0.3,319.2,does_not_raise_exception()),
     (0,0,0,10,None,True,31.1,0.9,319.2,does_not_raise_exception()),
     (6,0,0,10,None,True,10.8,0.7,1399.7,does_not_raise_exception()),
-    (10,0,0,10,None,True,np.nan,np.nan,None,does_not_raise_exception())
+    (10,0,0,10,None,True,np.nan,np.nan,None,pytest.raises(IntersectNotFound))
     ]
     )
 def test_ElevationProfile_get_first_intersection(profile,
@@ -203,15 +204,17 @@ def test_ElevationProfile_get_first_intersection(profile,
 
 @pytest.mark.parametrize(
     'elev_start,elev_stop,step_deg,raises,num,elev', [
+    (70,71,0.01,pytest.raises(IntersectNotFound),10,6.9),
     (0,10,0.1,does_not_raise_exception(),69,6.9),
-    (6.8,7,0.01,does_not_raise_exception(),10,6.9)
+    (6.8,7,0.01,does_not_raise_exception(),10,6.9),
+
     ])
-def test_ElevationProfile_find_horizon_elev(profile,
+def test_ElevationProfile_find_horizon_elev(profile1,
     elev_start,elev_stop,step_deg,raises,num,elev):
     with raises:
         (_elev,
          elev_sects,
-         dists_sects) = profile.find_horizon_elev(elev_start, elev_stop,
+         dists_sects) = profile1.find_horizon_elev(elev_start, elev_stop,
                                                   step_deg)
 
         npt.assert_allclose(_elev, elev, atol=0.1)

@@ -18,6 +18,7 @@
 import numpy as np
 from scipy.interpolate import interp1d
 
+from geonum.exceptions import IntersectNotFound
 from geonum.geopoint import GeoPoint
 from geonum.processing import LineOnGrid
 from geonum.topodata import TopoData
@@ -500,10 +501,9 @@ class ElevationProfile(object):
 
         #: create array with all distances matching the 2 conditions
         dists_0 = self.dists[cond1 * cond2]
-        dist, dist_err, intersect = None, None, None
         #: relax condition 2 if nothing was found
         if len(dists_0) == 0:
-            raise ValueError(
+            raise IntersectNotFound(
                 'could not establish initial array of candidate distances '
                 'for retrieval of intersection point, you might succeed by '
                 'setting or increasing the value of input parameter max_diff')
@@ -528,9 +528,12 @@ class ElevationProfile(object):
             #: set the altitude of this point (retrieved from profile)
             intersect.altitude = self.get_altitude_at_distance(dist) # / 1000.
 
-        except IndexError as e:
-            print(("No intersections could be detected, err: %s" %repr(e)))
-            dist, dist_err = np.nan, np.nan
+        except IndexError:
+            from traceback import format_exc
+            raise IntersectNotFound(
+                f'No intersections could be detected, traceback:\n'
+                f'{format_exc()}')
+
         ax = None
         if plot:
             ax = self._plot_intersect_search_result(view_elevations, dist)
@@ -552,17 +555,22 @@ class ElevationProfile(object):
         elevs = np.arange(elev_start, elev_stop + step_deg, step_deg)
         elev_sects = []
         dists_sects = []
+
+        prev_elev = None
         for elev in elevs:
-            (dist,
-             dist_err,
-             intersect,
-             view_elevations,
-             _) = self.get_first_intersection(elev, plot=False, **kwargs)
-            if np.isnan(dist):
-                return elev, elev_sects, dists_sects
-            else:
-                dists_sects.append(dist), elev_sects.append(elev)
-        raise ValueError("Failed to find elevation angle of horizon...")
+            try:
+                (dist,dist_err,intersect,view_elevations,_) = \
+                    self.get_first_intersection(elev, plot=False, **kwargs)
+            except IntersectNotFound:
+                if prev_elev is None:
+                    raise IntersectNotFound(
+                        f'failed to determine elevation angle of horizon '
+                        f'consider starting at a lower elevation than '
+                        f'{elev_start}')
+                else:
+                    return elev, elev_sects, dists_sects
+            dists_sects.append(dist), elev_sects.append(elev)
+            prev_elev = elev
 
     def get_altitude_at_distance(self, dist):
         """Returns altitude at a ceratain distance from observer
