@@ -346,28 +346,6 @@ class GeoPoint(LatLon):
                                 resolution=resolution,
                                 **mapping_opts)
 
-    def get_altitude(self):
-        """Estimate the altitude (+/- uncertainty) of this point
-
-        The estimatation is done by retrieving a 2x2 grid of topography
-        data enclosing this point. The altitude value is estimated using the
-        topo data tile closest to the coordinates of this point. The uncertainty
-        is estimated conservatively using min/max difference of data in the 2x2
-        grid.
-
-        Returns
-        -------
-        float
-            altitude (NaN if retrieval failed)
-        float
-            uncertainty in altitude value
-        """
-        from warnings import warn
-        warn(DeprecationWarning(
-            'GeoPoint method get_altitude was renamed to set_topo_altitude'
-            'Please use the new name'))
-        return self.set_topo_altitude()
-
     def set_topo_altitude(self):
         """Set altitude using topographic terrain height at lat / lon position
 
@@ -396,22 +374,8 @@ class GeoPoint(LatLon):
         self.altitude, self.altitude_err = z, z_err
         return (z, z_err)
 
-    def update_topo_access(self, mode, local_path=None):
-        """Update topo access mode
-
-        Parameters
-        ----------
-        mode : str
-            valid topo access mode (e.g. "srtm", "etopo1")
-        local_path : str, optional
-            path for to be used for topo data access.
-        """
-        if local_path is not None:
-            self.local_topo_path = local_path
-        self.topo_access_mode = mode
-
     def plot_2d(self, map, add_name=False, dist_text=0.5, angle_text=-45,
-                **kwargs):
+                **kwargs): # pragma: no cover
         """Plot this point into existing 2D basemap
 
         Parameters
