@@ -546,11 +546,42 @@ class ElevationProfile(object):
                           **kwargs):
         """Find first elevation angle which does not intersect with topo
 
-        :param float elev_start: start search elevation angle
-        :param float elev_stop: stop search elevation angle
-        :param float step_deg: angle step for search (coarser is faster)
-        :param **kwargs: additional keyword agruments passed to
+        Scans towards zenith elevation within input elevation range
+        in elevation steps provided via input arg `step_deg`, starting at
+        `elev_start`. For each elevation, an attempt is made to find an
+        intersection of the resulting viewing direction vector with the local
+        topography using :func:`get_first_intersection`. The horizon
+        elevation is identified as the first elevation angle for which no
+        intersection can be found.
+
+        Parameters
+        ----------
+        elev_start : float
+            start search elevation angle
+        elev_stop : float
+            stop search elevation angle
+        step_deg : float
+            angle step for search (coarser is faster)
+        **kwargs:
+            additional keyword agruments passed to
             :func:`get_first_intersection`
+
+        Raises
+        ------
+        IntersectNotFound
+            if no intersection with topography can be found for input
+            elevation range.
+
+        Returns
+        -------
+        float
+            detected elevation angle of horizon
+        list
+            list of elevation angles for which intersections with topography
+            could be identified.
+        list
+            corresponding horizontal distances of :attr:`observer` to the
+            terrain features.
         """
         elevs = np.arange(elev_start, elev_stop + step_deg, step_deg)
         elev_sects = []
