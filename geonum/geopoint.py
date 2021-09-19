@@ -399,7 +399,8 @@ class GeoPoint(LatLon):
         if add_name:
             map.write_point_name_2d(self, dist_text, angle_text)
 
-    def plot_3d(self, map, add_name=False, dz_text=0.0, **kwargs):
+    def plot_3d(self, map, add_name=False, dz_text=0.0,
+                **kwargs): # pragma: # no cover
         """Plot this point into existing 3D basemap
 
         map : basemap

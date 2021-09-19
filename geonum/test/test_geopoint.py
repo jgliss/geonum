@@ -61,10 +61,6 @@ def test_GeoPoint_set_topo_data(topo_data, gp, raises):
         gp.set_topo_data(topo_data)
         assert gp.topo_data == topo_data
 
-def test_GeoPoint_update_topo_access():
-    pt = GeoPoint()
-    pt.update_topo_access('etop')
-
 if __name__ == "__main__":
     import sys
     pytest.main(sys.argv)
