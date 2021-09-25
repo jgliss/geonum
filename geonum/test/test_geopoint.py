@@ -103,6 +103,17 @@ def test_GeoPoint_check_topo(topo,lat1,lon1,result):
     val = pt.check_topo(lat1,lon1)
     assert result == val
 
+@pytest.mark.parametrize('kwargs,raises', [
+    ({}, pytest.raises(ValueError)),
+    (dict(geo_point=GeoPoint(46,15)), does_not_raise_exception()),
+])
+def test_GeoPoint_get_elevation_profile(kwargs,raises):
+    from geonum.elevationprofile import ElevationProfile
+    p = GeoPoint(45,15)
+    with raises:
+        ep = p.get_elevation_profile(**kwargs)
+        assert isinstance(ep, ElevationProfile)
+
 def test_GeoPoint__sub_geo_vector_2d():
     from LatLon23 import GeoVector
     pt = GeoPoint(0,1)

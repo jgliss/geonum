@@ -339,6 +339,8 @@ class GeoPoint(LatLon):
         """
         from geonum.elevationprofile import ElevationProfile
         topo, pf = self.get_topo_data(geo_point, azimuth, dist_hor, lon1, lat1)
+        if pf == self:
+            raise ValueError('please specify endpoint location')
         return ElevationProfile(observer=self,
                                 endpoint=pf,
                                 topo_data=topo,
