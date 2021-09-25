@@ -460,7 +460,7 @@ class GeoPoint(LatLon):
 
         Parameters
         ----------
-        other : GeoVector3D
+        other : GeoVector
             vector to be subtracted from this location
 
         Returns
