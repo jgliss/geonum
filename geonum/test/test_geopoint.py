@@ -78,6 +78,19 @@ def test_GeoPoint_range_borders(points,ll,tr):
     np.testing.assert_allclose(_ll, ll, atol=0.01)
     np.testing.assert_allclose(_tr, tr, atol=0.01)
 
+@pytest.mark.parametrize('kwargs,pf', [
+    ({}, (45,15)),
+    (dict(lat1=46, lon1=16), (46,16)),
+    (dict(geo_point=GeoPoint(46,16)), (46,16)),
+    (dict(azimuth=45,dist_hor=111*np.sqrt(2)),(45.99,16.433))
+])
+def test_GeoPoint_get_topo_data(kwargs,pf):
+    p0 = GeoPoint(45, 15)
+    topo, p1 = p0.get_topo_data(**kwargs)
+    assert isinstance(topo, TopoData)
+    assert isinstance(p1, GeoPoint)
+    np.testing.assert_allclose([p1.latitude, p1.longitude], pf, atol=1e-2)
+
 
 @pytest.mark.parametrize('topo,lat1,lon1,result', [
     (None,None,None,False),
