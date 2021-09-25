@@ -17,14 +17,17 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """Custom exceptions of geonum"""
+class InvalidTopoMode(IOError):
+    pass
+
+class IntersectNotFound(ValueError):
+    pass
+
+class OutOfDomain(ValueError):
+    pass
+
 class SRTMNotCoveredError(ValueError):
     pass
 
 class TopoAccessError(IOError):
-    pass
-
-class InvalidTopoMode(IOError):
-    pass
-
-class OutOfDomain(ValueError):
     pass

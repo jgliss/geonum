@@ -11,6 +11,7 @@ import numpy as np
 from geonum.conftest import does_not_raise_exception
 from LatLon23 import LatLon
 from geonum.geopoint import GeoPoint
+from geonum.geovector3d import GeoVector3D
 from geonum.exceptions import OutOfDomain
 from geonum import TopoData
 
@@ -60,6 +61,66 @@ def test_GeoPoint_set_topo_data(topo_data, gp, raises):
     with raises:
         gp.set_topo_data(topo_data)
         assert gp.topo_data == topo_data
+
+@pytest.mark.parametrize('points,ll,tr', [
+    ((), [44.994,14.991],[45.006,15.009]),
+    ([GeoPoint(46, 16)], [44.913,14.878],[46.086,16.124]),
+    ([GeoPoint(46, 16), GeoPoint(-20, -80)], [-27.464, -88.592],
+     [53.016, 28.711])
+])
+def test_GeoPoint_range_borders(points,ll,tr):
+    p0 = GeoPoint(45, 15)
+    pll, ptr = p0.range_borders(*points)
+    assert isinstance(pll, GeoPoint)
+    assert isinstance(ptr, GeoPoint)
+    _ll = [pll.latitude, pll.longitude]
+    _tr = [ptr.latitude, ptr.longitude]
+    np.testing.assert_allclose(_ll, ll, atol=0.01)
+    np.testing.assert_allclose(_tr, tr, atol=0.01)
+
+@pytest.mark.parametrize('kwargs,pf', [
+    ({}, (45,15)),
+    (dict(lat1=46, lon1=16), (46,16)),
+    (dict(geo_point=GeoPoint(46,16)), (46,16)),
+    (dict(azimuth=45,dist_hor=111*np.sqrt(2)),(45.99,16.433))
+])
+def test_GeoPoint_get_topo_data(kwargs,pf):
+    p0 = GeoPoint(45, 15)
+    topo, p1 = p0.get_topo_data(**kwargs)
+    assert isinstance(topo, TopoData)
+    assert isinstance(p1, GeoPoint)
+    np.testing.assert_allclose([p1.latitude, p1.longitude], pf, atol=1e-2)
+
+
+@pytest.mark.parametrize('topo,lat1,lon1,result', [
+    (None,None,None,False),
+    (FAKE_TOPO,None,None,True),
+    (FAKE_TOPO,0.1,0.1,True),
+    (FAKE_TOPO,10,20,False),
+])
+def test_GeoPoint_check_topo(topo,lat1,lon1,result):
+    pt = GeoPoint(-0.1,-0.1,topo_data=topo)
+    val = pt.check_topo(lat1,lon1)
+    assert result == val
+
+@pytest.mark.parametrize('kwargs,raises', [
+    ({}, pytest.raises(ValueError)),
+    (dict(geo_point=GeoPoint(46,15)), does_not_raise_exception()),
+])
+def test_GeoPoint_get_elevation_profile(kwargs,raises):
+    from geonum.elevationprofile import ElevationProfile
+    p = GeoPoint(45,15)
+    with raises:
+        ep = p.get_elevation_profile(**kwargs)
+        assert isinstance(ep, ElevationProfile)
+
+def test_GeoPoint__sub_geo_vector_2d():
+    from LatLon23 import GeoVector
+    pt = GeoPoint(0,1)
+    v = GeoVector(dx=1,dy=0)
+    result = pt._sub_geo_vector_2d(v)
+    assert isinstance(result, GeoPoint)
+
 
 if __name__ == "__main__":
     import sys

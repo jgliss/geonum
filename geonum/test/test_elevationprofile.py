@@ -4,6 +4,7 @@ import numpy.testing as npt
 import pytest
 from geonum.conftest import skip_srtm, does_not_raise_exception
 import numpy as np
+from geonum.exceptions import IntersectNotFound
 from geonum import GeoPoint, ElevationProfile, TopoData
 from matplotlib.axes import Axes
 
@@ -146,6 +147,16 @@ def test_ElevationProfile_slope_angles(profile1,decimal_degree,avg):
     sla = profile1.slope_angles(decimal_degree)
     npt.assert_allclose(np.nanmean(sla),avg,rtol=1e-1)
 
+@pytest.mark.parametrize('dist,val,raises', [
+    (1, 2.29, does_not_raise_exception()),
+    (-1, 2.29, pytest.raises(ValueError)),
+    (1999, 2.29, pytest.raises(ValueError))
+])
+def test_ElevationProfile_slope_angle(profile1,dist,val,raises):
+    with raises:
+        sla = profile1.slope_angle(dist)
+        npt.assert_allclose(np.nanmean(sla),val,rtol=1e-1)
+
 @pytest.mark.parametrize('elev_angle,view_above_topo_m,num,avg', [
     (0, 0, 319, 318),
     (0, 10, 319, 328),
@@ -161,44 +172,49 @@ def test_ElevationProfile_get_altitudes_view_dir(profile1, elev_angle,
     npt.assert_allclose(mean, avg, atol=1)
 
 @pytest.mark.parametrize(
-    'elev_angle,view_above_topo_m,min_dist,local_tolerance,plot,d,derr,alt', [
-    (0,0,0,3,True,31.1,0.3,319.2),
-    (0,0,0,10,True,31.1,0.9,319.2),
-    (6,0,0,10,True,10.8,0.7,1399.7),
-    (10,0,0,10,True,np.nan,np.nan,None)
+    'elev_angle,view_above_topo_m,min_dist,local_tolerance,max_diff,plot,d,'
+    'derr,alt,raises', [
+    (0,0,0,3,0,True,31.1,0.3,319.2,pytest.raises(IntersectNotFound)),
+    (0,0,0,3,None,True,31.1,0.3,319.2,does_not_raise_exception()),
+    (0,0,0,10,None,True,31.1,0.9,319.2,does_not_raise_exception()),
+    (6,0,0,10,None,True,10.8,0.7,1399.7,does_not_raise_exception()),
+    (10,0,0,10,None,True,np.nan,np.nan,None,pytest.raises(IntersectNotFound))
     ]
     )
 def test_ElevationProfile_get_first_intersection(profile,
-    elev_angle,view_above_topo_m,min_dist,local_tolerance,plot,
-    d,derr,alt):
+    elev_angle,view_above_topo_m,min_dist,local_tolerance,max_diff,plot,
+    d,derr,alt,raises):
     profile.det_profile(**{'interpolate': True, 'resolution': 1000})
-    val = profile.get_first_intersection(elev_angle,view_above_topo_m,min_dist,
-                                         local_tolerance,plot)
-    dist, dist_err, intersect, view_elevations, ax = val
+    with raises:
+        val = profile.get_first_intersection(elev_angle,view_above_topo_m,min_dist,
+                                             local_tolerance,max_diff,plot)
+        dist, dist_err, intersect, view_elevations, ax = val
 
-    assert isinstance(view_elevations, np.ndarray)
-    if np.isnan(d):
-        assert intersect is None
-        assert np.isnan(dist)
-        assert np.isnan(dist_err)
-    else:
-        assert isinstance(intersect, GeoPoint)
-        npt.assert_allclose([dist,dist_err,intersect.altitude], [d, derr, alt],
-                        atol=0.1)
-    if plot:
-        assert isinstance(ax, Axes)
+        assert isinstance(view_elevations, np.ndarray)
+        if np.isnan(d):
+            assert intersect is None
+            assert np.isnan(dist)
+            assert np.isnan(dist_err)
+        else:
+            assert isinstance(intersect, GeoPoint)
+            npt.assert_allclose([dist,dist_err,intersect.altitude], [d, derr, alt],
+                            atol=0.1)
+        if plot:
+            assert isinstance(ax, Axes)
 
 @pytest.mark.parametrize(
     'elev_start,elev_stop,step_deg,raises,num,elev', [
+    (70,71,0.01,pytest.raises(IntersectNotFound),10,6.9),
     (0,10,0.1,does_not_raise_exception(),69,6.9),
-    (6.8,7,0.01,does_not_raise_exception(),10,6.9)
+    (6.8,7,0.01,does_not_raise_exception(),10,6.9),
+
     ])
-def test_ElevationProfile_find_horizon_elev(profile,
+def test_ElevationProfile_find_horizon_elev(profile1,
     elev_start,elev_stop,step_deg,raises,num,elev):
     with raises:
         (_elev,
          elev_sects,
-         dists_sects) = profile.find_horizon_elev(elev_start, elev_stop,
+         dists_sects) = profile1.find_horizon_elev(elev_start, elev_stop,
                                                   step_deg)
 
         npt.assert_allclose(_elev, elev, atol=0.1)

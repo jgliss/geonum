@@ -18,6 +18,7 @@
 import numpy as np
 from scipy.interpolate import interp1d
 
+from geonum.exceptions import IntersectNotFound
 from geonum.geopoint import GeoPoint
 from geonum.processing import LineOnGrid
 from geonum.topodata import TopoData
@@ -279,7 +280,8 @@ class ElevationProfile(object):
         return self.max - self.min
 
     def slope_angles(self, decimal_degrees=True):
-        """Returns slope angle of profile (in each sample point)
+        """
+        Get slope angles of profile (in each sample point)
 
         Parameters
         ----------
@@ -297,7 +299,8 @@ class ElevationProfile(object):
         return a
 
     def slope_angle(self, dist):
-        """Returns slope angle of profile at input distance from observer
+        """
+        Get slope angle of profile at input distance from observer
 
         Parameters
         ----------
@@ -309,12 +312,15 @@ class ElevationProfile(object):
         float
             retrieved slope at input distance.
         """
+        if not dist >= 0 or dist > np.nanmax(self.dists):
+            raise ValueError('invalid input: dist must be positive')
         idx = np.argmin(abs(self.dists - dist))
         return self.slope_angles()[idx]
 
     def det_profile(self, interpolate=True, resolution=5.0, itp_type="linear",
                     **mapping_opts):
-        """Determines the elevation profile
+        """
+        Determine the elevation profile
 
         Searches the closest tiles in the topo data grid for both observer and
         endpoint and based on these two points the elevation profile is
@@ -389,8 +395,9 @@ class ElevationProfile(object):
                   'has sufficient resolution')
         return dists, altitudes
 
-    def get_altitudes_view_dir(self, elev_angle, view_above_topo_m=1.5):
-        """Get vector containing altitudes for a viewing direction
+    def get_altitudes_view_dir(self, elev_angle, view_above_topo_m=0):
+        """
+        Get vector containing altitudes for a viewing direction
 
         The viewing direction is specified by the azimuth angle of the
         connection vector between observer and endpoint, the elevation angle
@@ -398,18 +405,26 @@ class ElevationProfile(object):
         (first elevation value) corresponds to the altitude at the observer
         position plus an offset in m which can be specified.
 
-        :param float elev_angle: elevation angle of viewing direction
-        :param float view_above_topo_m (1.5): altitude offset of start point
-            in m
-        :return:
-            - vector with altitude values (same length as ``self.profile``)
+        Parameters
+        ----------
+        elev_angle : float
+            elevation angle of viewing direction
+        view_above_topo_m : float
+            altitude offset of start point in m, defaults to 0.
+
+        Returns
+        -------
+        ndarray
+            vector with altitude values (same length as ``self.profile``)
 
         """
-        return (1000 * np.tan(np.radians(elev_angle)) * self.dists +
-                self.profile[0] + view_above_topo_m)
+        dh = 1000 * np.tan(np.radians(elev_angle))*self.dists
+        result = dh+self.profile[0] + view_above_topo_m
+        return result
 
-    def get_first_intersection(self, elev_angle, view_above_topo_m=1.5,
-                               min_dist=None, local_tolerance=3, plot=False):
+    def get_first_intersection(self, elev_angle,view_above_topo_m=1.5,
+                               min_dist=None,local_tolerance=3,
+                               max_diff=None, plot=False):
 
         """Finds first intersection of a viewing direction with topography
 
@@ -419,8 +434,8 @@ class ElevationProfile(object):
         with respect to the topography altitude at the observer position
         can be controlled on input (arg ``view_above_topo_m``) as well as
         the elevation angle of the viewing direction. The azimuth angle
-        corresponds to the profile azimuth (i.e. azimuth between observer
-        position and endpoint of this profile).
+        corresponds to the profile azimuth (i.e. azimuth between
+        :attr:`observer` and :attr:`endpoint` of this profile).
 
         The signal analysed for finding the intersection is a vector
         containing relative elevation positions of the viewing direction
@@ -431,24 +446,48 @@ class ElevationProfile(object):
         The first intersection of the viewing direction with the topography
         is identified by the first zero crossing of this ``diff_signal``.
 
-        :param float elev_angle: elevation angle of viewing direction (in
-            decimal degrees)
-        :param int view_above_topo_m: altitude offset of start point
-            (``observer``) in m (default: 1.5)
-        :param float min_dist: minimum distance (in km) of first
-            considered intersection with topography from observer. If None,
-            use 1% of distance between ``observer`` and ``endpoint``.
-        :param float local_tolerance: tolerance factor to estimate
-            distance uncertainty based on topo grid resolution  (default: 3)
-        :param bool plot: creates a plot of the profile including the
-            intersection information
+        Parameters
+        ----------
+        elev_angle : float
+            elevation angle of viewing direction (in decimal degrees)
+        view_above_topo_m : float
+            altitude offset in m relative to altitude of start point (
+            :attr:`observer`) in m. Defaults to 1.5 m.
+        min_dist : float
+            minimum distance (in km) of first considered intersection with
+            topography from observer. If None, use 1% of distance between
+            :attr:`observer` and :attr:`endpoint`.
+        local_tolerance : int
+            tolerance factor to estimate distance uncertainty based on topo
+            grid resolution. Defaults to 3.
+        max_diff : float, optional
+            maximum allowed altitude difference in m between vector specifying
+            viewing direction and the topography. Default to None, in which
+            case the value assigned to :attr:`resolution` x 1000.
+        plot : bool
+            If true, the profile is plotted, including the intersection
+            result.
 
-
+        Returns
+        -------
+        float
+            retrieved horizontal distance of intersection point.
+        float
+            error of retrieved horizontal distance of intersection point.
+        GeoPoint
+            location of intersect
+        ndarray
+            elevations along viewing direction vector arising from input
+            elevation and altitude offset as well as the azimuth of the
+            profile
+        Axes or None
+            matplotlib axes instance if input arg `plot` is True, else None.
         """
 
         if min_dist is None:
             min_dist = self.dist_hor*.01
-        max_diff = self.resolution * 1000
+        if max_diff is None:
+            max_diff = self.resolution * 1000
         view_elevations = self.get_altitudes_view_dir(elev_angle,
                                                       view_above_topo_m)
 
@@ -462,12 +501,12 @@ class ElevationProfile(object):
 
         #: create array with all distances matching the 2 conditions
         dists_0 = self.dists[cond1 * cond2]
-        dist, dist_err, intersect = None, None, None
         #: relax condition 2 if nothing was found
-        if not len(dists_0) > 0:
-            max_diff = self.resolution * 1000 * local_tolerance
-            cond2 = abs(diff_signal) < max_diff
-            dists_0 = self.dists[cond1 * cond2]
+        if len(dists_0) == 0:
+            raise IntersectNotFound(
+                'could not establish initial array of candidate distances '
+                'for retrieval of intersection point, you might succeed by '
+                'setting or increasing the value of input parameter max_diff')
 
         try:
             #: get all diff vals matching the 2 conditions
@@ -489,9 +528,12 @@ class ElevationProfile(object):
             #: set the altitude of this point (retrieved from profile)
             intersect.altitude = self.get_altitude_at_distance(dist) # / 1000.
 
-        except IndexError as e:
-            print(("No intersections could be detected, err: %s" %repr(e)))
-            dist, dist_err = np.nan, np.nan
+        except IndexError:
+            from traceback import format_exc
+            raise IntersectNotFound(
+                f'No intersections could be detected, traceback:\n'
+                f'{format_exc()}')
+
         ax = None
         if plot:
             ax = self._plot_intersect_search_result(view_elevations, dist)
@@ -504,26 +546,62 @@ class ElevationProfile(object):
                           **kwargs):
         """Find first elevation angle which does not intersect with topo
 
-        :param float elev_start: start search elevation angle
-        :param float elev_stop: stop search elevation angle
-        :param float step_deg: angle step for search (coarser is faster)
-        :param **kwargs: additional keyword agruments passed to
+        Scans towards zenith elevation within input elevation range
+        in elevation steps provided via input arg `step_deg`, starting at
+        `elev_start`. For each elevation, an attempt is made to find an
+        intersection of the resulting viewing direction vector with the local
+        topography using :func:`get_first_intersection`. The horizon
+        elevation is identified as the first elevation angle for which no
+        intersection can be found.
+
+        Parameters
+        ----------
+        elev_start : float
+            start search elevation angle
+        elev_stop : float
+            stop search elevation angle
+        step_deg : float
+            angle step for search (coarser is faster)
+        **kwargs:
+            additional keyword agruments passed to
             :func:`get_first_intersection`
+
+        Raises
+        ------
+        IntersectNotFound
+            if no intersection with topography can be found for input
+            elevation range.
+
+        Returns
+        -------
+        float
+            detected elevation angle of horizon
+        list
+            list of elevation angles for which intersections with topography
+            could be identified.
+        list
+            corresponding horizontal distances of :attr:`observer` to the
+            terrain features.
         """
         elevs = np.arange(elev_start, elev_stop + step_deg, step_deg)
         elev_sects = []
         dists_sects = []
+
+        prev_elev = None
         for elev in elevs:
-            (dist,
-             dist_err,
-             intersect,
-             view_elevations,
-             _) = self.get_first_intersection(elev, plot=False, **kwargs)
-            if np.isnan(dist):
-                return elev, elev_sects, dists_sects
-            else:
-                dists_sects.append(dist), elev_sects.append(elev)
-        raise ValueError("Failed to find elevation angle of horizon...")
+            try:
+                (dist,dist_err,intersect,view_elevations,_) = \
+                    self.get_first_intersection(elev, plot=False, **kwargs)
+            except IntersectNotFound:
+                if prev_elev is None:
+                    raise IntersectNotFound(
+                        f'failed to determine elevation angle of horizon '
+                        f'consider starting at a lower elevation than '
+                        f'{elev_start}')
+                else:
+                    return elev, elev_sects, dists_sects
+            dists_sects.append(dist), elev_sects.append(elev)
+            prev_elev = elev
 
     def get_altitude_at_distance(self, dist):
         """Returns altitude at a ceratain distance from observer
