@@ -188,6 +188,7 @@ def test_GeoPoint__sub_latlon():
 
 @pytest.mark.parametrize('other,raises', [
     (42,pytest.raises(ValueError)),
+    (GeoPoint(0,0),pytest.raises(ValueError)),
     (GeoVector(dx=1,dy=1), does_not_raise_exception()),
     (GeoVector3D(dx=1,dy=1, dz=100), does_not_raise_exception()),
 ])
@@ -197,8 +198,13 @@ def test_GeoPoint___add__(other,raises):
         p2 = pt.__add__(other)
         assert isinstance(p2, GeoPoint)
 
+class Fake:
+    def type(self):
+        return 'blaaa'
+
 @pytest.mark.parametrize('other,tp,raises', [
     (42,None, pytest.raises(ValueError)),
+    (Fake(), None, pytest.raises(ValueError)),
     (GeoVector(dx=1,dy=1), GeoPoint, does_not_raise_exception()),
     (GeoVector3D(dx=1,dy=1, dz=100), GeoPoint, does_not_raise_exception()),
     (LatLon(1,1), GeoVector3D, does_not_raise_exception()),

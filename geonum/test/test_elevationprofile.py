@@ -254,6 +254,7 @@ def test__check_set_topo_data_FAIL():
     with pytest.raises(ValueError):
         ep._check_set_topo_data('42')
 
-if __name__ == "__main__":
-    import sys
-    pytest.main(sys.argv)
+def test_ElevationProfile___call__(profile1):
+    val = profile1(100)
+    assert int(val) == 175
+
