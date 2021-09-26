@@ -477,7 +477,7 @@ class GeoPoint(LatLon):
         return p.offset(heading, distance)
 
     def _add_geo_vector_2d(self, other):
-        """Subtract another geo vector
+        """Add another geo vector
 
         Add a geo vector (adapted from `LatLon` object,  only return
         type was changed from LatLon object to GeoPoint object)
@@ -498,7 +498,7 @@ class GeoPoint(LatLon):
         return p.offset(azimuth, dist_hor, 0.0)
 
     def _sub_geo_vector_3d(self, other):
-        """Called when subtracting a GeoVector3D object from self
+        """Subtract a GeoVector3D object from self
 
         Parameters
         ----------
@@ -571,8 +571,15 @@ class GeoPoint(LatLon):
 
         :param (GeoVector, GeoVector3D) other: a vector
         """
-        object_operator = {'GeoVector'      :   self._add_geo_vector_2d,
-                           'GeoVector3D'    :   self._add_geo_vector_3d}
+        object_operator = {'GeoVector': self._add_geo_vector_2d,
+                           'GeoVector3D': self._add_geo_vector_3d}
+        try:
+            tp = other.type()
+            if not tp in object_operator.keys():
+                raise AttributeError
+        except AttributeError:
+            raise ValueError(f'invalid input type {type(other)}, choose from '
+                             f'{list(object_operator)}')
         return object_operator[other.type()](other)
 
     def __sub__(self, other):
@@ -581,21 +588,26 @@ class GeoPoint(LatLon):
                            'GeoVector3D'    :   self._sub_geo_vector_3d,
                            'LatLon'         :   self._sub_latlon,
                            'GeoPoint'       :   self._sub_geo_point}
+        try:
+            tp = other.type()
+            if not tp in object_operator.keys():
+                raise AttributeError
+        except AttributeError:
+            raise ValueError(f'invalid input type {type(other)}, choose from '
+                             f'{list(object_operator)}')
         return object_operator[other.type()](other)
 
     def __str__(self):
         """String formatting"""
-        return ("GeoPoint %s\nLat: %s, Lon: %s, Alt: %s m\n"
-                %(self.name, self.latitude, self.longitude, self.altitude))
+        return (
+            f"GeoPoint {self.name}\nLat: {self.latitude},  Lon:"
+            f" {self.longitude}, Alt: {self.altitude} m\n")
 
     def __repr__(self):
         """Obj. representation"""
-        return ("%s, %s, Alt. %s m"
-                %(self.lat.__repr__(), self.lon.__repr__(), self.altitude))
-
-    def __complex__(self):
-        """Complex representation of lat and lon"""
-        return self.complex()
+        return (
+            f"Lat: {self.latitude}, Lon: {self.longitude}, Alt:"
+            f" {self.altitude} m")
 
     def type(self):
         """Object type identifier
