@@ -244,6 +244,15 @@ def test_ElevationProfile_via_GeoPoint():
                                   [2482.598405, 176.008484, 583.012202,
                                    486.57815, 50.033677, 1005.208932, 0.])
 
+def test__check_set_endpoint_FAIL():
+    ep = ElevationProfile(GeoPoint(45,15), GeoPoint(45,16))
+    with pytest.raises(ValueError):
+        ep._check_set_endpoint('42')
+
+def test__check_set_topo_data_FAIL():
+    ep = ElevationProfile(GeoPoint(45,15), GeoPoint(45,16))
+    with pytest.raises(ValueError):
+        ep._check_set_topo_data('42')
 
 if __name__ == "__main__":
     import sys

@@ -76,7 +76,7 @@ class GeoVector3D(GeoVector):
             self.dx = dx
             self.dy = dy
         else:
-            raise NameError
+            raise ValueError('invalid input')
         #Check input for altitude difference dz
         if dz is None or isnan(dz): #invalid for dz directly
             if elevation is not None and -90 <= elevation <= 90: #check if instead elevation is valid, then set dz
@@ -217,8 +217,6 @@ class GeoVector3D(GeoVector):
         """
         azimuth, dist_hor = self._geom_hor()
         return azimuth, dist_hor, self.dz
-    
-    
         
     def __neg__(self):
         """Returns negative of this vector"""

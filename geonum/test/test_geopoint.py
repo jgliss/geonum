@@ -9,7 +9,7 @@ Created on Sat Mar 20 13:55:05 2021
 import pytest
 import numpy as np
 from geonum.conftest import does_not_raise_exception
-from LatLon23 import LatLon
+from LatLon23 import LatLon, GeoVector
 from geonum.geopoint import GeoPoint
 from geonum.geovector3d import GeoVector3D
 from geonum.exceptions import OutOfDomain
@@ -114,14 +114,110 @@ def test_GeoPoint_get_elevation_profile(kwargs,raises):
         ep = p.get_elevation_profile(**kwargs)
         assert isinstance(ep, ElevationProfile)
 
-def test_GeoPoint__sub_geo_vector_2d():
-    from LatLon23 import GeoVector
-    pt = GeoPoint(0,1)
-    v = GeoVector(dx=1,dy=0)
-    result = pt._sub_geo_vector_2d(v)
-    assert isinstance(result, GeoPoint)
+@pytest.mark.parametrize('vkwargs,result', [
+    (dict(dx=1, dy=0), (0, -0.008983)),
+    (dict(dx=111.15, dy=111.15), (-1.005, -0.999)),
+    (dict(initial_heading=270, distance=222.15), (0, 1.996)),
+    (dict(initial_heading=225, distance=222.15*np.sqrt(2)), (2.009, 1.996)),
+])
+def test_GeoPoint__sub_geo_vector_2d(vkwargs,result):
+    pt = GeoPoint(latitude=0,longitude=0)
+    v = GeoVector(**vkwargs)
+    p2 = pt._sub_geo_vector_2d(v)
+    assert isinstance(p2, GeoPoint)
+    assert p2.altitude == pt.altitude
+    np.testing.assert_allclose([p2.latitude, p2.longitude],
+                               result, atol=0.001)
 
+@pytest.mark.parametrize('vkwargs,result', [
+    (dict(dx=1, dy=0), (0, 0.008983)),
+    (dict(dx=111.15, dy=111.15), (1.005, 0.999)),
+    (dict(initial_heading=270, distance=222.15), (0, -1.996)),
+    (dict(initial_heading=225, distance=222.15*np.sqrt(2)), (-2.009, -1.996)),
+])
+def test_GeoPoint__add_geo_vector_2d(vkwargs,result):
+    pt = GeoPoint(0,0)
+    v = GeoVector(**vkwargs)
+    p2 = pt._add_geo_vector_2d(v)
+    assert isinstance(p2, GeoPoint)
+    assert p2.altitude == pt.altitude
+    np.testing.assert_allclose([p2.latitude, p2.longitude],
+                               result, atol=0.001)
 
-if __name__ == "__main__":
-    import sys
-    pytest.main(sys.argv)
+@pytest.mark.parametrize('vkwargs,result', [
+    (dict(dx=1, dy=0), (0, -0.008983, 0)),
+    (dict(dx=1, dy=0, dz=100), (0, -0.008983, -100)),
+    (dict(dx=111.15, dy=111.15, dz=-1100), (-1.005, -0.999, 1100)),
+    (dict(azimuth=270, dist_hor=222.15), (0, 1.996, 0)),
+    (dict(azimuth=270, dist_hor=222.15, dz=100), (0, 1.996, -100)),
+    (dict(azimuth=270, dist_hor=1, elevation=45), (0, 0.008983, -1000)),
+    (dict(azimuth=225, dist_hor=np.sqrt(2), elevation=45), (0.008983, 0.008983,
+                                                            -1000*np.sqrt(2))),
+])
+def test_GeoPoint__sub_geo_vector_3d(vkwargs,result):
+    pt = GeoPoint(0,0, altitude=0)
+    v = GeoVector3D(**vkwargs)
+    p2 = pt._sub_geo_vector_3d(v)
+    assert isinstance(p2, GeoPoint)
+    np.testing.assert_allclose([p2.latitude, p2.longitude, p2.altitude],
+                               result, atol=0.001)
+
+@pytest.mark.parametrize('vkwargs,result', [
+    (dict(dx=1, dy=0), (0, 0.008983, 0)),
+    (dict(dx=1, dy=0, dz=100), (0, 0.008983, 100)),
+    (dict(dx=111.15, dy=111.15, dz=-1100), (1.005, 0.999, -1100)),
+    (dict(azimuth=270, dist_hor=222.15), (0, -1.996, 0)),
+    (dict(azimuth=270, dist_hor=222.15, dz=100), (0, -1.996, 100)),
+    (dict(azimuth=270, dist_hor=1, elevation=45), (0, -0.008983, 1000)),
+    (dict(azimuth=225, dist_hor=np.sqrt(2), elevation=45), (-0.008983, -0.008983,
+                                                            1000*np.sqrt(2))),
+])
+def test_GeoPoint__add_geo_vector_3d(vkwargs,result):
+    pt = GeoPoint(0,0, altitude=0)
+    v = GeoVector3D(**vkwargs)
+    p2 = pt._add_geo_vector_3d(v)
+    assert isinstance(p2, GeoPoint)
+    np.testing.assert_allclose([p2.latitude, p2.longitude, p2.altitude],
+                               result, atol=0.001)
+
+def test_GeoPoint__sub_latlon():
+    pt = GeoPoint(0,1, altitude=1000)
+    p2 = LatLon(-1, 0)
+    result = pt._sub_latlon(p2)
+    assert isinstance(result, GeoVector3D)
+
+@pytest.mark.parametrize('other,raises', [
+    (42,pytest.raises(ValueError)),
+    (GeoVector(dx=1,dy=1), does_not_raise_exception()),
+    (GeoVector3D(dx=1,dy=1, dz=100), does_not_raise_exception()),
+])
+def test_GeoPoint___add__(other,raises):
+    pt = GeoPoint(0, 0, altitude=0)
+    with raises:
+        p2 = pt.__add__(other)
+        assert isinstance(p2, GeoPoint)
+
+@pytest.mark.parametrize('other,tp,raises', [
+    (42,None, pytest.raises(ValueError)),
+    (GeoVector(dx=1,dy=1), GeoPoint, does_not_raise_exception()),
+    (GeoVector3D(dx=1,dy=1, dz=100), GeoPoint, does_not_raise_exception()),
+    (LatLon(1,1), GeoVector3D, does_not_raise_exception()),
+    (GeoPoint(1,1), GeoVector3D, does_not_raise_exception()),
+])
+def test_GeoPoint___sub__(other,tp,raises):
+    pt = GeoPoint(0, 0, altitude=0)
+    with raises:
+        val = pt.__sub__(other)
+        assert isinstance(val, tp)
+
+def test_GeoPoint___str__():
+    pt = GeoPoint(0, 0, altitude=0)
+    st = pt.__str__()
+    assert isinstance(st,str)
+    assert st == 'GeoPoint undefined\nLat: 0.0,  Lon: 0.0, Alt: 0 m\n'
+
+def test_GeoPoint___repr__():
+    pt = GeoPoint(0, 0, altitude=0)
+    st = pt.__repr__()
+    assert isinstance(st,str)
+    assert st == 'Lat: 0.0, Lon: 0.0, Alt: 0 m'
