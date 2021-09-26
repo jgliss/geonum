@@ -107,5 +107,5 @@ See below for my (@jgliss) personal wish-list of new features, help is more than
 .. |docs| image:: https://readthedocs.org/projects/geonum/badge/?version=latest
     :target: https://geonum.readthedocs.io/en/latest/?badge=latest
 
-.. |cov| image:: https://codecov.io/gh/jgliss/geonum/branch/master/graph/badge.svg?token=802DAZA1W9
+.. |cov| image:: https://codecov.io/gh/jgliss/geonum/branch/main-dev/graph/badge.svg?token=802DAZA1W9
     :target: https://codecov.io/gh/jgliss/geonum
