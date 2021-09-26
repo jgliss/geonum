@@ -484,7 +484,7 @@ class GeoPoint(LatLon):
 
         Parameters
         ----------
-        other : GeoVector3D
+        other : GeoVector
             vector to be added to this location
 
         Returns
@@ -538,7 +538,10 @@ class GeoPoint(LatLon):
         inv = self._pyproj_inv(other)
         heading = inv['heading_reverse']
         distance = inv['distance']
-        name=str(other.name + "->" + self.name)
+        on = other.name
+        if on is None:
+            on = 'undefined'
+        name= f'{on}->{self.name}'
         return GeoVector3D(dz=0.0, azimuth=heading, dist_hor=distance,
                            anchor=other, name=name)
 

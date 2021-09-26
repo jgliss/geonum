@@ -121,7 +121,28 @@ def test_GeoPoint__sub_geo_vector_2d():
     result = pt._sub_geo_vector_2d(v)
     assert isinstance(result, GeoPoint)
 
+def test_GeoPoint__add_geo_vector_2d():
+    from LatLon23 import GeoVector
+    pt = GeoPoint(0,1)
+    v = GeoVector(dx=1,dy=0)
+    result = pt._add_geo_vector_2d(v)
+    assert isinstance(result, GeoPoint)
 
-if __name__ == "__main__":
-    import sys
-    pytest.main(sys.argv)
+def test_GeoPoint__sub_geo_vector_3d():
+    pt = GeoPoint(0,1, altitude=1000)
+    v = GeoVector3D(dx=1,dy=1, dz=100)
+    result = pt._sub_geo_vector_3d(v)
+    assert isinstance(result, GeoPoint)
+
+def test_GeoPoint__add_geo_vector_3d():
+    pt = GeoPoint(0,1, altitude=1000)
+    v = GeoVector3D(dx=1,dy=1, dz=100)
+    result = pt._add_geo_vector_3d(v)
+    assert isinstance(result, GeoPoint)
+
+def test_GeoPoint__sub_latlon():
+    from LatLon23 import LatLon
+    pt = GeoPoint(0,1, altitude=1000)
+    p2 = LatLon(-1, 0)
+    result = pt._sub_latlon(p2)
+    assert isinstance(result, GeoVector3D)
