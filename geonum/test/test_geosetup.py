@@ -7,7 +7,7 @@ Created on Sat Mar  6 21:15:34 2021
 """
 import pytest
 from geonum.conftest import does_not_raise_exception
-from geonum import GeoPoint, GeoVector3D, TopoDataAccess
+from geonum import GeoPoint, GeoVector3D, TopoDataAccess, TopoData
 from geonum import geosetup as mod
 from geonum.conftest import skip_srtm
 
@@ -92,4 +92,10 @@ def test_GeoSetup_change_topo_mode(new_mode,local_path,raises):
     gs = mod.GeoSetup()
     with raises:
         gs.change_topo_mode(new_mode,local_path)
+
+@skip_srtm
+def test_GeoSetup_get_topo():
+    stp = mod.GeoSetup.create_test_setup()
+    stp.get_topo()
+    assert isinstance(stp.topo_data, TopoData)
 
