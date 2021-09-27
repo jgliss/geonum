@@ -179,8 +179,8 @@ class GeoSetup(object):
             new search path for topography data
         """
         if not exists(p):
-            raise IOError("Input path does not exist")
-        self.topo_access.local_path = p
+            raise FileExistsError("Input path does not exist")
+        self.local_topo_path = p
 
     def change_topo_mode(self, new_mode="srtm", local_path=None):
         """Change the current mode for topography data access
@@ -193,8 +193,8 @@ class GeoSetup(object):
             if not None and valid, update local topo access
 
         """
-        if local_path is not None and exists(local_path):
-            self.load_topo_path = local_path
+        if local_path is not None:
+            self.set_local_topo_path(local_path)
         self.topo_access_mode = new_mode
 
     def get_topo(self):
@@ -338,15 +338,16 @@ class GeoSetup(object):
 
         :param GeoPoint pt: the new point
         """
-        if pt.name in self.points:
-            raise ValueError(
-                f'GeoPoint with name {pt.name} already exists in GeoSetup. '
-                )
-        if assert_in_domain and not self.contains_coordinate(pt.latitude,
+        if not pt.name in ['ll', 'tr']:
+            if pt.name in self.points:
+                raise ValueError(
+                    f'GeoPoint with name {pt.name} already exists in GeoSetup. '
+                    )
+            if assert_in_domain and not self.contains_coordinate(pt.latitude,
                                                              pt.longitude):
-            raise OutOfDomain(
-                f'{pt} is not within domain of GeoSetup'
-                )
+                raise OutOfDomain(
+                    f'{pt} is not within domain of GeoSetup'
+                    )
         self.points[pt.name] = pt
         if (isinstance(self.topo_data, TopoData) and
             not isinstance(pt.topo_data, TopoData)):
