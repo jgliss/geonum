@@ -22,7 +22,7 @@ muliple geo point and geo vector objects.
 """
 from geonum import BASEMAP_AVAILABLE
 from matplotlib.pyplot import get_cmap
-if BASEMAP_AVAILABLE:
+if BASEMAP_AVAILABLE: # pragma: no cover
     from geonum.mapping import Map
 from numpy import asarray, nanmin, nanmax
 from os.path import exists
