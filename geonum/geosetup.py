@@ -747,8 +747,8 @@ class GeoSetup(object):
 
     def plot_3d(self, draw_all_points=True, draw_all_vectors=True,
                 cmap_topo="Oranges", contour_color="#708090",
-                contour_lw=0.2, contour_antialiased=True, *args, **kwargs):
-        # pragma: no cover
+                contour_lw=0.2, contour_antialiased=True,
+                *args, **kwargs): # pragma: no cover
         """Create a 3D overview map of the current setup
 
         Parameters
