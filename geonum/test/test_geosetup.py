@@ -1,11 +1,13 @@
+import numpy as np
 import pytest
 import numpy.testing as npt
+from numpy import ndarray
+
 from geonum.conftest import does_not_raise_exception
 from geonum import GeoPoint, GeoVector3D, TopoDataAccess, TopoData
 from geonum import geosetup as mod
 from geonum.conftest import skip_srtm
 from geonum.exceptions import OutOfDomain
-
 
 @pytest.mark.parametrize(
     'points,vectors,lat_ll,lon_ll,lat_tr,lon_tr,id,topo_access_mode,'
@@ -68,7 +70,6 @@ def test_GeoSetup_ll():
     stp.set_borders_from_points()
     stp.load_topo_data()
     assert isinstance(stp.ll, GeoPoint)
-    assert stp.ll == GeoPoint(45,15)
     stp.ll = GeoPoint(44,15,name='ll')
 
 def test_GeoSetup_tr():
@@ -79,7 +80,6 @@ def test_GeoSetup_tr():
     stp.set_borders_from_points()
     stp.load_topo_data()
     assert isinstance(stp.tr, GeoPoint)
-    assert stp.tr == GeoPoint(45,15)
     stp.tr = GeoPoint(44,15,name='tr')
 
 def test_GeoSetup_lon_ll(dummy_setup):
@@ -114,6 +114,9 @@ def test_GeoSetup_center_coordinates():
     gs.add_geo_point(GeoPoint(0.5, 0.5, name='tr'))
     coords = gs.center_coordinates
     assert coords == (0,0)
+
+def test_GeoSetup_magnitude(dummy_setup):
+    npt.assert_allclose(dummy_setup.magnitude, 4.898, atol=0.01)
 
 def test_GeoSetup_topo_access(empty_setup):
     assert isinstance(empty_setup.topo_access, TopoDataAccess)
@@ -169,22 +172,6 @@ def test_GeoSetup_load_topo_data():
     stp.load_topo_data()
     assert isinstance(stp.topo_data, TopoData)
 
-@pytest.mark.parametrize('pts,assert_in_domain,raises', [
-    ([GeoPoint(0,0)], True, pytest.raises(OutOfDomain)),
-    ([GeoPoint(48,16)], True, does_not_raise_exception()),
-    ([GeoPoint(48,16), GeoPoint(49,16)], True, pytest.raises(ValueError)),
-    ([GeoPoint(48,16,name='p1'), GeoPoint(49,16,name='p2')], True,
-    does_not_raise_exception()),
-    ([GeoPoint(48,16,name='p1'), GeoPoint(49,21)], True, pytest.raises(
-        OutOfDomain)),
-    ([GeoPoint(48,16,name='p1'), GeoPoint(49,21)], False, does_not_raise_exception()),
-])
-def test_GeoSetup_add_geo_points(pts,assert_in_domain,raises):
-    stp = mod.GeoSetup(lat_ll=45,lon_ll=15, lat_tr=50, lon_tr=20)
-    with raises:
-        stp.add_geo_points(*pts, assert_in_domain=assert_in_domain)
-        assert len(stp.points) == len(pts) + 2
-
 def test_GeoSetup_has_point():
     stp = mod.GeoSetup(lat_ll=45, lon_ll=15, lat_tr=50, lon_tr=20)
     assert stp.has_point('ll') == True
@@ -204,6 +191,7 @@ def test_GeoSetup_contains_coordinate():
     assert stp.contains_coordinate(30, 16) == False
 
 @pytest.mark.parametrize('pt,assert_in_domain,overwrite_existing,raises', [
+    (42,False,True,pytest.raises(ValueError)),
     (GeoPoint(0,0,name='bla'),False,True,does_not_raise_exception()),
     (GeoPoint(0,0,name='bla'),False,False,pytest.raises(ValueError)),
     (GeoPoint(0,0,name='bla'),True,True,pytest.raises(OutOfDomain)),
@@ -217,6 +205,108 @@ def test_GeoSetup_add_geo_point(pt,assert_in_domain,overwrite_existing,raises):
         stp.add_geo_point(pt=pt,assert_in_domain=assert_in_domain,
                           overwrite_existing=overwrite_existing)
         assert pt.name in stp.points
+
+
+@pytest.mark.parametrize('pts,assert_in_domain,raises', [
+    ([GeoPoint(0,0)], True, pytest.raises(OutOfDomain)),
+    ([GeoPoint(48,16)], True, does_not_raise_exception()),
+    ([GeoPoint(48,16), GeoPoint(49,16)], True, pytest.raises(ValueError)),
+    ([GeoPoint(48,16,name='p1'), GeoPoint(49,16,name='p2')], True,
+    does_not_raise_exception()),
+    ([GeoPoint(48,16,name='p1'), GeoPoint(49,21)], True, pytest.raises(
+        OutOfDomain)),
+    ([GeoPoint(48,16,name='p1'), GeoPoint(49,21)], False, does_not_raise_exception()),
+])
+def test_GeoSetup_add_geo_points(pts,assert_in_domain,raises):
+    stp = mod.GeoSetup(lat_ll=45,lon_ll=15, lat_tr=50, lon_tr=20)
+    with raises:
+        stp.add_geo_points(*pts, assert_in_domain=assert_in_domain)
+        assert len(stp.points) == len(pts) + 2
+
+
+@pytest.mark.parametrize('vec,overwrite_existing,raises', [
+    (42, False, pytest.raises(ValueError)),
+    (GeoVector3D(1,1,1,name='bla'), False, pytest.raises(ValueError)),
+    (GeoVector3D(1,1,1,name='bla'), True, does_not_raise_exception()),
+    (GeoVector3D(1,1,1,name='blub'), False, does_not_raise_exception()),
+])
+def test_GeoSetup_add_geo_vector(vec,overwrite_existing,raises):
+    stp = mod.GeoSetup(lat_ll=45, lon_ll=15, lat_tr=50, lon_tr=20)
+    stp.vectors['bla'] = GeoVector3D(1,1,1,name='bla')
+    with raises:
+        stp.add_geo_vector(vec=vec,
+                          overwrite_existing=overwrite_existing)
+        assert vec.name in stp.vectors
+
+
+@pytest.mark.parametrize('vecs,raises', [
+    ([GeoVector3D(1,1,1,name='bla')], does_not_raise_exception()),
+    ([GeoVector3D(1,1,1,name='bla'),
+      GeoVector3D(1,1,1,name='bla')], does_not_raise_exception()),
+])
+def test_GeoSetup_add_geo_vector(vecs,raises):
+    stp = mod.GeoSetup(lat_ll=45, lon_ll=15, lat_tr=50, lon_tr=20)
+    with raises:
+        stp.add_geo_vectors(*vecs)
+
+def test_GeoSetup_delete_geo_point():
+    stp = mod.GeoSetup(lat_ll=45, lon_ll=15, lat_tr=50, lon_tr=20)
+    with pytest.raises(ValueError):
+        stp.delete_geo_point('bla')
+    stp.add_geo_point(GeoPoint(0,0,name='bla'),assert_in_domain=False)
+    assert 'bla' in stp.points
+    stp.delete_geo_point('bla')
+    assert not 'bla' in stp.points
+
+def test_GeoSetup_delete_geo_vector():
+    stp = mod.GeoSetup(lat_ll=45, lon_ll=15, lat_tr=50, lon_tr=20)
+    with pytest.raises(ValueError):
+        stp.delete_geo_vector('bla')
+    stp.add_geo_vector(GeoVector3D(1,1,1,name='bla'))
+    assert 'bla' in stp.vectors
+    stp.delete_geo_vector('bla')
+    assert not 'bla' in stp.vectors
+
+def test_GeoSetup_new_geo_point():
+    stp = mod.GeoSetup(lat_ll=45, lon_ll=15, lat_tr=50, lon_tr=20)
+    with pytest.raises(OutOfDomain):
+        stp.new_geo_point(latitude=10, longitude=20)
+
+    stp.new_geo_point(latitude=46, longitude=19, name='name')
+    stp.new_geo_point(47, 19, name='name2')
+
+def test_GeoSetup__all_lats_lons():
+    stp = mod.GeoSetup(lat_ll=45, lon_ll=15, lat_tr=50, lon_tr=20)
+    result = stp._all_lats_lons()
+    assert isinstance(result[0], ndarray)
+    assert isinstance(result[1], ndarray)
+    assert list(result[0]) == [45, 50]
+    assert list(result[1]) == [15, 20]
+
+@pytest.mark.parametrize('pts,extend_km,to_square,raises,delta_lat,'
+                         'delta_lon', [
+    ([],1,True,pytest.raises(AttributeError),None,None),
+    ([GeoPoint(0,0)],1,True,does_not_raise_exception(),0.013,0.013),
+    ([GeoPoint(0,0)],111.15/np.sqrt(2),True,does_not_raise_exception(),
+     1.005,0.999),
+    ([GeoPoint(0, 0, name='p1'), GeoPoint(1, 10, name='p2')], 0, True,
+     does_not_raise_exception(),
+     10.061, 10),
+    ([GeoPoint(0, 0, name='p1'), GeoPoint(1, 10, name='p2')], 0, False,
+     does_not_raise_exception(),
+     1, 10),
+    ([GeoPoint(0, 0, name='p1'), GeoPoint(1, 10, name='p2')], 100,
+     False,
+     does_not_raise_exception(),
+     2.279, 11.271),
+])
+def test_set_borders_from_points(pts,extend_km,to_square,raises,delta_lat,
+                                 delta_lon):
+    stp = mod.GeoSetup(points=pts, init_borders=False)
+    with raises:
+        stp.set_borders_from_points(extend_km,to_square)
+        npt.assert_allclose(delta_lat, stp.delta_lat, atol=0.001)
+        npt.assert_allclose(delta_lon, stp.delta_lon, atol=0.001)
 
 
 

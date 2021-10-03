@@ -77,7 +77,7 @@ class GeoSetup(object):
     def __init__(self, points=None, vectors=None, lat_ll=None, lon_ll=None,
                  lat_tr=None, lon_tr=None, id=None,
                  topo_access_mode=None, local_topo_path=None,
-                 cmap_vecs=None):
+                 cmap_vecs=None, init_borders=True):
         if id is None:
             id ='MyGeoSetup'
         if topo_access_mode is None:
@@ -122,7 +122,7 @@ class GeoSetup(object):
                 self.new_geo_point(lat_tr, lon_tr, name="tr")
             except (TypeError, ValueError):
                 pass
-        if not self.borders_set and self.has_points():
+        if init_borders and not self.borders_set and self.has_points():
             self.set_borders_from_points()
 
     @property
@@ -209,15 +209,23 @@ class GeoSetup(object):
                 self.lon_ll + self.delta_lon / 2.)
 
     @property
+    def magnitude(self):
+        """Returns dimension (in km) of area covered by this setup"""
+        return (self.tr - self.ll).norm
+
+
+    @property
     def topo_access(self):
         """Topograph data access class"""
         return TopoDataAccess(self.topo_access_mode,
                               self.local_topo_path)
 
+
     @property
     def cmap_vecs(self):
         """Default colormap used for drawing vectors"""
         return get_cmap(self._cmap_vecs)
+
 
     def has_points(self):
         """
@@ -231,6 +239,7 @@ class GeoSetup(object):
         if len(self.points) > 0:
             return True
         return False
+
 
     def has_topo_data(self):
         """
@@ -304,28 +313,18 @@ class GeoSetup(object):
             p.set_topo_data(self.topo_data)
 
 
-    def add_geo_points(self, *pts, assert_in_domain=False) -> None:
-        """Add multiple GeoPoints to the collection
-
-        Parameters
-        ----------
-        *pts
-            points to add
-        assert_in_domain : bool
-            if True, check assert that each point is within domain
-
-        Returns
-        -------
-        None
-        """
-        for pt in pts:
-            self.add_geo_point(pt, assert_in_domain)
-
     def has_point(self, name):
         """Checks if point with input name exists
 
-        :param str key: name of point
-        :return: bool
+        Parameters
+        ----------
+        name : str
+            name of point to be checked
+
+        Returns
+        -------
+        bool
+            Whether or not point existes
         """
         if name in self.points:
             return True
@@ -388,6 +387,8 @@ class GeoSetup(object):
         -------
         None
         """
+        if not isinstance(pt, GeoPoint):
+            raise ValueError(f'invalid input: {pt}. Need GeoPoint')
         if pt.name == 'll':
             self.ll = pt
         elif pt.name == 'tr':
@@ -408,25 +409,44 @@ class GeoSetup(object):
                 pt.set_topo_data(self.topo_data)
 
 
-    def add_geo_vector(self, vec):
+    def add_geo_points(self, *pts, assert_in_domain=False) -> None:
+        """Add multiple GeoPoints to the collection
+
+        Parameters
+        ----------
+        *pts
+            points to add
+        assert_in_domain : bool
+            if True, check assert that each point is within domain
+
+        Returns
+        -------
+        None
+        """
+        for pt in pts:
+            self.add_geo_point(pt, assert_in_domain)
+
+
+    def add_geo_vector(self, vec, overwrite_existing=True) -> None:
         """Add :class:`GeoVector3D` to this collection
 
-        :param GeoVector3D vec: should be clear ;)
+        Parameters
+        ----------
+        vec : GeoVector3D
+            vector to be added
+        overwrite_existing : bool
+            If True and if vector with same name already exists, the former one
+
+        Raises
+        ------
+        ValueError
+            if input is not GeoVector3D
+
         """
         if not isinstance(vec, GeoVector3D):
-            print(("Error adding GeoVector3D, wrong input type, need "
-                  ":class:`GeoVector3D` object, input type: %s" %type(vec)))
-            return
-        if vec.name in self.vectors:
-            print(("Vector ID %s already exists in %s" %(vec.name, self)))
-            vec2 = self.vectors[vec.name]
-            if (vec2.almost_equals(vec) and vec2.dz == vec.dz
-                and vec.anchor == vec2.anchor):
-                print("Vector is unchanged")
-                return
-            print("Updating name of existing vector to: %s_old" %vec.name)
-            vec2.name = vec2.name + "_old"
-            self.vectors[vec2.name] = vec2
+            raise ValueError(f'invalid input: {vec}. Need GeoVector3D')
+        if vec.name in self.vectors and not overwrite_existing:
+            raise ValueError(f'Vector with name {vec.name} already exists.')
         self.vectors[vec.name] = vec
 
     def add_geo_vectors(self, *vecs) -> None:
@@ -479,12 +499,26 @@ class GeoSetup(object):
         -------
         None
         """
+        if not name in self.vectors:
+            raise ValueError(f'no such GeoVector3D ({name}) in GeoSetup')
         del self.vectors[name]
 
-    def new_geo_point(self, *args, **kwargs):
+    def new_geo_point(self, *args, **kwargs) -> None:
         """Create new geo_point and add to collection
 
-        :param **kwargs: see :class:`GeoPoint` for initiation info
+        Create GeoPoint using input args and kwargs and then parse that
+        GeoPoint to :func:`add_geo_point`.
+
+        Parameters
+        ----------
+        *args
+            input args passed to init function of GeoPoint
+        **kwargs
+            input keyword args passed to init function of GeoPoint
+
+        Returns
+        -------
+        None
         """
         self.add_geo_point(GeoPoint(*args, **kwargs))
 
@@ -504,10 +538,6 @@ class GeoSetup(object):
             lons.append(p.longitude)
         return (asarray(lats), asarray(lons))
 
-    @property
-    def magnitude(self):
-        """Returns dimension (in km) of area covered by this setup"""
-        return (self.tr - self.ll).norm
 
     def set_borders_from_points(self, extend_km=1, to_square=True) -> None:
         """Set lower left (ll) and top right (tr) corners of domain
@@ -548,39 +578,19 @@ class GeoSetup(object):
                 pll = pll.offset(azimuth=270, dist_hor=-add)
                 ptr = ptr.offset(azimuth=90, dist_hor=-add)
 
-        if not self.has_point('ll'):
-            ll = pll.offset(azimuth=-135,
-                            dist_hor=float(extend_km),
-                            name='ll')
-            self.add_geo_point(ll, assert_in_domain=False,
-                               overwrite_existing=True)
-        if not self.has_point('tr'):
-            tr = ptr.offset(azimuth=45,
-                            dist_hor=float(extend_km),
-                            name='tr')
-            self.add_geo_point(tr, assert_in_domain=False,
-                               overwrite_existing=True)
 
-    def create_map(self, *args, **kwargs):
-        """Create a Basemap object for this regime"""
-        if not BASEMAP_AVAILABLE:
-            raise ImportError("Cannot create map: "
-                              "Basemap library is not available")
+        ll = pll.offset(azimuth=-135,
+                        dist_hor=float(extend_km),
+                        name='ll')
+        self.add_geo_point(ll, assert_in_domain=False,
+                           overwrite_existing=True)
 
-        if not isinstance(self.topo_data, TopoData):
-            self.load_topo_data()
-        if not "projection" in kwargs and self.magnitude < 150:
-            kwargs["projection"] = "lcc"
-        if not "llcrnrlon" in kwargs:
-            kwargs["llcrnrlat"] = self.lat_ll
-            kwargs["llcrnrlon"] = self.lon_ll
-            kwargs["urcrnrlat"] = self.lat_tr
-            kwargs["urcrnrlon"] = self.lon_tr
-            kwargs["lat_0"], kwargs["lon_0"] = self.center_coordinates
+        tr = ptr.offset(azimuth=45,
+                        dist_hor=float(extend_km),
+                        name='tr')
+        self.add_geo_point(tr, assert_in_domain=False,
+                           overwrite_existing=True)
 
-        m = Map(*args, **kwargs)
-        m.set_topo_data(self.topo_data)
-        return m
 
     def points_close(self, p, radius=None):
         """
@@ -636,6 +646,28 @@ class GeoSetup(object):
 
         gs.add_geo_vectors(plume, view_dir)
         return gs
+
+
+    def create_map(self, *args, **kwargs): # pragma: no cover
+        """Create a Basemap object for this regime"""
+        if not BASEMAP_AVAILABLE:
+            raise ImportError("Cannot create map: "
+                              "Basemap library is not available")
+
+        if not isinstance(self.topo_data, TopoData):
+            self.load_topo_data()
+        if not "projection" in kwargs and self.magnitude < 150:
+            kwargs["projection"] = "lcc"
+        if not "llcrnrlon" in kwargs:
+            kwargs["llcrnrlat"] = self.lat_ll
+            kwargs["llcrnrlon"] = self.lon_ll
+            kwargs["urcrnrlat"] = self.lat_tr
+            kwargs["urcrnrlon"] = self.lon_tr
+            kwargs["lat_0"], kwargs["lon_0"] = self.center_coordinates
+
+        m = Map(*args, **kwargs)
+        m.set_topo_data(self.topo_data)
+        return m
 
     def plot_2d(self, draw_all_points=True, draw_all_vectors=True,
                 draw_topo=True, draw_coastline=True, draw_mapscale=True,
