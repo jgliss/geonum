@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Mar  6 21:15:34 2021
-
-@author: jonasg
-"""
 import pytest
 import numpy.testing as npt
 from geonum.conftest import does_not_raise_exception
