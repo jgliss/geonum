@@ -52,6 +52,20 @@ def test_GeoSetup__init__(points,vectors,lat_ll,lon_ll,lat_tr,lon_tr,
 def empty_setup():
     return mod.GeoSetup()
 
+def test_GeoSetup_ll():
+    stp = mod.GeoSetup(points=[GeoPoint(45,15,name='ll')])
+    stp.load_topo_data()
+    assert isinstance(stp.ll, GeoPoint)
+    assert stp.ll == GeoPoint(45,15)
+    stp.ll = GeoPoint(44,15,name='ll')
+
+def test_GeoSetup_tr():
+    stp = mod.GeoSetup(points=[GeoPoint(45,15,name='tr')])
+    stp.load_topo_data()
+    assert isinstance(stp.tr, GeoPoint)
+    assert stp.tr == GeoPoint(45,15)
+    stp.tr = GeoPoint(44,15,name='tr')
+
 def test_GeoSetup_topo_access(empty_setup):
     assert isinstance(empty_setup.topo_access, TopoDataAccess)
 
@@ -93,9 +107,49 @@ def test_GeoSetup_change_topo_mode(new_mode,local_path,raises):
     with raises:
         gs.change_topo_mode(new_mode,local_path)
 
+def test_GeoSetup_borders_set():
+    assert mod.GeoSetup().borders_set == False
+    assert mod.GeoSetup(points=GeoPoint(0,0)).borders_set == True
+
+def test_GeoSetup_center_coordinates():
+    gs = mod.GeoSetup()
+    with pytest.raises(AttributeError):
+        coords = gs.center_coordinates
+    gs.add_geo_point(GeoPoint(-0.5,-0.5,name='ll'))
+    with pytest.raises(AttributeError):
+        coords = gs.center_coordinates
+    gs.add_geo_point(GeoPoint(0.5, 0.5, name='tr'))
+    coords = gs.center_coordinates
+    assert coords == (0,0)
+
 @skip_srtm
 def test_GeoSetup_get_topo():
     stp = mod.GeoSetup.create_test_setup()
     stp.get_topo()
     assert isinstance(stp.topo_data, TopoData)
+
+@skip_srtm
+def test_GeoSetup_load_topo_data():
+    stp = mod.GeoSetup()
+    stp.add_geo_point(GeoPoint(45,15))
+    stp.load_topo_data()
+    assert isinstance(stp.topo_data, TopoData)
+
+
+near_Etna = GeoPoint(latitude=37.751, longitude=14.993,
+                     name="near Etna", auto_topo_access=True)
+
+@skip_srtm
+@pytest.mark.parametrize('p,radius,result,raises', [
+    (None,None,[],pytest.raises(ValueError)),
+    (near_Etna,None,['Etna'],does_not_raise_exception()),
+    (near_Etna,0.01,[],does_not_raise_exception()),
+    (near_Etna,20,['Etna', 'Observatory', 'll', 'tr'],does_not_raise_exception()),
+])
+def test_GeoSetup_points_close(p,radius,result,raises):
+    stp = mod.GeoSetup.create_test_setup()
+    with raises:
+        val = stp.points_close(p,radius)
+        assert val == result
+
 
