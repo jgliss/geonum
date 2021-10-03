@@ -18,6 +18,9 @@ from geonum.conftest import skip_srtm
         ('Blaaaa',None,None,None,None,None,None,None,None,None, pytest.raises(ValueError)),
         (None,GeoVector3D(0,0),None,None,None,None,None,None,None,None, does_not_raise_exception()),
         (None, 'Blaaaa',None,None,None,None,None,None,None,None, pytest.raises(ValueError)),
+        (None, None, 13,None,None,None,None,None,None,None, does_not_raise_exception()),
+        (None, None, 13,15,14,16,None,None,None,None,
+         does_not_raise_exception()),
 
         ])
 def test_GeoSetup__init__(points,vectors,lat_ll,lon_ll,lat_tr,lon_tr,
