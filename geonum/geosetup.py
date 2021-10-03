@@ -409,8 +409,7 @@ class GeoSetup(object):
                 try:
                     pt.set_topo_data(self.topo_data)
                 except OutOfDomain:
-                    if assert_in_domain:
-                        raise
+                    pass
 
 
     def add_geo_points(self, *pts, assert_in_domain=False) -> None:
