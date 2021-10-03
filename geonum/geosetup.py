@@ -304,13 +304,22 @@ class GeoSetup(object):
             p.set_topo_data(self.topo_data)
 
 
-    def add_geo_points(self, *args, assert_in_domain=False):
+    def add_geo_points(self, *pts, assert_in_domain=False) -> None:
         """Add multiple GeoPoints to the collection
 
-        :param *args: arbitrary amount of new geo points
+        Parameters
+        ----------
+        *pts
+            points to add
+        assert_in_domain : bool
+            if True, check assert that each point is within domain
+
+        Returns
+        -------
+        None
         """
-        for arg in args:
-            self.add_geo_point(arg, assert_in_domain)
+        for pt in pts:
+            self.add_geo_point(pt, assert_in_domain)
 
     def has_point(self, name):
         """Checks if point with input name exists
