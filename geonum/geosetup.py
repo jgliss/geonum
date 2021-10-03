@@ -407,20 +407,6 @@ class GeoSetup(object):
                 not isinstance(pt.topo_data, TopoData)):
                 pt.set_topo_data(self.topo_data)
 
-    def set_geo_point(self, p_id, pt):
-        """Update an existing GeoPoint in the collection
-
-        :param str id: id of existing point in ``self.points``
-        :param GeoPoint pt: a new geo_point
-        """
-        if not isinstance(pt, GeoPoint):
-            raise TypeError("Wrong input: " + type(pt))
-        self.points[p_id] = pt
-
-    def add_geo_vectors(self, *args):
-        """Add multiple GeoPoints to the collection"""
-        for arg in args:
-            self.add_geo_vector(arg)
 
     def add_geo_vector(self, vec):
         """Add :class:`GeoVector3D` to this collection
@@ -443,18 +429,55 @@ class GeoSetup(object):
             self.vectors[vec2.name] = vec2
         self.vectors[vec.name] = vec
 
-    def delete_geo_point(self, name):
-        """Remove one of the geo_points from the collection
+    def add_geo_vectors(self, *vecs) -> None:
+        """Add multiple GeoVector3D objects to the collection
 
-        :param str name: name of geo point
+        Parameters
+        ----------
+        *vecs
+            Instances of :class:`GeoVector3D` to be added
         """
+        for vec in vecs:
+            self.add_geo_vector(vec)
+
+    def delete_geo_point(self, name) -> None:
+        """Remove one of the geo points from the collection
+
+        Parameters
+        ----------
+        name : str
+            name of the point
+
+        Raises
+        ------
+        ValueError
+            if no point with with input name exists in this setup
+
+        Returns
+        -------
+        None
+        """
+        if not name in self.points:
+            raise ValueError(f'no such GeoPoint ({name}) in GeoSetup')
         del self.points[name]
 
 
     def delete_geo_vector(self, name):
         """Remove one of the vectors from the collection
 
-        :param str name: name of geo vector
+        Parameters
+        ----------
+        name : str
+            name of the vector
+
+        Raises
+        ------
+        ValueError
+            if no vector with with input name exists in this setup
+
+        Returns
+        -------
+        None
         """
         del self.vectors[name]
 
@@ -526,13 +549,17 @@ class GeoSetup(object):
                 ptr = ptr.offset(azimuth=90, dist_hor=-add)
 
         if not self.has_point('ll'):
-            self.set_geo_point('ll', pll.offset(azimuth=-135,
-                                                dist_hor=float(extend_km),
-                                                name='ll'))
+            ll = pll.offset(azimuth=-135,
+                            dist_hor=float(extend_km),
+                            name='ll')
+            self.add_geo_point(ll, assert_in_domain=False,
+                               overwrite_existing=True)
         if not self.has_point('tr'):
-            self.set_geo_point('tr', ptr.offset(azimuth=45,
-                                                dist_hor=float(extend_km),
-                                                name='tr'))
+            tr = ptr.offset(azimuth=45,
+                            dist_hor=float(extend_km),
+                            name='tr')
+            self.add_geo_point(tr, assert_in_domain=False,
+                               overwrite_existing=True)
 
     def create_map(self, *args, **kwargs):
         """Create a Basemap object for this regime"""

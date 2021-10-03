@@ -227,7 +227,6 @@ def test_GeoSetup_add_geo_point(pt,assert_in_domain,overwrite_existing,raises):
 
 
 
-
 near_Etna = GeoPoint(latitude=37.751, longitude=14.993,
                      name="near Etna", auto_topo_access=True)
 
