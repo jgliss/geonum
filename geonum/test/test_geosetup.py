@@ -83,7 +83,7 @@ def test_GeoSetup_tr():
     stp.load_topo_data()
     assert isinstance(stp.tr, GeoPoint)
     with pytest.raises(ValueError):
-        stp.ll = 42
+        stp.tr = 42
     stp.tr = GeoPoint(44,15,name='tr')
 
 def test_GeoSetup_lon_ll(dummy_setup):
