@@ -26,10 +26,10 @@ def _init_local_topodir():
         import os
         home = os.path.expanduser('~')
         LOCAL_TOPO_DIR = os.path.join(home, '.geonum')
-        if not os.path.exists(LOCAL_TOPO_DIR):
+        if not os.path.exists(LOCAL_TOPO_DIR): # pragma: no cover
             os.mkdir(LOCAL_TOPO_DIR)
         TOPO_INFO_FILE = os.path.join(LOCAL_TOPO_DIR,  "LOCAL_TOPO_PATHS")
-        if not os.path.exists(TOPO_INFO_FILE):
+        if not os.path.exists(TOPO_INFO_FILE): # pragma: no cover
             with open(TOPO_INFO_FILE,'w') as f:
                 f.write(f'{LOCAL_TOPO_DIR}\n')
     except Exception: # pragma: no cover
