@@ -561,8 +561,9 @@ class GeoPoint(LatLon):
 
         :param other: another :class:`GeoPoint` object
         """
-        if (self.lat == other.lat and self.lon == other.lon
-            and self.altitude == other.altitude):
+        if (self.latitude == other.latitude and
+            self.longitude == other.longitude and
+            self.altitude == other.altitude):
             return True
         return False
 
