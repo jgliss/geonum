@@ -249,7 +249,7 @@ def test_GeoSetup_add_geo_vector(vec,overwrite_existing,raises):
     ([GeoVector3D(1,1,1,name='bla'),
       GeoVector3D(1,1,1,name='bla')], does_not_raise_exception()),
 ])
-def test_GeoSetup_add_geo_vector(vecs,raises):
+def test_GeoSetup_add_geo_vectors(vecs,raises):
     stp = mod.GeoSetup(lat_ll=45, lon_ll=15, lat_tr=50, lon_tr=20)
     with raises:
         stp.add_geo_vectors(*vecs)
