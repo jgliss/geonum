@@ -33,7 +33,7 @@ jobs:
     - name: Install geonum
       run: python ./setup.py install
     - name: Run pytest
-      run: pytest --cov=pyplis/ --cov-report xml
+      run: pytest --cov=geonum/ --cov-report xml
     - name: Upload coverage to Codecov (Python 3.9, Ubuntu)
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9'
       uses: codecov/codecov-action@v1
