@@ -70,6 +70,8 @@ def test_GeoSetup_ll():
     stp.set_borders_from_points()
     stp.load_topo_data()
     assert isinstance(stp.ll, GeoPoint)
+    with pytest.raises(ValueError):
+        stp.ll = 42
     stp.ll = GeoPoint(44,15,name='ll')
 
 def test_GeoSetup_tr():
@@ -80,6 +82,8 @@ def test_GeoSetup_tr():
     stp.set_borders_from_points()
     stp.load_topo_data()
     assert isinstance(stp.tr, GeoPoint)
+    with pytest.raises(ValueError):
+        stp.ll = 42
     stp.tr = GeoPoint(44,15,name='tr')
 
 def test_GeoSetup_lon_ll(dummy_setup):
@@ -201,6 +205,7 @@ def test_GeoSetup_contains_coordinate():
 def test_GeoSetup_add_geo_point(pt,assert_in_domain,overwrite_existing,raises):
     stp = mod.GeoSetup(lat_ll=45, lon_ll=15, lat_tr=50, lon_tr=20)
     stp.points['bla'] = GeoPoint(47,16,name='bla')
+    stp.topo_data = TopoData(lats=[45,50], lons=[15,20], data=np.ones((2,2)))
     with raises:
         stp.add_geo_point(pt=pt,assert_in_domain=assert_in_domain,
                           overwrite_existing=overwrite_existing)

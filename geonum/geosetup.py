@@ -137,7 +137,7 @@ class GeoSetup(object):
     @ll.setter
     def ll(self, value):
         if not isinstance(value, GeoPoint):
-            raise TypeError("Could not set lower left coordinate in "
+            raise ValueError("Could not set lower left coordinate in "
                             "GeoSetup: need GeoPoint object")
         self.points["ll"] = value
         if self.has_topo_data():
@@ -157,7 +157,7 @@ class GeoSetup(object):
     @tr.setter
     def tr(self, value):
         if not isinstance(value, GeoPoint):
-            raise TypeError("Could not set top right coordinate in "
+            raise ValueError("Could not set top right coordinate in "
                             "GeoSetup: need GeoPoint object")
         self.points["tr"] = value
         if self.has_topo_data():
@@ -406,7 +406,11 @@ class GeoSetup(object):
             self.points[pt.name] = pt
             if (isinstance(self.topo_data, TopoData) and
                 not isinstance(pt.topo_data, TopoData)):
-                pt.set_topo_data(self.topo_data)
+                try:
+                    pt.set_topo_data(self.topo_data)
+                except OutOfDomain:
+                    if assert_in_domain:
+                        raise
 
 
     def add_geo_points(self, *pts, assert_in_domain=False) -> None:
