@@ -8,17 +8,7 @@ Creating basemaps including topographic data and some further features
 
 import geonum
 from numpy import mean
-from matplotlib.pyplot import close, subplots, show
-from os.path import join, exists
-from os import getcwd
-from SETTINGS import OPTPARSE
-from numpy import testing as npt
-
-### Set save directory for figures
-save_path = join(getcwd(), "scripts_out")
-
-close("all")
-exceptions = []
+from matplotlib.pyplot import close, subplots
 
 def create_map_and_load_topodata():
     """Create and return map object around Guallatiri volcano"""
@@ -78,16 +68,6 @@ def add_points_and_plot_map(basemap):
     # just some little adjustment of the 3D viewing direction
     basemap.ax.view_init(20, 240)
 
-
-    # save the 3D figure
-    print(("Save path: %s (exists: %s)" %(save_path, exists(save_path))))
-
-    try:
-        basemap.ax.figure.savefig(join(save_path, "ex3_out_1_map3D.png"))
-    except Exception as e:
-        exceptions.append("Failed to save first plot...%s" %repr(e))
-
-
     fig, ax = subplots(1,1)
 
     # update the axes object in the map
@@ -106,49 +86,11 @@ def add_points_and_plot_map(basemap):
     # You can include a polygon connecting different points (for whatever
     # reason)
     basemap.add_polygon_2d([summit, p2, p1], fc="lime", alpha=0.2)
-    try:
-        basemap.ax.figure.savefig(join(save_path, "ex3_out_2_map2D.png"))
-    except Exception as e:
-        exceptions.append("Failed to save second plot... %s" %repr(e))
-    for e in exceptions:
-        print(e)
 
 if __name__ == "__main__":
+    close('all')
     if not geonum.BASEMAP_AVAILABLE:
-        raise ImportError('Cannot run script. Basemap is not installed')
-    m = create_map_and_load_topodata()
-    add_points_and_plot_map(m)
-
-    # Import script options
-    (options, args) = OPTPARSE.parse_args()
-
-    # If applicable, do some tests. This is done only if TESTMODE is active:
-    # testmode can be activated globally (see SETTINGS.py) or can also be
-    # activated from the command line when executing the script using the
-    # option --test 1
-    if int(options.test):
-        from os.path import basename
-        npt.assert_array_equal([m.topo_data.data.shape],
-                               [(110, 122)])
-
-
-        actual = [m.topo_data.data.mean(),
-                  m.delta_lat,
-                  m.delta_lon]
-
-        actual.extend(m.get_map_center())
-        npt.assert_allclose(actual=actual,
-                            desired=[4982.759463487,
-                                     0.089999999999,
-                                     0.100000000000,
-                                     -18.43500000000,
-                                     -69.10000000000],
-                            rtol=1e-7)
-        print(("All tests passed in script: %s" %basename(__file__)))
-    try:
-        if int(options.show) == 1:
-            show()
-    except:
-        print("Use option --show 1 if you want the plots to be displayed")
-
-
+        print('Cannot run example script 3. Basemap is not installed')
+    else:
+        m = create_map_and_load_topodata()
+        add_points_and_plot_map(m)
