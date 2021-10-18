@@ -21,34 +21,31 @@ GeoVector3D
    :members:
    :undoc-members:
 
-Analysis and processing
-=======================
-
-GeoSetup class
---------------
+GeoSetup
+========
 
 .. automodule:: geonum.geosetup
    :members:
    :undoc-members:
 
-ElevationProfile class
-----------------------
+Elevation profiles
+==================
 
 .. automodule:: geonum.elevationprofile
    :members:
    :undoc-members:
 
 Further processing tools
-------------------------
+========================
 
 .. automodule:: geonum.processing
    :members:
    :undoc-members:
 
-Topographic data (access, import and processing)
-================================================
+Topographic data
+================
 
-Access of topographic data
+Access to topographic data
 --------------------------
 
 .. automodule:: geonum.topodataaccess
@@ -90,12 +87,14 @@ Custom exceptions
    :members:
    :undoc-members:
 
-Plotting (creating 2D and 3D Basemaps)
-======================================
+Plotting
+========
 
 .. note::
 
-  The `geonum.mapping <https://github.com/jgliss/geonum/blob/master/geonum/mapping.py>`__ cannot be compiled by RTD since mpl_toolkits.basemap needed to be mocked out in order for the compile process to work at all. No fix found yet...(apologies for any inconveniences).
+  The current plotting routines are deprecated
+  as they are based on the basemap library. They
+  will be revised and replaced in parts using cartopy.
 
 .. automodule:: geonum.mapping
    :members:
