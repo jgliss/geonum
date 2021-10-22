@@ -98,3 +98,5 @@ _private
 .idea
 
 .pytest_cache
+
+docs/auto_examples

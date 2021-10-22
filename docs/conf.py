@@ -32,13 +32,6 @@ try:
 except ImportError:
     from mock import Mock
 
-# =============================================================================
-# class Mock(MagicMock):
-#     @classmethod
-#     def __getattr__(cls, name):
-#         return Mock()
-# =============================================================================
-
 MOCK_MODULES = [
   'mpl_toolkits.basemap'
 ]
@@ -68,8 +61,9 @@ extensions = [
     'sphinx.ext.imgmath',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
-	  'sphinx.ext.graphviz',
-    'sphinxcontrib.napoleon']
+	'sphinx.ext.graphviz',
+    'sphinxcontrib.napoleon',
+    'sphinx_gallery.gen_gallery']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -344,4 +338,9 @@ autodoc_member_order = 'bysource'
 images_config = {
     'default_image_width' : '300px',
     'default_group'       : 'default'
+}
+
+sphinx_gallery_conf = {
+     'examples_dirs': '../examples',   # path to your example scripts
+     'gallery_dirs': 'auto_examples',  # path to where to save gallery generated output
 }

@@ -21,6 +21,7 @@ Official code documentation web page of geonum (`GitHub <https://github.com/jgli
 
    intro
    examples
+   auto_examples/index
    api
 
 Indices and tables
