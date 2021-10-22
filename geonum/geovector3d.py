@@ -68,13 +68,14 @@ class GeoVector3D(GeoVector):
         
         """
         self.name = name
-        if any(x == None for x in [dx, dy]): # If only initial_heading and distance are given
+        if all(x is not None for x in [dx, dy]): # If only dx and dy are given
+            self.dx = dx
+            self.dy = dy
+        elif all(x is not None for x in [azimuth, dist_hor]): # If only
+            # azimuth and distance are given
             theta_rad = radians(self._angle_or_heading(azimuth))
             self.dx = dist_hor * cos(theta_rad)
             self.dy = dist_hor * sin(theta_rad)
-        elif azimuth == None and dist_hor == None: # If only dx and dy are given
-            self.dx = dx
-            self.dy = dy
         else:
             raise ValueError('invalid input')
         #Check input for altitude difference dz
