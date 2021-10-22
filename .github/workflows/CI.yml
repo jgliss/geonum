@@ -40,3 +40,9 @@ jobs:
       with:
           file: ./coverage.xml
           flags: unittests
+    - name: Run example scripts
+      run: |
+        python scripts/ex1_basic_objects.py
+        python scripts/ex2_geosetup_intro.py
+        python scripts/ex4_elevation_profiles.py
+        python scripts/ex5_topodata.py
