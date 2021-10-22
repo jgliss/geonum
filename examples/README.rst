@@ -1,2 +1,2 @@
-geonum example gallery
-======================
+Examples
+========
