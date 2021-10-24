@@ -112,6 +112,3 @@ _ = ax.annotate(etna.name,
             arrowprops=dict(color='black', lw=1, arrowstyle='->', ),
             ha='left', size=11
             )
-
-import matplotlib.pyplot as plt
-plt.show()

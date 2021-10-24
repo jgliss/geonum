@@ -294,15 +294,28 @@ class GeoSetup(object):
             self.load_topo_data()
         return self.topo_data
 
-    def load_topo_data(self):
+    def load_topo_data(self, topo_access_mode=None):
         """Load topography data
 
-        .. note::
+        Note
+        ----
 
-            The loaded :class:`TopoData` object will also be set in all
-            :class:`GeoPoint` objects belonging to this setup
+        The loaded :class:`TopoData` object will also be set in all
+        :class:`GeoPoint` objects belonging to this setup
 
+        Parameters
+        ----------
+        topo_access_mode : str, optional
+            topo dataset that is supposed to be used. If None, then
+            :attr:`topo_access_mode` is used.
+
+        Returns
+        -------
+        TopoData
+            topographic data (is also assigned to :attr:`topo_data`).
         """
+        if topo_access_mode is not None:
+            self.topo_access_mode = topo_access_mode
         if "ll" not in self.points:
             self.set_borders_from_points()
         self.topo_data = self.topo_access.get_data(self.ll.latitude,
@@ -311,6 +324,8 @@ class GeoSetup(object):
                                                    self.tr.longitude)
         for p in list(self.points.values()):
             p.set_topo_data(self.topo_data)
+
+        return self.topo_data
 
 
     def has_point(self, name):
