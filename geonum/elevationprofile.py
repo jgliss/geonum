@@ -619,12 +619,14 @@ class ElevationProfile(object):
         if ax is None:
             from matplotlib.pyplot import subplots
             fig, ax = subplots(1,1)
-        ax.fill_between(self.dists, self.profile, facecolor="#994d00",
+        dists = self.dists
+        ax.fill_between(dists, self.profile, facecolor="#994d00",
                         alpha=0.20)
         ax.set_xlabel("Distance [km]")
         ax.set_ylabel("Altitude [m]")
         ax.set_ylim([self.min - .1 * self.alt_range,
                      self.max + .1 * self.alt_range])
+        ax.set_xlim([0, dists[-1]])
         return ax
 
     def __call__(self, dist):
