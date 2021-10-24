@@ -2,4 +2,6 @@ scipy
 matplotlib
 LatLon23
 SRTM.py
+pyproj
+cython
 cartopy
