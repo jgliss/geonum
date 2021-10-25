@@ -106,45 +106,36 @@ _ = ax.annotate(
     transform=crs.PlateCarree(),
     xy=(etna.longitude, etna.latitude), # location of observatory in plot
     xytext=(etna.longitude, etna.latitude-0.05),
-            arrowprops=dict(color='black', lw=1, arrowstyle='->', ),
-            ha='center', size=7
-            )
+    arrowprops=dict(color='black', lw=1, arrowstyle='->'),
+    ha='center', size=7
+    )
 
 _ = ax.annotate(
     observatory.name,
     transform=crs.PlateCarree(),
     xy=(observatory.longitude, observatory.latitude), # location of observatory in plot
     xytext=(observatory.longitude, observatory.latitude+0.03),
-            arrowprops=dict(color='black', lw=1, arrowstyle='->', ),
-            ha='left', size=7
-            )
+    arrowprops=dict(color='black', lw=1, arrowstyle='->'),
+    ha='left', size=7
+    )
 
 
 # Set title
 ax.set_title(domain.id)
 
 # Calculate x and y ticks and add them
-pot_lon = np.floor(np.log10(domain.delta_lon))
-lon_tick = np.floor(domain.delta_lon / 10 ** pot_lon) * 10 ** pot_lon / 4
+from _helpers_plot import get_map_ticks
 
-pot_lat = np.floor(np.log10(domain.delta_lat))
-lat_tick = np.floor(domain.delta_lat / 10 ** pot_lat) * 10 ** pot_lat / 3
+lat_ticks, lon_ticks = get_map_ticks(domain.lat_ll,
+                                     domain.lon_ll,
+                                     domain.lat_tr,
+                                     domain.lon_tr)
 
-lon_tick_array = np.arange(
-    lon_tick*int((domain.lon_ll - domain.delta_lon * 0.3)/lon_tick),
-    lon_tick*int((domain.lon_tr+domain.delta_lon * 0.3)/lon_tick),
-    lon_tick)
-
-lat_tick_array = np.arange(
-    lat_tick*int((domain.lat_ll - domain.delta_lat * 0.3)/lat_tick),
-    lat_tick*int((domain.lat_tr+domain.delta_lat * 0.3)/lat_tick),
-    lat_tick)
-
-ax.set_xticks(lon_tick_array, crs=crs.PlateCarree())
+ax.set_xticks(lon_ticks, crs=crs.PlateCarree())
 lon_formatter = cticker.LongitudeFormatter()
 ax.xaxis.set_major_formatter(lon_formatter)
 
-ax.set_yticks(lat_tick_array, crs=crs.PlateCarree())
+ax.set_yticks(lat_ticks, crs=crs.PlateCarree())
 lat_formatter = cticker.LatitudeFormatter()
 ax.yaxis.set_major_formatter(lat_formatter)
 
