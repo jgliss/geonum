@@ -44,6 +44,7 @@ domain.add_geo_point(observatory)
 #%%
 #
 # Load topographic data using SRTM database
+# -----------------------------------------
 topo = domain.load_topo_data(topo_access_mode='srtm')
 
 #%%
