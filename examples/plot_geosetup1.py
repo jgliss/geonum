@@ -57,8 +57,7 @@ import cartopy.mpl.ticker as cticker
 import cartopy.crs as crs
 
 # Initiate figure and cartopy GeoAxes for map plot
-fig = plt.figure(figsize=(10,6))
-ax = fig.add_subplot(1,1,1, projection=crs.PlateCarree())
+ax = geonum.plot_helpers.init_figure_with_geoaxes()
 
 # Create meshgrid for domain for contour plot
 x = topo.longitude
@@ -76,7 +75,7 @@ pdata = ax.contourf(X, Y, landdata, 50,
             cmap='Oranges')
 
 # Add colorbar
-cb = fig.colorbar(pdata, label='Altitude [m]')
+cb = ax.figure.colorbar(pdata, label='Altitude [m]')
 
 # Plot sea in a light blue
 ax.contourf(X, Y, seadata, 50,
@@ -94,8 +93,9 @@ ax.contour(X, Y, topo.data, 10,
 ax.scatter(
     x=[observatory.longitude, etna.longitude],
     y=[observatory.latitude, etna.latitude],
-    color='k',
-    marker='x',
+    color='w',
+    marker='o',
+    facecolor='none',
     s=16,
     transform=crs.PlateCarree()
 )
@@ -106,8 +106,8 @@ _ = ax.annotate(
     transform=crs.PlateCarree(),
     xy=(etna.longitude, etna.latitude), # location of observatory in plot
     xytext=(etna.longitude, etna.latitude-0.05),
-    arrowprops=dict(color='black', lw=1, arrowstyle='->'),
-    ha='center', size=7
+    arrowprops=dict(color='white', lw=1, arrowstyle='->', shrinkB=4),
+    ha='center', size=7, color='w', fontweight='bold'
     )
 
 _ = ax.annotate(
@@ -115,32 +115,17 @@ _ = ax.annotate(
     transform=crs.PlateCarree(),
     xy=(observatory.longitude, observatory.latitude), # location of observatory in plot
     xytext=(observatory.longitude, observatory.latitude+0.03),
-    arrowprops=dict(color='black', lw=1, arrowstyle='->'),
-    ha='left', size=7
+    arrowprops=dict(color='white', lw=1, arrowstyle='->', shrinkB=4),
+    ha='left', size=7, color='w', fontweight='bold'
     )
 
 
 # Set title
 ax.set_title(domain.id)
 
-# Calculate x and y ticks and add them
-from _helpers_plot import get_map_ticks
-
-lat_ticks, lon_ticks = get_map_ticks(domain.lat_ll,
-                                     domain.lon_ll,
-                                     domain.lat_tr,
-                                     domain.lon_tr)
-
-ax.set_xticks(lon_ticks, crs=crs.PlateCarree())
-lon_formatter = cticker.LongitudeFormatter()
-ax.xaxis.set_major_formatter(lon_formatter)
-
-ax.set_yticks(lat_ticks, crs=crs.PlateCarree())
-lat_formatter = cticker.LatitudeFormatter()
-ax.yaxis.set_major_formatter(lat_formatter)
-
 # Set x and y limits
 ax.set_xlim([domain.ll.longitude, domain.tr.longitude])
 ax.set_ylim([domain.ll.latitude, domain.tr.latitude])
 
+ax = geonum.plot_helpers.set_map_ticks(ax)
 plt.show()
