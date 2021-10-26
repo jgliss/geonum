@@ -1,3 +1,4 @@
-sphinx_rtd_theme
-sphinxcontrib-napoleon
-sphinx-gallery
+sphinx>=4
+sphinx_rtd_theme>=1
+sphinxcontrib-napoleon>=0.7
+sphinx-gallery>=0.10
