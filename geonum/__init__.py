@@ -27,10 +27,11 @@ __dir__, __version__ = _init_dir_and_version()
 from . import exceptions
 from . import helpers
 from . import atmosphere
+from . import plot_helpers
+
 from .topodata import TopoData
 from .topodataaccess import TopoDataAccess
 from .topoaccessbase import delete_all_local_srtm_files
-
 
 from .geopoint import GeoPoint
 from .geovector3d import GeoVector3D

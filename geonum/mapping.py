@@ -26,9 +26,16 @@ import numpy as np
 from geonum.topodataaccess import TopoDataAccess
 from geonum.topodata import TopoData
 from geonum.exceptions import TopoAccessError
-from geonum.helpers import haversine_formula, shifted_color_map, exponent
+from geonum.helpers import haversine_formula, shifted_color_map, order_of_magnitude
 
 from geonum import CV2_AVAILABLE
+import warnings
+warnings.warn(DeprecationWarning('geonum.mapping module is deprecated '
+                                 'since it is based on the deprecated '
+                                 'basemap library. It is in the process of '
+                                 'being replaced using cartopy instead. See '
+                                 'geonum.helpers_plot and example scripts '
+                                 'for plot functionality.'))
 
 class Map(Basemap):
     """Basemap object for drawing and plotting (on) a map
@@ -285,7 +292,7 @@ class Map(Basemap):
 
 
             delz = z_max - z_min #in m
-            exp = exponent(delz) - 1
+            exp = order_of_magnitude(delz) - 1
             start_alt = round((z_min - delz*0.1)*10**(-exp))*10**exp
             stop_alt = round((z_max + delz*0.1)*10**(-exp))*10**exp
             if z_min > 0:
@@ -310,7 +317,7 @@ class Map(Basemap):
 
             if insert_colorbar:
                 self.insert_colorbar("topo", cs2, label="Altitude [m]")
-                exp = exponent(delz)
+                exp = order_of_magnitude(delz)
                 step = round(delz*10**(-exp))*10**(exp-1)
                 self.set_ticks_topo_colorbar(start_alt, stop_alt, step)
         except Exception as e:
@@ -400,7 +407,7 @@ class Map(Basemap):
             ones will be set automatically)
         """
         l = self._len_diag()
-        exp = exponent(l)
+        exp = order_of_magnitude(l)
         l = round(l * 10**(-exp))*10**(exp)/5.0
         lat_center, lon_center = self.get_map_center()
         str_format = '%d'

@@ -23,7 +23,31 @@ import os
 import numpy as np
 from geonum import TOPO_INFO_FILE, LOCAL_TOPO_DIR
 
-exponent = lambda num: np.int(np.floor(np.log10(np.abs(num))))
+def order_of_magnitude(num):
+    """
+    Get exponent precision of input number
+
+    E.g. 1 if input number is 14.2, 0 if input number is 3 or -1 if input
+    number is 0.1.
+
+    Note
+    ----
+    The order of magnitude here is calculated using floor(log10(num)), thus,
+    num=9, would result in a value of 0, in contrary to other definitions (
+    e.g. https://en.wikipedia.org/wiki/Order_of_magnitude).
+
+    Parameters
+    ----------
+    num : float
+        input number
+
+    Returns
+    -------
+    int
+        order of magnitude of input number
+
+    """
+    return int(np.floor(np.log10(np.abs(num))))
 
 def all_topodata_search_dirs():
     """Returns a list of all directories that are searched for topography data

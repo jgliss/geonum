@@ -1,18 +1,15 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Feb 22 15:11:33 2021
-
-@author: jonasg
-"""
-
 import pytest
 import os, shutil
 import numpy as np
 import numpy.testing as npt
 from geonum import LOCAL_TOPO_DIR, TOPO_INFO_FILE
-from geonum.conftest import does_not_raise_exception
 from geonum import helpers as h
+
+@pytest.mark.parametrize('num,result', [
+    (10, 1), (1000, 3), (1.2,0), (0.023, -2)
+])
+def test_order_of_magnitude(num,result):
+    assert h.order_of_magnitude(num) == result
 
 def test_all_topodata_search_dirs():
     all_dirs = h.all_topodata_search_dirs()
