@@ -340,7 +340,14 @@ images_config = {
     'default_group'       : 'default'
 }
 
+from sphinx_gallery.sorting import FileNameSortKey
+
 sphinx_gallery_conf = {
      'examples_dirs': '../examples',   # path to your example scripts
      'gallery_dirs': 'auto_examples',  # path to where to save gallery generated output
+     'within_subsection_order': FileNameSortKey,
+     'reference_url': {
+         # The module you locally document uses None
+        'sphinx_gallery': None,
+    }
 }

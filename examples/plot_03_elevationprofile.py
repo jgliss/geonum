@@ -19,6 +19,8 @@ This script guides through some of the core features of geonum, including:
 """
 
 #%%
+import matplotlib
+matplotlib.rcParams['savefig.dpi'] = 300
 import geonum
 
 #%%
@@ -84,11 +86,14 @@ print(altitudes)
 print(eprof.dists)
 
 #%%
-# Plot the profile and annotate the names of both GeoPoints
+# Plot the profile
+# ----------------
 #
 # On the x-axis, the distances are plotted, and on the y-axis,
 # the corresponding altitude values that were retrieved from the SRTM dataset.
 ax = eprof.plot()
+
+# add title
 ax.set_title('Etna summit region')
 
 # Add name of the observatory location to the plot

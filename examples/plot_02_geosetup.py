@@ -5,6 +5,8 @@ Introduction to GeoSetup class
 """
 
 #%%
+import matplotlib
+matplotlib.rcParams['savefig.dpi'] = 300
 import geonum
 
 #%%

@@ -6,6 +6,8 @@ Introduction to GeoPoint and GeoVector3D.
 """
 
 #%%
+import matplotlib
+matplotlib.rcParams['savefig.dpi'] = 300
 import geonum
 
 #%%
