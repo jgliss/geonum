@@ -56,8 +56,9 @@ topo = domain.load_topo_data(topo_access_mode='srtm')
 #
 # .. note::
 #   the plotting features of geonum currently undergo revision,
-#   and the API shown below is not finalised yet and may change. For details
-#   see here: https://github.com/jgliss/geonum/issues/4
+#   and thus, parts of the geonum plot API (geonum.plot_helpers) shown below
+#   is not finalised yet and may change. For details and updates related to
+#   the revision, see here: https://github.com/jgliss/geonum/issues/4
 
 import matplotlib.pyplot as plt
 
