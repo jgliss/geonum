@@ -125,7 +125,7 @@ def set_map_ticks(ax, xticks=None, yticks=None, tick_format=None):
         xticks, yticks = _calculate_map_ticks(ax)
 
     if tick_format is None:
-        tick_format = _get_tick_formatter(xticks[0])
+        tick_format = _get_tick_formatter(np.mean(xticks))
 
     ax.set_xticks(xticks, crs=crs.PlateCarree())
     ax.set_yticks(yticks, crs=crs.PlateCarree())
@@ -191,17 +191,33 @@ def plot_geopoint_into_map(ax, p, annotate=True, annot_kwargs=None, **kwargs):
     if annot_kwargs is None:
         annot_kwargs = {}
 
-    ax.scatter(x=[p.longitude],y=[p.latitude],**kwargs)
+    ax.scatter(x=[p.longitude],y=[p.latitude], **kwargs)
 
     if annotate:
         annot_loc = _infer_text_location(ax,p)
+        try:
+            c = kwargs['color']
+        except KeyError:
+            c = 'k'
         annot = dict(
             text = p.name,
             xy = (p.longitude,
                   p.latitude),  # location of observatory in plot
-            arrowprops = dict(color='white', lw=1, arrowstyle='->', shrinkB=4),
-            size=7, color='w', fontweight='bold', **annot_loc
+            arrowprops = dict(color=c, lw=1, arrowstyle='->', shrinkB=4),
+            size=7, color=c, fontweight='bold', **annot_loc
         )
         annot.update(annot_kwargs)
         ax.annotate(**annot)
+    return ax
+
+def plot_geovector3d_into_map(ax, vec, **kwargs):
+    if vec.anchor is None:
+        raise AttributeError(
+            f'input vector {vec} does not have an anchor point assigned. '
+            f'Please set anchor location using vec.add_anchor')
+
+    start = vec.anchor
+    end = start + vec
+    ax.plot([start.longitude, end.longitude],
+            [start.latitude, end.latitude], **kwargs)
     return ax

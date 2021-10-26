@@ -203,10 +203,7 @@ class GeoVector3D(GeoVector):
         map.draw_geo_vector_3d(self, **kwargs)
         if add_anchor:
             self.anchor.plot(map, add_name=True, dz_text=self.dz*.1)
-        
-    """Redifining magic methods from base class :class:`GeoVector` object for
-    3D calcs
-    """
+
     def __call__(self):
         """Call function
         
@@ -221,7 +218,19 @@ class GeoVector3D(GeoVector):
     def __neg__(self):
         """Returns negative of this vector"""
         return GeoVector3D(-self.dx, -self.dy, -self.dz)
-    
+
+    def __truediv__(self, other):
+        if isinstance(other, GeoVector3D):
+            dx = self.dx / other.dx
+            dy = self.dy / other.dy
+            dz = self.dz / other.dz
+        else:
+            dx = self.dx / other
+            dy = self.dy / other
+            dz = self.dz / other
+        return GeoVector3D(dx,dy,dz)
+
+
     def __add__(self, other):
         """Add another geo vector
         
