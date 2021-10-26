@@ -14,6 +14,8 @@ import geonum
 # Create instance of Geosetup and specify domain by providing latitude and
 # longitude of lower left (ll) and top right (tr) coordinates. Here,
 # the summit region of the volcano Mt. Etna, Sicily, is used as an example.
+from geonum.plot_helpers import plot_topo_contourf
+
 domain = geonum.GeoSetup(id='Etna region (Sicily)',
                          lat_ll=37.5, lat_tr=38.0,
                          lon_ll=14.8, lon_tr=15.30)
@@ -51,81 +53,57 @@ topo = domain.load_topo_data(topo_access_mode='srtm')
 #
 # Make a beautiful map of the GeoSetup
 # ------------------------------------
+#
+# .. note::
+#   the plotting features of geonum currently undergo revision,
+#   and the API shown below is not finalised yet and may change. For details
+#   see here: https://github.com/jgliss/geonum/issues/4
+
 import matplotlib.pyplot as plt
-import numpy as np
-import cartopy.mpl.ticker as cticker
-import cartopy.crs as crs
 
 # Initiate figure and cartopy GeoAxes for map plot
 ax = geonum.plot_helpers.init_figure_with_geoaxes()
 
-# Create meshgrid for domain for contour plot
-x = topo.longitude
-y = topo.latitude
-X,Y = np.meshgrid(x, y)
+# Set x and y limits based on domain ranges
+ax.set_xlim([domain.ll.longitude, domain.tr.longitude])
+ax.set_ylim([domain.ll.latitude, domain.tr.latitude])
 
-# Separate land areas from sea areas for plotting below
-seamask = np.ma.masked_less_equal(topo.data, 0)
-landdata = np.ma.MaskedArray(topo.data, mask=seamask.mask)
-seadata = np.ma.MaskedArray(topo.data, mask=~seamask.mask)
+# Make a filled contour plot of the topography
+ax, pdata = plot_topo_contourf(
+    ax, # GeoAxes
+    topo, # geonum.TopoData
+    oceans_separate=True, # plot oceans in light blue
+    levels=50, # number of vertical levels
+    cmap='Oranges' # color map
+)
 
-# Plot topographic land data
-pdata = ax.contourf(X, Y, landdata, 50,
-            transform=crs.PlateCarree(),
-            cmap='Oranges')
 
 # Add colorbar
 cb = ax.figure.colorbar(pdata, label='Altitude [m]')
 
-# Plot sea in a light blue
-ax.contourf(X, Y, seadata, 50,
-            transform=crs.PlateCarree(),
-            colors='#e6f7ff')
-
 # Plot contour lines
-ax.contour(X, Y, topo.data, 10,
-                linestyles='--',
-                linewidths=0.1,
-                colors='k',
-                transform=crs.PlateCarree())
+ax.contour(
+    *topo.init_mesh(),
+    topo.data,
+    levels=10,
+    linestyles='--',
+    linewidths=0.1,
+    colors='k')
 
 # Plot the 2 GeoPoints that were added to the GeoSetup
-ax.scatter(
-    x=[observatory.longitude, etna.longitude],
-    y=[observatory.latitude, etna.latitude],
-    color='w',
-    marker='o',
-    facecolor='none',
-    s=16,
-    transform=crs.PlateCarree()
-)
+geonum.plot_helpers.plot_geopoint_into_map(ax,etna, color='w',
+        marker='o',
+        facecolor='none',
+        s=16,
+        annot_kwargs={'xytext': (etna.longitude, etna.latitude-0.05)})
 
-# Annotate names of the 2 GeoPoints
-_ = ax.annotate(
-    etna.name,
-    transform=crs.PlateCarree(),
-    xy=(etna.longitude, etna.latitude), # location of observatory in plot
-    xytext=(etna.longitude, etna.latitude-0.05),
-    arrowprops=dict(color='white', lw=1, arrowstyle='->', shrinkB=4),
-    ha='center', size=7, color='w', fontweight='bold'
-    )
-
-_ = ax.annotate(
-    observatory.name,
-    transform=crs.PlateCarree(),
-    xy=(observatory.longitude, observatory.latitude), # location of observatory in plot
-    xytext=(observatory.longitude, observatory.latitude+0.03),
-    arrowprops=dict(color='white', lw=1, arrowstyle='->', shrinkB=4),
-    ha='left', size=7, color='w', fontweight='bold'
-    )
-
+geonum.plot_helpers.plot_geopoint_into_map(ax,observatory, color='w',
+        marker='o',
+        facecolor='none',
+        s=16)
 
 # Set title
 ax.set_title(domain.id)
-
-# Set x and y limits
-ax.set_xlim([domain.ll.longitude, domain.tr.longitude])
-ax.set_ylim([domain.ll.latitude, domain.tr.latitude])
 
 ax = geonum.plot_helpers.set_map_ticks(ax)
 plt.show()

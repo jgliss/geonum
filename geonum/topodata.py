@@ -267,6 +267,16 @@ class TopoData(object):
         return (self.lats[0] + self.delta_lat / 2.,
                 self.lons[0] + self.delta_lon / 2.)
 
+    def init_mesh(self):
+        """
+        Init X,Y meshgrid from latitudes and longitudes for map plots
+
+        Returns
+        -------
+        list
+            meshgrid
+        """
+        return np.meshgrid(self.longitude, self.latitude)
     def plot(self, plot3d=True, draw_coastlines=False,
              draw_mapscale=False, **kwargs):
         from geonum.mapping import Map

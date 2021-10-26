@@ -140,3 +140,68 @@ def set_map_ticks(ax, xticks=None, yticks=None, tick_format=None):
     ax.yaxis.set_major_formatter(lat_formatter)
 
     return ax
+
+def _infer_text_location(ax,p):
+    info = dict(ha='center')
+    left,right = ax.get_xlim()
+    dx = right - left
+    bottom,top = ax.get_ylim()
+    dy = top - bottom
+    lat, lon = p.latitude, p.longitude
+    distleft = abs(left - lon) / dx
+    if distleft < 0.3:
+        info['ha'] = 'left'
+    elif distleft > 0.7:
+        info['ha'] = 'right'
+
+    yoffs = dy*0.08 # put text 5% of range above or below the points latitude
+    distbottom = abs(bottom - lat) / dx
+    if distbottom > 0.6: # point is in upper 40% of map, put text below
+        yoffs *= -1
+    info['xytext'] = (lon, lat+yoffs)
+    return info
+
+def plot_topo_contourf(ax, topo, oceans_separate=True, levels=50, cmap=None):
+    if cmap is None:
+        cmap = 'Oranges'
+
+    # Create meshgrid for domain for contour plot
+    X,Y = topo.init_mesh()
+
+    # Separate land areas from sea areas for plotting below
+    if oceans_separate:
+        seamask = np.ma.masked_less_equal(topo.data, 0)
+        data = np.ma.MaskedArray(topo.data, mask=seamask.mask)
+        if np.any(seamask):
+            seadata = np.ma.MaskedArray(topo.data, mask=~seamask.mask)
+            # Plot sea in a light blue
+            ax.contourf(X, Y, seadata, 50,
+                        colors='#e6f7ff')
+    else:
+        data = topo.data
+
+    # Plot topographic land data
+    pdata = ax.contourf(X, Y, data, levels=levels,
+                cmap=cmap)
+
+    return ax, pdata
+
+def plot_geopoint_into_map(ax, p, annotate=True, annot_kwargs=None, **kwargs):
+
+    if annot_kwargs is None:
+        annot_kwargs = {}
+
+    ax.scatter(x=[p.longitude],y=[p.latitude],**kwargs)
+
+    if annotate:
+        annot_loc = _infer_text_location(ax,p)
+        annot = dict(
+            text = p.name,
+            xy = (p.longitude,
+                  p.latitude),  # location of observatory in plot
+            arrowprops = dict(color='white', lw=1, arrowstyle='->', shrinkB=4),
+            size=7, color='w', fontweight='bold', **annot_loc
+        )
+        annot.update(annot_kwargs)
+        ax.annotate(**annot)
+    return ax
