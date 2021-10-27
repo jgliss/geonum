@@ -20,24 +20,24 @@ Module for atmospheric calculations relevant for geonum
 
 from numpy import deg2rad, cos, ndarray, meshgrid, pi, exp, log
 
-#: Pressure at sea level [Pa]
+#: Pressure at sea level, Unit [Pa]
 p0 = 101325.0
 
-#: Avogadro constant [mol-1]
+#: Avogadro constant, Unit [mol-1]
 NA = 6.022140857e+23
 
-#: Standard sea level temperature [K]
+#: Standard sea level temperature, Unit [K]
 T0_STD = 288.15
 
-#: Average molar mass of air, Unit: [g mol-1]
+#: Average molar mass of air, Unit [g mol-1]
 M_AIR_AVG = 28.9645
 
-#: Gas constant (U.S. standard atmosphere) [Nm mol-1 K-1]
+#: Gas constant (U.S. standard atmosphere), Unit [Nm mol-1 K-1]
 R_STD = 8.31432
 
-#: Atmospheric lapse rate (Standard atmosphere) [K m-1]
+#: Atmospheric lapse rate (Standard atmosphere), Unit [K m-1]
 L_STD_ATM = -6.5e-3
-#: Atmospheric lapse rate (dry atmosphere) [K m-1]
+#: Atmospheric lapse rate (dry atmosphere), Unit [K m-1]
 L_DRY_AIR = -9.8e-3
 
 def _g0(phi=0.0):
@@ -54,7 +54,7 @@ def _g0(phi=0.0):
     Returns
     -------
     float or ndarray
-        value(s) of Earth gravitational accelaration at sea level for input
+        value(s) of Earth gravitational acceleration at sea level for input
         latitude(s)
     """
     return 9.806160 * (1 - 0.0026373 * cos(2 * phi)
@@ -82,7 +82,7 @@ def g(lat=45.0, alt=0.0):
     Returns
     -------
     float or ndarray
-        value(s) of Earth gravitational accelaration at sea level for input
+        Value(s) of Earth gravitational accelaration at sea level for input
         latitude(s) and altitude(s). If both inputs are arrays, then a 2D array
         is returned with the first axis (index 0) corresponding to altitudes
         and second axis to latitude
@@ -91,6 +91,7 @@ def g(lat=45.0, alt=0.0):
     --------
 
     >>> import geonum
+    >>> import numpy as np
     >>> lats = np.linspace(0, 90, 200)
     >>> alts = np.linspace(0, 1000, 100)
     >>> dat = geonum.atmosphere.g(lats, alts)
@@ -118,7 +119,7 @@ def g0(lat=45.0):
     Returns
     -------
     float or ndarray
-        value(s) of Earth gravitational accelaration at sea level for input
+        Value(s) of Earth gravitational accelaration at sea level for input
         latitude(s) and altitude(s). If both inputs are arrays, then a 2D array
         is returned with the first axis (index 0) corresponding to altitudes
         and second axis to latitude
@@ -155,7 +156,7 @@ def temperature(alt=0.0, ref_temp=T0_STD, ref_alt=0.0, lapse_rate=L_STD_ATM):
     Returns
     -------
     float or ndarray
-        temperature(s) in K corresponding to altitudes
+        Temperature(s) in K corresponding to altitudes
     """
     return float(ref_temp) + float(lapse_rate) * (alt - float(ref_alt))
 
@@ -165,7 +166,7 @@ def beta_exp(mol_mass=M_AIR_AVG, lapse_rate=L_STD_ATM, lat=45.0):
     Based on barometric height formula (see e.g. `wikipedia <https://en.
     wikipedia.org/wiki/Barometric_formula>`__) for details.
 
-    **Formula: **
+    **Formula:**
 
     .. math::
 
@@ -214,8 +215,6 @@ def pressure(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
         - :math:`$h$` is the altitude in m
         - :math:`$h_{ref}$` is a reference altitude
 
-
-
     Parameters
     ----------
     alt : float or ndarray
@@ -228,11 +227,11 @@ def pressure(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
     ref_alt : float, optional
         altitude corresponding to `ref_p`
     lapse_rate : float, optional
-        atmospheric lapse rate (in K / m)
+        atmospheric lapse rate (in K m-1)
     mol_mass : float, optional
-        molar mass of air
+        molar mass of air (in g mol-1)
     lat : float, optional
-        latitude for calculation of gravitational constant
+        latitude in decimal degrees for calculation of gravitational constant
 
     Returns
     -------
@@ -253,22 +252,10 @@ def pressure_hPa(alt=0.0, *args, **kwargs):
     ----------
     alt : float or ndarray
         altitude(s) in m
-    ref_p : float, optional
-        reference pressure (default is std atm sea level)
-    ref_temp : float, optional
-        reference temperature in K corresponding to `ref_p`
-        (default is std atm sea level)
-    ref_alt : float, optional
-        altitude corresponding to `ref_p`
-    lapse_rate : float, optional
-        atmospheric lapse rate (in K / m)
-    mol_mass : float, optional
-        molar mass of air
-    lat : float, optional
-        latitude for calculation of gravitational constant
-    temp : float, optional
-        if unspecified (default), the temperature is calculated using
-        :func:`temperature`
+    *args
+        non-keyword args parsed to :func:`pressure`
+    **kwargs
+        keyword args parsed to :func:`pressure`
 
     Returns
     -------
@@ -379,8 +366,9 @@ def air_density(alt=0.0, temp=None, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
     p = pressure(alt, ref_p, ref_temp, ref_alt, lapse_rate,mol_mass, lat)
     return p * mol_mass / (R_STD * temp)
 
-def air_number_density(alt=0.0, temp=None, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
-                   lapse_rate=L_STD_ATM, mol_mass=M_AIR_AVG, lat=45.0):
+def air_number_density(alt=0.0, temp=None, ref_p=p0, ref_temp=T0_STD,
+                       ref_alt=0.0, lapse_rate=L_STD_ATM,
+                       mol_mass=M_AIR_AVG, lat=45.0):
     """Get atmospheric number density in m-3
 
     Parameters
@@ -433,11 +421,11 @@ def refr_idx_300ppm_co2(lbda_mu=0.300):
         return 1 + (5791817 / (238.0185 - (1 / lbda_mu) ** 2) +
                     167909  / (57.362   - (1 / lbda_mu) ** 2)
                    ) * 10 ** (-8)
-    else:
-        return 1 + (8060.51 +
-                    2480990 / (132.274  - (1 / lbda_mu) ** 2) +
-                    17455.7 / (39.32957 - (1 / lbda_mu) ** 2)
-                   ) * 10 ** (-8)
+
+    return 1 + (8060.51 +
+                2480990 / (132.274  - (1 / lbda_mu) ** 2) +
+                17455.7 / (39.32957 - (1 / lbda_mu) ** 2)
+               ) * 10 ** (-8)
 
 def refr_idx(lbda_mu=0.300, co2_ppm=400.0):
     """Calculate refr. index of atm for varying CO2 amount
@@ -565,20 +553,3 @@ def rayleigh_vol_sc_coeff(alt=0.0, lbda_mu=0.300, co2_ppm=400.0, **kwargs):
     """
     num_dens = air_number_density(alt, **kwargs) * 100**(-3) # cm^-3
     return num_dens * sigma_rayleigh(lbda_mu, co2_ppm)
-
-### deprecated stuff
-def density(*args,**kwargs):
-    from warnings import warn
-    warn(DeprecationWarning(
-        'method geonum.atmosphere.density was renamed to '
-        'geonum.atmosphere.air_density, please use the new name'
-        ))
-    return air_density(*args, **kwargs)
-
-def number_density(*args,**kwargs):
-    from warnings import warn
-    warn(DeprecationWarning(
-        'method geonum.atmosphere.number_density was renamed to '
-        'geonum.atmosphere.air_number_density, please use the new name'
-        ))
-    return air_number_density(*args, **kwargs)
