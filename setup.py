@@ -1,10 +1,4 @@
-# -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
-
-# Utility function to read the README file.
-# Used for the long_description.  It's nice, because now 1) we have a top level
-# README file and 2) it's easier to type in the README file than to put a raw
-# string in below ...
 
 with open('README.rst') as file:
     readme = file.read()
@@ -12,8 +6,6 @@ with open('README.rst') as file:
 with open("VERSION.rst") as f:
     version = f.readline()
     f.close()
-
-#with open(join("geonum","local_topo_data", "LOCAL_TOPO_PATHS.txt"), 'w'): pass
 
 setup(
     name        =   'geonum',
@@ -27,9 +19,6 @@ setup(
     include_package_data    =   True,
     package_data=   {'geonum'     :   ['local_topo_data/*.rst',
                                        'local_topo_data/*.txt']},
-    install_requires  =   [],
-    extras_require={},
-
     classifiers=[
         # How mature is this project? Common values are
         #   3 - Alpha
@@ -48,12 +37,7 @@ setup(
         # that you indicate whether you support Python 2, Python 3 or both.,
         'Programming Language :: Python :: 3'
     ],
-
-    #dependency_links    =   ["https://github.com/tkrajina/srtm.py/archive/v.0.3.1.zip#egg=srtm"],
-    #package_data={'geonum':['suppl/*.dat']},
     description = 'Toolbox for 3D geonumerical calculations and atmospheric composition',
     long_description = readme,
     long_description_content_type='text/x-rst'
-
-    #requires=['python (>= 2.7)', 'numpy', 'astropy'],
 )
