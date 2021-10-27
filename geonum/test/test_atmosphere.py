@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Geonum is a Python library for geographical calculations in 3D
 # Copyright (C) 2017 Jonas Gliss (jonasgliss@gmail.com)
 #
@@ -277,25 +275,3 @@ def test_rayleigh_vol_sc_coeff(alt,lbda_mu,co2_ppm,should_be):
     val = atm.rayleigh_vol_sc_coeff(alt,lbda_mu,co2_ppm)
     npt.assert_allclose(val, should_be, rtol=1e-5)
 
-@pytest.mark.filterwarnings('ignore')
-@pytest.mark.parametrize('alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat,should_be', [
-
-    (0,None,atm.p0,atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,1225.0033852145957)
-
-    ])
-def test_density(alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat,should_be):
-    val = atm.density(alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat)
-    npt.assert_allclose(val, should_be, rtol=1e-7)
-
-@pytest.mark.filterwarnings('ignore')
-@pytest.mark.parametrize('alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat,should_be', [
-
-    (0,None,atm.p0,atm.T0_STD,0,atm.L_STD_ATM,atm.M_AIR_AVG,45,2.5469602223632817e+25)
-    ])
-def test_number_density(alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat,should_be):
-    val = atm.number_density(alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat)
-    npt.assert_allclose(val, should_be, rtol=1e-7)
-
-if __name__ == "__main__":
-    import sys
-    pytest.main(sys.argv)
