@@ -93,6 +93,7 @@ def g(lat=45.0, alt=0.0):
     --------
 
     >>> import geonum
+    >>> import numpy as np
     >>> lats = np.linspace(0, 90, 200)
     >>> alts = np.linspace(0, 1000, 100)
     >>> dat = geonum.atmosphere.g(lats, alts)
@@ -435,11 +436,11 @@ def refr_idx_300ppm_co2(lbda_mu=0.300):
         return 1 + (5791817 / (238.0185 - (1 / lbda_mu) ** 2) +
                     167909  / (57.362   - (1 / lbda_mu) ** 2)
                    ) * 10 ** (-8)
-    else:
-        return 1 + (8060.51 +
-                    2480990 / (132.274  - (1 / lbda_mu) ** 2) +
-                    17455.7 / (39.32957 - (1 / lbda_mu) ** 2)
-                   ) * 10 ** (-8)
+
+    return 1 + (8060.51 +
+                2480990 / (132.274  - (1 / lbda_mu) ** 2) +
+                17455.7 / (39.32957 - (1 / lbda_mu) ** 2)
+               ) * 10 ** (-8)
 
 def refr_idx(lbda_mu=0.300, co2_ppm=400.0):
     """Calculate refr. index of atm for varying CO2 amount
