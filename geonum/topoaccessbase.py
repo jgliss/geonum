@@ -568,11 +568,3 @@ class SRTMAccess(TopoAccessBase):
 
         return TopoData(lats, lons, vals, data_id=self.topo_id)
 
-def delete_all_local_srtm_files():
-    """Deletes all locally stored SRTM files"""
-    import glob
-    from srtm.utils import FileHandler
-    fh = FileHandler()
-    for file in glob.glob(f'{fh.local_cache_dir}/*.hgt'):
-        print('Deleting SRTM data file at {}'.format(file))
-        os.remove(file)
