@@ -20,8 +20,10 @@ Official code documentation web page of geonum (`GitHub <https://github.com/jgli
    :maxdepth: 4
 
    intro
+   install
    examples
    api
+   upcoming
 
 Indices and tables
 ==================

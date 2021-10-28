@@ -32,17 +32,10 @@ try:
 except ImportError:
     from mock import Mock
 
-# =============================================================================
-# class Mock(MagicMock):
-#     @classmethod
-#     def __getattr__(cls, name):
-#         return Mock()
-# =============================================================================
-
 MOCK_MODULES = [
   'mpl_toolkits.basemap'
 ]
-#autodoc_mock_imports = ['mpl_toolkits']
+
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -68,7 +61,7 @@ extensions = [
     'sphinx.ext.imgmath',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
-	  'sphinx.ext.graphviz',
+	'sphinx.ext.graphviz',
     'sphinxcontrib.napoleon']
 
 # Add any paths that contain templates here, relative to this directory.

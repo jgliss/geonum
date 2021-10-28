@@ -3,13 +3,7 @@
 geonum is a python library for geo-numerical calculations
 =========================================================
 
-Website (ReadTheDocs): https://geonum.readthedocs.io/en/latest/
-
-Installation: https://geonum.readthedocs.io/en/latest/install.html
-
-Getting started: COMIN' SOON
-
-Contribute: https://geonum.readthedocs.io/en/latest/upcoming.html#contribute-to-geonum.html
+All you need to know: https://geonum.readthedocs.io/en/latest/
 
 .. |CI| image:: https://github.com/jgliss/geonum/actions/workflows/CI.yml/badge.svg
     :target: https://github.com/jgliss/geonum/actions/

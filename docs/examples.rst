@@ -1,7 +1,7 @@
 Example scripts
 ###############
 
-On this page, some exemplary example scripts are presented, the scripts 
+On this page, some example scripts are presented, the scripts
 are shipped with the code.
 
 Example 1 - Basic objects (GeoPoint, GeoVector3D)
