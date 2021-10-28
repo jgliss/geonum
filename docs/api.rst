@@ -1,6 +1,5 @@
-***
-API
-***
+API Reference
+#############
 
 Application programming interface of geonum.
 
@@ -77,22 +76,30 @@ Helper methods
    :members:
    :undoc-members:
 
+Utility functions
+=================
+
+.. automodule:: geonum.utils
+   :members:
+   :undoc-members:
+
+Plotting of maps
+================
+
+.. note::
+
+  The former map plotting routines routines (:mod:`geonum.mapping`)
+  are deprecated as they are based on the basemap library. They
+  will be revised and replaced in parts using cartopy. For details see:
+  https://github.com/jgliss/geonum/issues/4
+
+.. automodule:: geonum.mapping
+   :members:
+   :undoc-members:
+
 Custom exceptions
 =================
 
 .. automodule:: geonum.exceptions
-   :members:
-   :undoc-members:
-
-Plotting
-========
-
-.. note::
-
-  The current plotting routines are deprecated
-  as they are based on the basemap library. They
-  will be revised and replaced in parts using cartopy.
-
-.. automodule:: geonum.mapping
    :members:
    :undoc-members:

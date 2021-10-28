@@ -16,4 +16,4 @@ All you need to know: https://geonum.readthedocs.io/en/latest/
 
 .. |code-quality| image:: https://www.codefactor.io/repository/github/jgliss/geonum/badge
    :target: https://www.codefactor.io/repository/github/jgliss/geonum
-   :alt: CodeFactor
+   :alt: Code quality
