@@ -4,18 +4,15 @@ API
 
 Application programming interface of geonum.
 
-Base classes
-============
-
 GeoPoint
---------
+========
 
 .. automodule:: geonum.geopoint
    :members:
    :undoc-members:
 
 GeoVector3D
------------
+===========
 
 .. automodule:: geonum.geovector3d
    :members:
