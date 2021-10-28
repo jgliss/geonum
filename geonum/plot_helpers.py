@@ -125,7 +125,13 @@ def set_map_ticks(ax, xticks=None, yticks=None, tick_format=None):
         xticks, yticks = _calculate_map_ticks(ax)
 
     if tick_format is None:
-        tick_format = _get_tick_formatter(np.mean(xticks))
+        val = np.mean(xticks)
+        if val == 0:
+            val = xticks[next((i for i, x in enumerate(xticks) if x), None)]
+        if val != 0:
+            tick_format = _get_tick_formatter(val)
+        else:
+            tick_format = '.1f'
 
     ax.set_xticks(xticks, crs=crs.PlateCarree())
     ax.set_yticks(yticks, crs=crs.PlateCarree())

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Geonum is a Python library for geographical calculations in 3D
 # Copyright (C) 2017 Jonas Gliss (jonasgliss@gmail.com)
 #
@@ -54,8 +52,8 @@ class ElevationProfile(object):
                  calc_on_init=True, **kwargs):
 
         self._topo_data = None
-        self._observer = None #: coordinate of observer (start of profile)
-        self._endpoint = None #: coordinate of endpoint of profile
+        self._observer = None
+        self._endpoint = None
 
         self._check_set_observer(observer)
         self._check_set_endpoint(endpoint)
@@ -69,9 +67,9 @@ class ElevationProfile(object):
             self.det_profile(**kwargs)
 
     @property
-    def observer(self):
+    def observer(self) -> GeoPoint:
         """
-        GeoPoint: start coordinate of elevation profile
+        Start coordinate of elevation profile
         """
         return self._observer
 
@@ -81,9 +79,9 @@ class ElevationProfile(object):
         self._init_attrs()
 
     @property
-    def endpoint(self):
+    def endpoint(self) -> GeoPoint:
         """
-        GeoPoint: end coordinate of elevation profile
+        End coordinate of elevation profile
         """
         return self._endpoint
 
@@ -93,13 +91,17 @@ class ElevationProfile(object):
         self._init_attrs()
 
     @property
-    def topo_data(self):
+    def topo_data(self) -> TopoData:
         """
-        TopoData: topographic data used to extract elevation profile
+        Topographic data used to extract elevation profile
+
+        Note
+        ----
+        Attempts automatic retrieval of topographic data if the data is not
+        set.
         """
         if self._topo_data is None:
-            topo, _ = self.observer.get_topo_data(geo_point=self.endpoint)
-            self._topo_data = topo
+            self._topo_data = self._get_topo()
         return self._topo_data
 
     @topo_data.setter
@@ -108,9 +110,9 @@ class ElevationProfile(object):
         self._init_attrs()
 
     @property
-    def line(self):
+    def line(self) -> LineOnGrid:
         """
-        LineOnGrid: line along which the profile is calculated
+        Connection line between :attr:`observer` and :attr:`endpoint`
 
         Note
         ----
@@ -125,13 +127,13 @@ class ElevationProfile(object):
         return self._line
 
     @property
-    def observer_topogrid(self):
+    def observer_topogrid(self) -> GeoPoint:
         """
-        GeoPoint: Location of endpoint on topogrid (depends on topo resolution)
+        Location of endpoint on topogrid (depends on topo resolution)
 
         Note
         ----
-        private attribute that cannot be set by the user but is calculated
+        Cannot be set by the user but is calculated
         automatically based on attributes :attr:`observer` and
         :attr:`topo_data`.
         """
@@ -145,13 +147,13 @@ class ElevationProfile(object):
         return self._observer_topogrid
 
     @property
-    def endpoint_topogrid(self):
+    def endpoint_topogrid(self) -> GeoPoint:
         """
-        GeoPoint: Location of endpoint on topogrid (depends on topo resolution)
+        Location of endpoint on topogrid (depends on topo resolution)
 
         Note
         ----
-        private attribute that cannot be set by the user but is calculated
+        Cannot be set by the user but is calculated
         automatically based on attributes :attr:`endpoint` and
         :attr:`topo_data`.
         """
@@ -165,33 +167,29 @@ class ElevationProfile(object):
         return self._endpoint_topogrid
 
     @property
-    def dist_hor(self):
+    def dist_hor(self) -> float:
         """
-        float: Horizontal distance in km between start and endpoint
+        Horizontal distance in km between start and endpoint
         """
         return (self.endpoint_topogrid - self.observer_topogrid).dist_hor
 
 
     @property
-    def azimuth(self):
+    def azimuth(self) -> float:
         """
-        float: Azimuth angle of profile (wrt to North direction)
+        Azimuth angle of profile (wrt to North direction)
         """
         return (self.endpoint_topogrid - self.observer_topogrid).azimuth
 
     @property
-    def profile(self):
+    def profile(self) -> np.ndarray:
         """
-        Retrived altitude levels in m along :attr:`line`
+        Retrieved altitude levels in m along :attr:`line`
 
         Raises
         ------
         AttributeError
             if profile has not been calculated yet
-
-        Returns
-        -------
-        ndarray
         """
         if self._profile is None:
             raise AttributeError(
@@ -199,7 +197,7 @@ class ElevationProfile(object):
         return self._profile
 
     @property
-    def dists(self):
+    def dists(self) -> np.ndarray:
         """
         Distances from observer in km along :attr:`line`
 
@@ -207,10 +205,6 @@ class ElevationProfile(object):
         ------
         AttributeError
             if profile has not been calculated yet
-
-        Returns
-        -------
-        ndarray
         """
         if self._dists is None:
             raise AttributeError(
@@ -218,66 +212,54 @@ class ElevationProfile(object):
         return self._dists
 
     @property
-    def resolution(self):
-        """Get profile x (distance) resolution (averaged from distance array)
+    def resolution(self) -> float:
+        """Horizontal profile resolution (averaged from distance array)
 
         Note
         ----
         Only works if profile was already determined
-
-        Returns
-        -------
-        float
-            average resolution along horizontal dimension
-
         """
         return abs((self.dists[1:] - self.dists[:-1]).mean())
 
     @property
-    def gradient(self):
-        """Return gradient of profile
-
-        Uses numpy function ``gradient`` on :attr:`profile`
-
-        Returns
-        -------
-        ndarray
-
+    def gradient(self) -> np.ndarray:
+        """Gradient of profile at each point
         """
         return np.gradient(self.profile)
 
     @property
-    def slope(self):
-        """Returns slope of profile
+    def slope(self) -> np.ndarray:
+        """Slope of profile at each point
 
-        Determines dx and dy arrays and returns slope vector::
-
-            slope = dy / dx = gradient(self.profile) /
-                (gradient(self.dists) * 1000.0)
-
+        The slope is calculated for each profile point by dividing the
+        associated altitude step by the corresponding horitontal step.
         """
         return np.gradient(self.profile)/(np.gradient(self.dists)*1000)
 
     @property
-    def start_point(self):
-        """Return position of observer"""
-        return self.observer
-
-    @property
-    def min(self):
-        """Minimum altitude in profile"""
+    def min(self) -> float:
+        """Minimum altitude in elevation profile"""
         return np.nanmin(self.profile)
 
     @property
-    def max(self):
-        """Maximum altitude in profile"""
+    def max(self) -> float:
+        """Maximum altitude in elevation profile"""
         return np.nanmax(self.profile)
 
     @property
-    def alt_range(self):
-        """Altitude range of profile (dh = max - min)
-        """
+    def alt_range(self) -> float:
+        """Altitude range of profile"""
         return self.max - self.min
+
+    def _get_topo(self):
+        """
+        Load topographic data between start and end point
+
+        Returns
+        -------
+        TopoData
+        """
+        return self.observer.get_topo_data(geo_point=self.endpoint)[0]
 
     def slope_angles(self, decimal_degrees=True):
         """
@@ -290,8 +272,8 @@ class ElevationProfile(object):
 
         Returns
         -------
-        ndarray
-            slopes at each profile point
+        np.ndarray
+            slope angles at each profile point
         """
         a = np.tan(self.slope)
         if decimal_degrees:
@@ -346,7 +328,7 @@ class ElevationProfile(object):
 
         Returns
         -------
-        ndarray
+        np.ndarray
             the array containing the retrieved altitude levels along the
             retrieval direction (from the observer)
         """
@@ -368,9 +350,9 @@ class ElevationProfile(object):
 
         Parameters
         ----------
-        dists : ndarray
+        dists : np.ndarray
             Array with distances from observer
-        altitudes : ndarray
+        altitudes : np.ndarray
             Array with retrieved altitudes at input distances
         resolution : int or float
             desired horizontal resolution in m
@@ -379,9 +361,9 @@ class ElevationProfile(object):
 
         Returns
         -------
-        dists : ndarray
+        np.ndarray
             interpolated distances from observer.
-        altitudes :  ndarray
+        np.ndarray
             interpolated altitude levels.
         """
         res0 = (dists[1] - dists[0]) * 1000
@@ -414,7 +396,7 @@ class ElevationProfile(object):
 
         Returns
         -------
-        ndarray
+        np.ndarray
             vector with altitude values (same length as ``self.profile``)
 
         """
@@ -476,7 +458,7 @@ class ElevationProfile(object):
             error of retrieved horizontal distance of intersection point.
         GeoPoint
             location of intersect
-        ndarray
+        np.ndarray
             elevations along viewing direction vector arising from input
             elevation and altitude offset as well as the azimuth of the
             profile
@@ -491,17 +473,17 @@ class ElevationProfile(object):
         view_elevations = self.get_altitudes_view_dir(elev_angle,
                                                       view_above_topo_m)
 
-        #: determine the difference signal
+        # determine the difference signal
         diff_signal = view_elevations - self.profile
-        #: First condition: consider only points in certain distance from observer
+        # First condition: consider only points in certain distance from observer
         cond1 = self.dists > min_dist
-        #: Second condition: consider only "close to zero" points (this might be
-        #: redundant, I'll leave it for now because it works)
+        # Second condition: consider only "close to zero" points (this might be
+        # redundant, I'll leave it for now because it works)
         cond2 = abs(diff_signal) < max_diff
 
-        #: create array with all distances matching the 2 conditions
+        # create array with all distances matching the 2 conditions
         dists_0 = self.dists[cond1 * cond2]
-        #: relax condition 2 if nothing was found
+        # relax condition 2 if nothing was found
         if len(dists_0) == 0:
             raise IntersectNotFound(
                 'could not establish initial array of candidate distances '
@@ -509,23 +491,23 @@ class ElevationProfile(object):
                 'setting or increasing the value of input parameter max_diff')
 
         try:
-            #: get all diff vals matching the 2 conditions
+            # get all diff vals matching the 2 conditions
             diff_vals = diff_signal[cond1 * cond2]
-            #: get the index of the first zero crossing
+            # get the index of the first zero crossing
             first_idx = np.where(np.diff(np.sign(diff_vals)))[0][0]
 
-            #: get distance and local tolerance value
+            # get distance and local tolerance value
             dist, tol = dists_0[first_idx], self.resolution * local_tolerance
-            #: make mask to access all distances within tolerance range
+            # make mask to access all distances within tolerance range
             cond4 = np.logical_and(dist - tol <= dists_0, dist + tol >= dists_0)
-            #: estimate distance error from standard deviation of all
-            #: distances within tolerance range
+            # estimate distance error from standard deviation of all
+            # distances within tolerance range
             dist_err = dists_0[cond4].std()
 
-            #: create geopoint corresponding to intersection
+            # create geopoint corresponding to intersection
             intersect = self._observer_topogrid.offset(self.azimuth, dist)
 
-            #: set the altitude of this point (retrieved from profile)
+            # set the altitude of this point (retrieved from profile)
             intersect.altitude = self.get_altitude_at_distance(dist) # / 1000.
 
         except IndexError:
@@ -590,8 +572,12 @@ class ElevationProfile(object):
         prev_elev = None
         for elev in elevs:
             try:
-                (dist,dist_err,intersect,view_elevations,_) = \
-                    self.get_first_intersection(elev, plot=False, **kwargs)
+                (dist,
+                 dist_err,
+                 intersect,
+                 view_elevations,_) = self.get_first_intersection(elev,
+                                                                  plot=False,
+                                                                  **kwargs)
             except IntersectNotFound:
                 if prev_elev is None:
                     raise IntersectNotFound(
@@ -599,29 +585,50 @@ class ElevationProfile(object):
                         f'consider starting at a lower elevation than '
                         f'{elev_start}')
                 else:
-                    return elev, elev_sects, dists_sects
+                    return (elev, elev_sects, dists_sects)
             dists_sects.append(dist), elev_sects.append(elev)
             prev_elev = elev
 
     def get_altitude_at_distance(self, dist):
-        """Returns altitude at a ceratain distance from observer
+        """Get altitude at a certain distance from observer
 
-        :param float dist: horizontal distance from obsever along profile
+        Parameters
+        ----------
+        dist : float
+            horizontal distance from :attr:`observer` along profile
+
+        Returns
+        -------
+        float
+            altitude at input distance.
         """
         idx = np.argmin(abs(self.dists - dist))
         return self.profile[idx]
 
-    def plot(self, ax = None):
-        """Plot the profile into an axis object
+    def plot(self, ax=None, facecolor=None, alpha=0.20):
+        """Plot the elevation profile
+        Parameters
+        ----------
+        ax : Axes, optional
+            matplotlib axes object to be used for plot
+        facecolor : str, optional
+            color of profile, defaults to "#994d00" (light beige)
+        alpha : float, optional
+            opaqueness of profile, defaults to 0.20.
 
-        :param ax: matplotlib axis object
+        Returns
+        -------
+        Axes
+            matplotlib axes instance used for plot
         """
+        if facecolor is None:
+            facecolor = "#994d00"
         if ax is None:
             from matplotlib.pyplot import subplots
             fig, ax = subplots(1,1)
         dists = self.dists
-        ax.fill_between(dists, self.profile, facecolor="#994d00",
-                        alpha=0.20)
+        ax.fill_between(dists, self.profile, facecolor=facecolor,
+                        alpha=alpha)
         ax.set_xlabel("Distance [km]")
         ax.set_ylabel("Altitude [m]")
         ax.set_ylim([self.min - .1 * self.alt_range,
@@ -632,7 +639,17 @@ class ElevationProfile(object):
     def __call__(self, dist):
         """Returns altitude at a certain distance
 
-        :param float dist: distance in km
+        Wrapper for :func:`get_altitude_at_distance`
+
+        Parameters
+        ----------
+        dist : float
+            distance in km
+
+        Returns
+        -------
+        float
+            altitude at input distance.
         """
         return self.get_altitude_at_distance(dist)
 
@@ -650,10 +667,16 @@ class ElevationProfile(object):
     def _check_set_observer(self, value):
         """Setter helper for :attr:`observer`
 
+        Parameters
+        ----------
+        value : GeoPoint
+            observer candidate
+
         Raises
         ------
         ValueError
             if input is not instance of :class:`GeoPoint`
+
         """
         if not isinstance(value, GeoPoint):
             raise ValueError('Need instance of geonum.GeoPoint')
@@ -661,6 +684,11 @@ class ElevationProfile(object):
 
     def _check_set_endpoint(self, value):
         """Setter helper for :attr:`endpoint`
+
+        Parameters
+        ----------
+        value : GeoPoint
+            endpoint candidate
 
         Raises
         ------
@@ -673,6 +701,11 @@ class ElevationProfile(object):
 
     def _check_set_topo_data(self, value):
         """Setter helper for :attr:`topo_data`
+
+        Parameters
+        ----------
+        value : TopoData
+            topo_data candidate
 
         Raises
         ------
@@ -694,6 +727,23 @@ class ElevationProfile(object):
         }
 
     def _plot_intersect_search_result(self, view_elevations, dist=None):
+        """
+        Plot result from intersection point search
+
+        Parameters
+        ----------
+        view_elevations : list-like
+            elevation levels along line of sight
+
+        dist : float
+            distance to intersect
+
+        Returns
+        -------
+        Axes
+            matplotlib axes instance used for plotting
+
+        """
         ax = self.plot()
         ax.plot(self.dists, view_elevations, label = "Viewing direction")
         try:
