@@ -14,11 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""
-Module for atmospheric calculations relevant for geonum
-"""
-
-from numpy import deg2rad, cos, ndarray, meshgrid, pi, exp, log
+import numpy as np
 
 #: Pressure at sea level, Unit [Pa]
 p0 = 101325.0
@@ -40,6 +36,7 @@ L_STD_ATM = -6.5e-3
 #: Atmospheric lapse rate (dry atmosphere), Unit [K m-1]
 L_DRY_AIR = -9.8e-3
 
+
 def _g0(phi=0.0):
     """Gravitational accelaration at sea level (function of latitude)
 
@@ -48,22 +45,24 @@ def _g0(phi=0.0):
 
     Parameters
     ----------
-    phi : float or ndarray
+    phi : float or np.ndarray
         latitude(s) in rads
 
     Returns
     -------
-    float or ndarray
+    float or np.ndarray
         value(s) of Earth gravitational acceleration at sea level for input
         latitude(s)
     """
-    return 9.806160 * (1 - 0.0026373 * cos(2 * phi)
-                         + 0.0000059 * cos(2 * phi)**2)
+    return 9.806160 * (1 - 0.0026373 * np.cos(2 * phi)
+                       + 0.0000059 * np.cos(2 * phi) ** 2)
+
 
 def _g_acc(phi, alt):
-    return (_g0(phi) - (3.085e-4  + 2.27e-7 * cos(2 * phi)) * alt
-                     + (7.254e-11 + 1e-13   * cos(2 * phi)) * alt ** 2
-                     + (1.517e-17 + 6e-20   * cos(2 * phi)) * alt ** 3)
+    return (_g0(phi) - (3.085e-4 + 2.27e-7 * np.cos(2 * phi)) * alt
+            + (7.254e-11 + 1e-13 * np.cos(2 * phi)) * alt ** 2
+            + (1.517e-17 + 6e-20 * np.cos(2 * phi)) * alt ** 3)
+
 
 def g(lat=45.0, alt=0.0):
     """Gravitational accelaration as function of latitude and altitude
@@ -74,14 +73,14 @@ def g(lat=45.0, alt=0.0):
 
     Parameters
     ----------
-    lat : float or ndarray
+    lat : float or np.ndarray
         latitude(s) in degrees
-    alt : float or ndarray
+    alt : float or np.ndarray
         altitude(s) in m
 
     Returns
     -------
-    float or ndarray
+    float or np.ndarray
         Value(s) of Earth gravitational accelaration at sea level for input
         latitude(s) and altitude(s). If both inputs are arrays, then a 2D array
         is returned with the first axis (index 0) corresponding to altitudes
@@ -98,11 +97,12 @@ def g(lat=45.0, alt=0.0):
     >>> dat.shape
     (100, 200)
     """
-    phi = deg2rad(lat)
-    if all([isinstance(x, ndarray) for x in [phi, alt]]):
-        phi, alt = meshgrid(phi, alt)
+    phi = np.deg2rad(lat)
+    if all([isinstance(x, np.ndarray) for x in [phi, alt]]):
+        phi, alt = np.meshgrid(phi, alt)
 
     return _g_acc(phi, alt)
+
 
 def g0(lat=45.0):
     """Gravitational accelaration at sealevel as function of latitude
@@ -111,20 +111,21 @@ def g0(lat=45.0):
 
     Parameters
     ----------
-    lat : float or ndarray
+    lat : float or np.ndarray
         latitude(s) in degrees
-    alt : float or ndarray
+    alt : float or np.ndarray
         altitude(s) in m
 
     Returns
     -------
-    float or ndarray
+    float or np.ndarray
         Value(s) of Earth gravitational accelaration at sea level for input
         latitude(s) and altitude(s). If both inputs are arrays, then a 2D array
         is returned with the first axis (index 0) corresponding to altitudes
         and second axis to latitude
     """
     return g(lat, alt=0.0)
+
 
 def temperature(alt=0.0, ref_temp=T0_STD, ref_alt=0.0, lapse_rate=L_STD_ATM):
     """Get temperature for a certain altitude (or altitude array)
@@ -144,7 +145,7 @@ def temperature(alt=0.0, ref_temp=T0_STD, ref_alt=0.0, lapse_rate=L_STD_ATM):
 
     Parameters
     ----------
-    alt : float or ndarray
+    alt : float or np.ndarray
         altitude(s) in m
     ref_temp : float, optional
         reference temperature in K (default is std atm sea level)
@@ -155,10 +156,11 @@ def temperature(alt=0.0, ref_temp=T0_STD, ref_alt=0.0, lapse_rate=L_STD_ATM):
 
     Returns
     -------
-    float or ndarray
+    float or np.ndarray
         Temperature(s) in K corresponding to altitudes
     """
     return float(ref_temp) + float(lapse_rate) * (alt - float(ref_alt))
+
 
 def beta_exp(mol_mass=M_AIR_AVG, lapse_rate=L_STD_ATM, lat=45.0):
     """Exponent for conversion of atmosperic temperatures and pressures
@@ -195,6 +197,7 @@ def beta_exp(mol_mass=M_AIR_AVG, lapse_rate=L_STD_ATM, lat=45.0):
     """
     return g0(lat) * mol_mass / (1000 * R_STD * lapse_rate)
 
+
 def pressure(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
              lapse_rate=L_STD_ATM, mol_mass=M_AIR_AVG, lat=45.0):
     """Get atmospheric pressure in units of Pascal
@@ -217,7 +220,7 @@ def pressure(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
 
     Parameters
     ----------
-    alt : float or ndarray
+    alt : float or np.ndarray
         altitude(s) in m
     ref_p : float, optional
         reference pressure (default is std atm sea level)
@@ -235,12 +238,13 @@ def pressure(alt=0.0, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
 
     Returns
     -------
-    float or ndarray
+    float or np.ndarray
         pressure(s) corresponding to input altitude(s)
     """
     temp = temperature(alt, ref_temp, ref_alt, lapse_rate)
     exp = beta_exp(mol_mass, lapse_rate, lat)
     return ref_p * (ref_temp / temp) ** exp
+
 
 def pressure_hPa(alt=0.0, *args, **kwargs):
     """Calls :func:`pressure` using provided input and returns in unit of hPa
@@ -250,7 +254,7 @@ def pressure_hPa(alt=0.0, *args, **kwargs):
 
     Parameters
     ----------
-    alt : float or ndarray
+    alt : float or np.ndarray
         altitude(s) in m
     *args
         non-keyword args parsed to :func:`pressure`
@@ -259,10 +263,11 @@ def pressure_hPa(alt=0.0, *args, **kwargs):
 
     Returns
     -------
-    float or ndarray
+    float or np.ndarray
         pressure(s) in units of hPa corresponding to input altitude(s)
     """
     return pressure(alt, *args, **kwargs) / 100
+
 
 def pressure2altitude(p, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
                       lapse_rate=L_STD_ATM, mol_mass=M_AIR_AVG, lat=45.0):
@@ -316,10 +321,12 @@ def pressure2altitude(p, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
     """
 
     beta = beta_exp(mol_mass, lapse_rate, lat=lat)
-    return (ref_temp / lapse_rate * (exp(-log(p / ref_p) / beta) - 1) + ref_alt)
+    return (ref_temp / lapse_rate * (
+                np.exp(-np.log(p / ref_p) / beta) - 1) + ref_alt)
+
 
 def air_density(alt=0.0, temp=None, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
-            lapse_rate=L_STD_ATM, mol_mass=M_AIR_AVG, lat=45.0):
+                lapse_rate=L_STD_ATM, mol_mass=M_AIR_AVG, lat=45.0):
     """Get atmospheric density in units of :math:`$g\,m^-3$`
 
     **Formula:**
@@ -337,7 +344,7 @@ def air_density(alt=0.0, temp=None, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
 
     Parameters
     ----------
-    alt : float or ndarray
+    alt : float or np.ndarray
         altitude(s) in m
     temp : float, optional
         temperature in K, if None, :func:`temperature` is used to compute
@@ -358,13 +365,14 @@ def air_density(alt=0.0, temp=None, ref_p=p0, ref_temp=T0_STD, ref_alt=0.0,
 
     Returns
     -------
-    float or ndarray
+    float or np.ndarray
         density corresponding to input altitude (in g m-3)
     """
     if temp is None:
         temp = temperature(alt, ref_temp, ref_alt, lapse_rate)
-    p = pressure(alt, ref_p, ref_temp, ref_alt, lapse_rate,mol_mass, lat)
+    p = pressure(alt, ref_p, ref_temp, ref_alt, lapse_rate, mol_mass, lat)
     return p * mol_mass / (R_STD * temp)
+
 
 def air_number_density(alt=0.0, temp=None, ref_p=p0, ref_temp=T0_STD,
                        ref_alt=0.0, lapse_rate=L_STD_ATM,
@@ -373,7 +381,7 @@ def air_number_density(alt=0.0, temp=None, ref_p=p0, ref_temp=T0_STD,
 
     Parameters
     ----------
-    alt : float or ndarray
+    alt : float or np.ndarray
         altitude(s) in m
     temp : float, optional
         temperature in K, if None, :func:`temperature` is used to compute
@@ -394,11 +402,13 @@ def air_number_density(alt=0.0, temp=None, ref_p=p0, ref_temp=T0_STD,
 
     Returns
     -------
-    float or ndarray
+    float or np.ndarray
         number density of air in #particles m-3 corresponding to altitude
     """
-    rho = air_density(alt, temp, ref_p, ref_temp, ref_alt, lapse_rate, mol_mass, lat)
+    rho = air_density(alt, temp, ref_p, ref_temp, ref_alt, lapse_rate,
+                      mol_mass, lat)
     return rho * NA / mol_mass
+
 
 def refr_idx_300ppm_co2(lbda_mu=0.300):
     """Get refractive index of air using eq. of Peck and Reeder, 1972
@@ -409,7 +419,7 @@ def refr_idx_300ppm_co2(lbda_mu=0.300):
 
     Parameters
     ----------
-    lbda_mu : float or ndarray
+    lbda_mu : float or np.ndarray
         wavelength in microns
 
     Returns
@@ -419,13 +429,14 @@ def refr_idx_300ppm_co2(lbda_mu=0.300):
     """
     if lbda_mu >= 0.23:
         return 1 + (5791817 / (238.0185 - (1 / lbda_mu) ** 2) +
-                    167909  / (57.362   - (1 / lbda_mu) ** 2)
-                   ) * 10 ** (-8)
+                    167909 / (57.362 - (1 / lbda_mu) ** 2)
+                    ) * 10 ** (-8)
 
     return 1 + (8060.51 +
-                2480990 / (132.274  - (1 / lbda_mu) ** 2) +
+                2480990 / (132.274 - (1 / lbda_mu) ** 2) +
                 17455.7 / (39.32957 - (1 / lbda_mu) ** 2)
-               ) * 10 ** (-8)
+                ) * 10 ** (-8)
+
 
 def refr_idx(lbda_mu=0.300, co2_ppm=400.0):
     """Calculate refr. index of atm for varying CO2 amount
@@ -439,18 +450,19 @@ def refr_idx(lbda_mu=0.300, co2_ppm=400.0):
 
     Parameters
     ----------
-    lbda_mu : float or ndarray
+    lbda_mu : float or np.ndarray
         wavelength in micrometers
     co2_ppm : float
         atmospheric CO2 volume mixing ratio in ppm
 
     Returns
     -------
-    float or ndarray
+    float or np.ndarray
         refractive index
     """
     n_300 = refr_idx_300ppm_co2(lbda_mu)
-    return 1 + (n_300 - 1) * (1 + 0.54 * (co2_ppm * 10**(-6) - 0.0003))
+    return 1 + (n_300 - 1) * (1 + 0.54 * (co2_ppm * 10 ** (-6) - 0.0003))
+
 
 def _F_N2(lbda_mu=0.300):
     """Depolarisation factor of N2 for Rayleigh scattering cross section
@@ -460,15 +472,16 @@ def _F_N2(lbda_mu=0.300):
 
     Parameters
     ----------
-    lbda_mu : float or ndarray
+    lbda_mu : float or np.ndarray
         wavelength in micrometers
 
     Returns
     -------
-    float or ndarray
+    float or np.ndarray
         depolarisation factor of N2
     """
     return 1.034 + 3.17e-4 / lbda_mu ** 2
+
 
 def _F_O2(lbda_mu=0.300):
     """Depolarisation factor of O2 for Rayleigh scattering cross section
@@ -478,16 +491,17 @@ def _F_O2(lbda_mu=0.300):
 
     Parameters
     ----------
-    lbda_mu : float or ndarray
+    lbda_mu : float or np.ndarray
         wavelength in micrometers
 
     Returns
     -------
-    float or ndarray
+    float or np.ndarray
         depolarisation factor of O2
 
     """
-    return 1.096 + 1.385e-3 / lbda_mu ** 2 + 1.448e-4 / lbda_mu**4
+    return 1.096 + 1.385e-3 / lbda_mu ** 2 + 1.448e-4 / lbda_mu ** 4
+
 
 def F_AIR(lbda_mu=0.300, co2_ppm=400.0):
     """Depolarisation factor of air for Rayleigh scattering cross section
@@ -496,20 +510,21 @@ def F_AIR(lbda_mu=0.300, co2_ppm=400.0):
 
     Parameters
     ----------
-    lbda_mu : float or ndarray
+    lbda_mu : float or np.ndarray
         wavelength in micrometers
     co2_ppm : float
         atmospheric CO2 volume mixing ratio in ppm
 
     Returns
     -------
-    float or ndarray
+    float or np.ndarray
         depolarisation factor of O2
     """
-    co2 = co2_ppm * 10**(-6)
+    co2 = co2_ppm * 10 ** (-6)
     return (78.084 * _F_N2(lbda_mu) +
             20.946 * _F_O2(lbda_mu) +
             0.934 + co2 * 1.15) / (78.084 + 20.946 + 0.934 + co2)
+
 
 def sigma_rayleigh(lbda_mu=0.300, co2_ppm=400.0):
     """Rayleigh scattering cross section
@@ -527,11 +542,12 @@ def sigma_rayleigh(lbda_mu=0.300, co2_ppm=400.0):
         value of Rayleigh scattering cross section in cm2
     """
     n = refr_idx(lbda_mu, co2_ppm)
-    lbda = lbda_mu * 10**(-6)
+    lbda = lbda_mu * 10 ** (-6)
     num_dens = air_number_density()
-    refr_fac = (n**2 - 1)**2 / (n**2 + 2)**2
+    refr_fac = (n ** 2 - 1) ** 2 / (n ** 2 + 2) ** 2
     F = F_AIR(lbda_mu, co2_ppm)
-    return 24 * pi**3 / (lbda**4 * num_dens**2) * refr_fac * F * 100 ** 2
+    return 24 * np.pi ** 3 / (
+                lbda ** 4 * num_dens ** 2) * refr_fac * F * 100 ** 2
 
 
 def rayleigh_vol_sc_coeff(alt=0.0, lbda_mu=0.300, co2_ppm=400.0, **kwargs):
@@ -539,7 +555,7 @@ def rayleigh_vol_sc_coeff(alt=0.0, lbda_mu=0.300, co2_ppm=400.0, **kwargs):
 
     Parameters
     ----------
-    alt : float or ndarray
+    alt : float or np.ndarray
         altitude(s) in m
     lbda_mu : float
         wavelength in micrometers
@@ -548,8 +564,8 @@ def rayleigh_vol_sc_coeff(alt=0.0, lbda_mu=0.300, co2_ppm=400.0, **kwargs):
 
     Returns
     -------
-    float or ndarray
+    float or np.ndarray
         vol. scattering coeff. in cm-1 corresponding to altitudes
     """
-    num_dens = air_number_density(alt, **kwargs) * 100**(-3) # cm^-3
+    num_dens = air_number_density(alt, **kwargs) * 100 ** (-3)  # cm^-3
     return num_dens * sigma_rayleigh(lbda_mu, co2_ppm)
