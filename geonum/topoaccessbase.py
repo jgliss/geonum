@@ -567,4 +567,3 @@ class SRTMAccess(TopoAccessBase):
                 vals[i, j] = dat.get_elevation(lats[i], lons[j])
 
         return TopoData(lats, lons, vals, data_id=self.topo_id)
-
