@@ -38,10 +38,10 @@ class GeoSetup(object):
     ----------
     id : str
         name of this setup
-    points : list
-        list of :class:`GeoPoint` objects assigned to this setup
-    vectors : list
-        list of :class:`GeoVector3D` objects assigned to this setup
+    points : dict
+       contains :class:`GeoPoint` objects assigned to this setup
+    vectors : dict
+        contains :class:`GeoVector3D` objects assigned to this setup
 
     Parameters
     ----------
@@ -49,13 +49,13 @@ class GeoSetup(object):
         list of :class:`GeoPoint` objects to be included in this setup
     vectors : list
         list of :class:`GeoVector3D` objects to be included in this setup
-    lat_ll : :obj:`float`, optional
+    lat_ll : float, optional
         lower left latitude of regime
-    lon_ll : :obj:`float`, optional
+    lon_ll : float, optional
         lower left longitude of regime
-    lat_tr : :obj:`float`, optional
+    lat_tr : float, optional
         top right latitude of regime
-    lon_tr : :obj:`float`, optional
+    lon_tr : float, optional
         top right longitude of regime
     id : str
         identification string of this setup
@@ -68,7 +68,9 @@ class GeoSetup(object):
         String specifying a valid matplotlib colormap supposed to be
         used for drawing :class:`GeoVector3D` objects into overview
         maps
-
+    init_borders : bool
+        Whether or not lower left (ll) and top right (tr) border points are
+        supposed to be created.
 
     """
 
@@ -214,7 +216,7 @@ class GeoSetup(object):
 
     @property
     def topo_access(self):
-        """Topograph data access class"""
+        """Topography data access class"""
         return TopoDataAccess(self.topo_access_mode,
                               self.local_topo_path)
 
@@ -253,10 +255,10 @@ class GeoSetup(object):
 
         Note
         ----
-        The default topomode is "srtm" which provides online access, so
+        The default topo mode is "srtm" which provides online access, so
         it is not mandatory to provide topography data locally. However,
         the SRTM model has no global coverage, so there might be need to
-        use another of the provided topomodes and provide the respective
+        use another of the provided topo modes and provide the respective
         files locally.
 
         Parameters
@@ -268,22 +270,24 @@ class GeoSetup(object):
             raise FileExistsError("Input path does not exist")
         self.local_topo_path = p
 
-    def change_topo_mode(self, new_mode="srtm", local_path=None):
+    def change_topo_mode(self, new_mode=None, local_path=None):
         """Change the current mode for topography data access
 
         Parameters
         ----------
         new_mode : str
-            new topo access mode
-        local_path : :obj:`str`, optional
+            new topo access mode, default to "srtm"
+        local_path : str, optional
             if not None and valid, update local topo access
 
         """
+        if new_mode is None:
+            new_mode = "srtm"
         if local_path is not None:
             self.set_local_topo_path(local_path)
         self.topo_access_mode = new_mode
 
-    def get_topo(self):
+    def get_topo(self) -> TopoData:
         """Get current topo data"""
         if not isinstance(self.topo_data, TopoData):
             self.load_topo_data()
@@ -313,19 +317,30 @@ class GeoSetup(object):
         Parameters
         ----------
         name : str
-            name of point to be checked
+            name of GeoPoint to be checked
 
         Returns
         -------
         bool
-            Whether or not point existes
+            Whether or not point exists
         """
         if name in self.points:
             return True
         return False
 
     def has_vector(self, name):
-        """Checks if vector with input name exists"""
+        """Checks if vector with input name exists
+
+        Parameters
+        ----------
+        name : str
+            name of vector
+
+        Returns
+        -------
+        bool
+            whether or not such a vector with input name exists
+        """
         if name in self.vectors:
             return True
         return False
