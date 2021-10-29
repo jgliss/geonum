@@ -624,3 +624,12 @@ class GeoPoint(LatLon):
             value='GeoPoint'
         """
         return 'GeoPoint'
+
+    @staticmethod
+    def from_LatLon(coord):
+        if not isinstance(coord, LatLon):
+            raise ValueError('Need LatLon...')
+        return GeoPoint(latitude=coord.lon.decimal_degree,
+                        longitude=coord.lat.decimal_degree,
+                        altitude=0,
+                        auto_topo_access=False)
