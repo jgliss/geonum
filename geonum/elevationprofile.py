@@ -18,7 +18,7 @@ from scipy.interpolate import interp1d
 
 from geonum.exceptions import IntersectNotFound
 from geonum.geopoint import GeoPoint
-from geonum.processing import LineOnGrid
+from geonum.lineongrid import LineOnGrid
 from geonum.topodata import TopoData
 
 class ElevationProfile(object):

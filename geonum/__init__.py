@@ -34,7 +34,7 @@ from .geopoint import GeoPoint
 from .geovector3d import GeoVector3D
 from .geosetup import GeoSetup
 from .elevationprofile import ElevationProfile
-from .processing import LineOnGrid
+from .lineongrid import LineOnGrid
 
 from .utils import delete_local_srtm_files
 

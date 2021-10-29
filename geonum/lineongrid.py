@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Geonum is a Python library for geographical calculations in 3D
 # Copyright (C) 2017 Jonas Gliss (jonasgliss@gmail.com)
 #
@@ -16,26 +14,39 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""
-Processing module of geonum library
-"""
 import numpy as np
 from scipy.ndimage import map_coordinates
 
 class LineOnGrid(object):
-    """A class representing a line on a discrete grid"""
-    def __init__(self, x0, y0, x1, y1, id=""):
-        """Class initialisation
+    """A class representing a line on a discrete grid
 
-        :param int x0: start x coordinate
-        :param int y0: start y coordinate
-        :param int x1: stop x coordinate
-        :param int y1: stop y coordinate
-        :param str id: string for identification (optional)
-        """
-        self.id = id
-        self.start  = [x0,y0]
-        self.stop   = [x1,y1]
+    Attributes
+    ----------
+    start : list
+        start location [x0, y0]
+    stop : list
+        stop location [x1, y1]
+
+    Parameters
+    ----------
+    x0 : int
+        start x coordinate
+    y0 : int
+        start y coordinate
+    x1 : int
+        end x coordinate
+    y1 : int
+        end y coordinate
+    name : int
+        string for identification (optional)
+
+    """
+    def __init__(self, x0, y0, x1, y1, name=None):
+        if name is None:
+            name = 'undefined'
+        self.name = name
+        self.start = [x0,y0]
+        self.stop = [x1,y1]
 
         self.profile_coords = None
 
@@ -56,7 +67,6 @@ class LineOnGrid(object):
             print("Start and Stop will be exchanged")
             self.start, self.stop = self.stop, self.start
 
-    """Processing functionality"""
     def prepare_profile_coordinates(self):
         """Prepare the evaluation coordinates as stack"""
         length = self.length
@@ -169,7 +179,6 @@ class LineOnGrid(object):
         self.plot_line_profile(array, ax=axes[1])
         plt.tight_layout()
 
-    """'Private' functions"""
     def _delx_dely(self):
         """Returns length of x and y range"""
         return (abs(self.stop[0] - self.start[0]),
@@ -188,5 +197,5 @@ class LineOnGrid(object):
     def __str__(self):
         """String representation"""
         s = ("LineOnGrid %s\nStart (x,y): %s\nStop (x,y): %s\n"
-                                        %(self.id, self.start, self.stop))
+             % (self.name, self.start, self.stop))
         return s
