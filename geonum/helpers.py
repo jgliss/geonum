@@ -151,7 +151,7 @@ def approximate_connection_vector(lon0, lat0, lon1, lat1, len_lat_km=111.20):
 
     Returns
     -------
-    np.ndarray
+    numpy.ndarray
         2-element array containing (dx, dy) components of connection vector
     """
 
@@ -187,7 +187,7 @@ def shifted_color_map(vmin, vmax, cmap=None):
 
     Returns
     -------
-    LinearSegmentedColormap
+    matplotlib.colors.LinearSegmentedColormap
         shifted colormap
 
     """

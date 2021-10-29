@@ -147,15 +147,17 @@ class TopoAccessBase(with_metaclass(abc.ABCMeta, object)):
         """
         if any([x is None for x in [lat1, lon1]]):
             lat1, lon1 = lat0, lon0
+
         if lon0 > lon1:
             lon0, lon1 = lon1, lon0
             lat0, lat1 = lat1, lat0
-        #print lat0, lon0, lat1, lon1
+
         #closest indices
         idx_lons = [np.argmin(abs(lons_all - lon0)),
                     np.argmin(abs(lons_all - lon1))]
         idx_lats = [np.argmin(abs(lats_all - lat0)),
                     np.argmin(abs(lats_all - lat1))]
+
         #Make sure that the retrieved indices actually INCLUDE the input ranges
         if idx_lons[0] == 0 and lons_all[0] > lon0:
             warn("Error: Lon0 smaller than range covered by file, using first"
