@@ -15,7 +15,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 import warnings
 
-from LatLon23 import GeoVector
+from LatLon23 import GeoVector, LatLon
 from numpy import (radians, cos, sin, degrees, sqrt, tan, isnan, arctan2)
 
 from geonum.geopoint import GeoPoint
@@ -111,7 +111,11 @@ class GeoVector3D(GeoVector):
         # call setter for private attribute anchor (this ensures that input 
         # attr anchor is of right type
         if anchor is not None:
-            self.set_anchor(anchor)
+            try:
+                self.set_anchor(anchor)
+            except TypeError as e:
+                print(f'Failed to set anchor. Reason: {e}')
+
 
     def _eval_input(self,dx,dy,dz,azimuth,dist_hor,elevation):
         if any(x is None for x in [dx, dy]): # If only initial_heading and
@@ -195,7 +199,10 @@ class GeoVector3D(GeoVector):
             if input point is not instance of :class:`GeoPoint`.
         """
         if not isinstance(geo_point, GeoPoint):
-            raise TypeError("Could not set anchor: Invalid input type")
+            if isinstance(geo_point, LatLon):
+                geo_point = GeoPoint.from_LatLon(geo_point)
+            else:
+                raise TypeError("Could not set anchor: Invalid input type")
         self._priv_attr["anchor"] = geo_point
            
     def intersect_hor(self, other) -> 'GeoVector3D':
