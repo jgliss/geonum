@@ -31,10 +31,13 @@ Elevation profiles
    :members:
    :undoc-members:
 
-Further processing tools
+Further tools
 ========================
 
-.. automodule:: geonum.processing
+Line on grid
+------------
+
+.. automodule:: geonum.lineongrid
    :members:
    :undoc-members:
 
