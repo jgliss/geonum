@@ -89,7 +89,7 @@ def rotate_xtick_labels(ax, deg=30, ha="right"):
 
 
 def haversine_formula(lon0, lat0, lon1, lat1, radius=None):
-    """Haversine formula
+    """Haversine formula to compute distances on a sphere
 
     Approximate horizontal distance between 2 points assuming a spherical
     earth.
