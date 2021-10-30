@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Mar 20 13:55:05 2021
-
-@author: jonasg
-"""
-
 import pytest
 import numpy as np
 from geonum.conftest import does_not_raise_exception
@@ -227,3 +219,9 @@ def test_GeoPoint___repr__():
     st = pt.__repr__()
     assert isinstance(st,str)
     assert st == 'Lat: 0.0, Lon: 0.0, Alt: 0 m'
+
+def test_GeoPoint_from_LatLon():
+    pt = GeoPoint.from_LatLon(LatLon(0,1))
+    assert isinstance(pt, GeoPoint)
+    with pytest.raises(ValueError):
+        GeoPoint.from_LatLon((10, 20))

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Geonum is a Python library for geographical calculations in 3D
 # Copyright (C) 2017 Jonas Gliss (jonasgliss@gmail.com)
 #
@@ -16,23 +14,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""
-This module contains the GeoSetup class, a high level object for managing
-muliple geo point and geo vector objects.
-"""
-from geonum import BASEMAP_AVAILABLE
-from matplotlib.pyplot import get_cmap
-if BASEMAP_AVAILABLE: # pragma: no cover
-    from geonum.mapping import Map
-from numpy import asarray, nanmin, nanmax
 from os.path import exists
 from warnings import warn
 
+from matplotlib.pyplot import get_cmap
+from numpy import asarray, nanmin, nanmax
+
+from geonum import BASEMAP_AVAILABLE
 from geonum.exceptions import OutOfDomain
 from geonum.geopoint import GeoPoint
 from geonum.geovector3d import GeoVector3D
-from geonum.topodataaccess import TopoDataAccess
 from geonum.topodata import TopoData
+from geonum.topodataaccess import TopoDataAccess
+
+if BASEMAP_AVAILABLE:  # pragma: no cover
+    from geonum.mapping import Map
+
 
 class GeoSetup(object):
     """The GeoSetup class represents a collection of GeoPoints and vectors
@@ -41,10 +38,10 @@ class GeoSetup(object):
     ----------
     id : str
         name of this setup
-    points : list
-        list of :class:`GeoPoint` objects assigned to this setup
-    vectors : list
-        list of :class:`GeoVector3D` objects assigned to this setup
+    points : dict
+       contains :class:`GeoPoint` objects assigned to this setup
+    vectors : dict
+        contains :class:`GeoVector3D` objects assigned to this setup
 
     Parameters
     ----------
@@ -52,13 +49,13 @@ class GeoSetup(object):
         list of :class:`GeoPoint` objects to be included in this setup
     vectors : list
         list of :class:`GeoVector3D` objects to be included in this setup
-    lat_ll : :obj:`float`, optional
+    lat_ll : float, optional
         lower left latitude of regime
-    lon_ll : :obj:`float`, optional
+    lon_ll : float, optional
         lower left longitude of regime
-    lat_tr : :obj:`float`, optional
+    lat_tr : float, optional
         top right latitude of regime
-    lon_tr : :obj:`float`, optional
+    lon_tr : float, optional
         top right longitude of regime
     id : str
         identification string of this setup
@@ -71,15 +68,18 @@ class GeoSetup(object):
         String specifying a valid matplotlib colormap supposed to be
         used for drawing :class:`GeoVector3D` objects into overview
         maps
-
+    init_borders : bool
+        Whether or not lower left (ll) and top right (tr) border points are
+        supposed to be created.
 
     """
+
     def __init__(self, points=None, vectors=None, lat_ll=None, lon_ll=None,
                  lat_tr=None, lon_tr=None, id=None,
                  topo_access_mode=None, local_topo_path=None,
                  cmap_vecs=None, init_borders=True):
         if id is None:
-            id ='MyGeoSetup'
+            id = 'MyGeoSetup'
         if topo_access_mode is None:
             topo_access_mode = "srtm"
         if cmap_vecs is None:
@@ -110,7 +110,8 @@ class GeoSetup(object):
         elif isinstance(vectors, GeoVector3D):
             vectors = [vectors]
         if not isinstance(vectors, list):
-            raise ValueError('invalid input for points. need GeoVector3D or list')
+            raise ValueError(
+                'invalid input for points. need GeoVector3D or list')
 
         for vec in vectors:
             if isinstance(vec, GeoVector3D):
@@ -138,7 +139,7 @@ class GeoSetup(object):
     def ll(self, value):
         if not isinstance(value, GeoPoint):
             raise ValueError("Could not set lower left coordinate in "
-                            "GeoSetup: need GeoPoint object")
+                             "GeoSetup: need GeoPoint object")
         self.points["ll"] = value
         if self.has_topo_data():
             print('updated lower-left coordinate, consider reloading '
@@ -158,7 +159,7 @@ class GeoSetup(object):
     def tr(self, value):
         if not isinstance(value, GeoPoint):
             raise ValueError("Could not set top right coordinate in "
-                            "GeoSetup: need GeoPoint object")
+                             "GeoSetup: need GeoPoint object")
         self.points["tr"] = value
         if self.has_topo_data():
             print('updated top-right coordinate, consider reloading '
@@ -213,19 +214,16 @@ class GeoSetup(object):
         """Returns dimension (in km) of area covered by this setup"""
         return (self.tr - self.ll).norm
 
-
     @property
     def topo_access(self):
-        """Topograph data access class"""
+        """Topography data access class"""
         return TopoDataAccess(self.topo_access_mode,
                               self.local_topo_path)
-
 
     @property
     def cmap_vecs(self):
         """Default colormap used for drawing vectors"""
         return get_cmap(self._cmap_vecs)
-
 
     def has_points(self):
         """
@@ -239,7 +237,6 @@ class GeoSetup(object):
         if len(self.points) > 0:
             return True
         return False
-
 
     def has_topo_data(self):
         """
@@ -258,10 +255,10 @@ class GeoSetup(object):
 
         Note
         ----
-        The default topomode is "srtm" which provides online access, so
+        The default topo mode is "srtm" which provides online access, so
         it is not mandatory to provide topography data locally. However,
         the SRTM model has no global coverage, so there might be need to
-        use another of the provided topomodes and provide the respective
+        use another of the provided topo modes and provide the respective
         files locally.
 
         Parameters
@@ -273,22 +270,24 @@ class GeoSetup(object):
             raise FileExistsError("Input path does not exist")
         self.local_topo_path = p
 
-    def change_topo_mode(self, new_mode="srtm", local_path=None):
+    def change_topo_mode(self, new_mode=None, local_path=None):
         """Change the current mode for topography data access
 
         Parameters
         ----------
         new_mode : str
-            new topo access mode
-        local_path : :obj:`str`, optional
+            new topo access mode, default to "srtm"
+        local_path : str, optional
             if not None and valid, update local topo access
 
         """
+        if new_mode is None:
+            new_mode = "srtm"
         if local_path is not None:
             self.set_local_topo_path(local_path)
         self.topo_access_mode = new_mode
 
-    def get_topo(self):
+    def get_topo(self) -> TopoData:
         """Get current topo data"""
         if not isinstance(self.topo_data, TopoData):
             self.load_topo_data()
@@ -312,26 +311,36 @@ class GeoSetup(object):
         for p in list(self.points.values()):
             p.set_topo_data(self.topo_data)
 
-
     def has_point(self, name):
         """Checks if point with input name exists
 
         Parameters
         ----------
         name : str
-            name of point to be checked
+            name of GeoPoint to be checked
 
         Returns
         -------
         bool
-            Whether or not point existes
+            Whether or not point exists
         """
         if name in self.points:
             return True
         return False
 
     def has_vector(self, name):
-        """Checks if vector with input name exists"""
+        """Checks if vector with input name exists
+
+        Parameters
+        ----------
+        name : str
+            name of vector
+
+        Returns
+        -------
+        bool
+            whether or not such a vector with input name exists
+        """
         if name in self.vectors:
             return True
         return False
@@ -395,22 +404,21 @@ class GeoSetup(object):
             self.tr = pt
         elif pt.name in self.points and not overwrite_existing:
             raise ValueError(
-                    f'GeoPoint with name {pt.name} already exists in GeoSetup. '
-                    )
+                f'GeoPoint with name {pt.name} already exists in GeoSetup. '
+            )
         elif self.borders_set and assert_in_domain and not \
-                    self.contains_coordinate(pt.latitude, pt.longitude):
+                self.contains_coordinate(pt.latitude, pt.longitude):
 
-                raise OutOfDomain(f'{pt} is not within domain of GeoSetup')
+            raise OutOfDomain(f'{pt} is not within domain of GeoSetup')
 
         else:
             self.points[pt.name] = pt
             if (isinstance(self.topo_data, TopoData) and
-                not isinstance(pt.topo_data, TopoData)):
+                    not isinstance(pt.topo_data, TopoData)):
                 try:
                     pt.set_topo_data(self.topo_data)
                 except OutOfDomain:
                     pass
-
 
     def add_geo_points(self, *pts, assert_in_domain=False) -> None:
         """Add multiple GeoPoints to the collection
@@ -428,7 +436,6 @@ class GeoSetup(object):
         """
         for pt in pts:
             self.add_geo_point(pt, assert_in_domain)
-
 
     def add_geo_vector(self, vec, overwrite_existing=True) -> None:
         """Add :class:`GeoVector3D` to this collection
@@ -483,7 +490,6 @@ class GeoSetup(object):
         if not name in self.points:
             raise ValueError(f'no such GeoPoint ({name}) in GeoSetup')
         del self.points[name]
-
 
     def delete_geo_vector(self, name):
         """Remove one of the vectors from the collection
@@ -541,7 +547,6 @@ class GeoSetup(object):
             lons.append(p.longitude)
         return (asarray(lats), asarray(lons))
 
-
     def set_borders_from_points(self, extend_km=1, to_square=True) -> None:
         """Set lower left (ll) and top right (tr) corners of domain
 
@@ -561,26 +566,25 @@ class GeoSetup(object):
         AttributeError
             if no points are available in the setup.
         """
-        lats, lons= self._all_lats_lons()
+        lats, lons = self._all_lats_lons()
         if not len(lats) > 0:
             raise AttributeError('Cannot initiate range coordinates in empty '
                                  'GeoSetup, please add at least one point')
 
-        lat_ll, lon_ll, lat_tr , lon_tr = (nanmin(lats), nanmin(lons),
-                                           nanmax(lats), nanmax(lons))
+        lat_ll, lon_ll, lat_tr, lon_tr = (nanmin(lats), nanmin(lons),
+                                          nanmax(lats), nanmax(lons))
 
         pll, ptr = GeoPoint(lat_ll, lon_ll, 0.0), GeoPoint(lat_tr, lon_tr, 0.0)
 
         if to_square:
             v = ptr - pll
             add = (abs(v.dx) - abs(v.dy)) / 2
-            if add > 0: #E/W extend (dx) is smaller than N/S extend (dy)
+            if add > 0:  # E/W extend (dx) is smaller than N/S extend (dy)
                 pll = pll.offset(azimuth=180, dist_hor=add)
                 ptr = ptr.offset(azimuth=0, dist_hor=add)
             else:
                 pll = pll.offset(azimuth=270, dist_hor=-add)
                 ptr = ptr.offset(azimuth=90, dist_hor=-add)
-
 
         ll = pll.offset(azimuth=-135,
                         dist_hor=float(extend_km),
@@ -593,7 +597,6 @@ class GeoSetup(object):
                         name='tr')
         self.add_geo_point(tr, assert_in_domain=False,
                            overwrite_existing=True)
-
 
     def points_close(self, p, radius=None):
         """
@@ -650,8 +653,7 @@ class GeoSetup(object):
         gs.add_geo_vectors(plume, view_dir)
         return gs
 
-
-    def create_map(self, *args, **kwargs): # pragma: no cover
+    def create_map(self, *args, **kwargs):  # pragma: no cover
         """Create a Basemap object for this regime"""
         if not BASEMAP_AVAILABLE:
             raise ImportError("Cannot create map: "
@@ -661,7 +663,7 @@ class GeoSetup(object):
             self.load_topo_data()
         if not "projection" in kwargs and self.magnitude < 150:
             kwargs["projection"] = "lcc"
-        if not "llcrnrlon" in kwargs:
+        if "llcrnrlon" not in kwargs:
             kwargs["llcrnrlat"] = self.lat_ll
             kwargs["llcrnrlon"] = self.lon_ll
             kwargs["urcrnrlat"] = self.lat_tr
@@ -674,7 +676,7 @@ class GeoSetup(object):
 
     def plot_2d(self, draw_all_points=True, draw_all_vectors=True,
                 draw_topo=True, draw_coastline=True, draw_mapscale=True,
-                draw_legend=True, *args, **kwargs): # pragma: no cover
+                draw_legend=True, *args, **kwargs):  # pragma: no cover
         """Draw overview map of the current setup
 
         :param bool draw_all_points (True): if true, all points are included
@@ -697,18 +699,17 @@ class GeoSetup(object):
         if not BASEMAP_AVAILABLE:
             raise ImportError("Cannot create overview map: Basemap module "
                               "is not available")
-        if not "ax" in kwargs:
-            #fig, ax = subplots(1,1)
+        if "ax" not in kwargs:
             from matplotlib.pyplot import figure
-            fig = figure(figsize=(10,8))
-            ax = fig.add_axes([0.12,0.15,0.8,0.8])
+            fig = figure(figsize=(10, 8))
+            ax = fig.add_axes([0.12, 0.15, 0.8, 0.8])
             kwargs["ax"] = ax
         m = self.create_map(*args, **kwargs)
         if draw_coastline:
             try:
                 m.drawcoastlines()
             except ValueError:
-                pass # see https://github.com/jgliss/geonum/issues/5
+                pass  # see https://github.com/jgliss/geonum/issues/5
         if draw_topo:
             m.draw_topo(insert_colorbar=True)
             m.draw_topo_contour()
@@ -729,8 +730,8 @@ class GeoSetup(object):
                         p_close_count += 1
                     m.write_point_name_2d(pt, dist, ang)
 
-        #create some color indices for colormap
-        nums = [int(255.0 / k) for k in range(1, len(self.vectors)+3)]
+        # create some color indices for colormap
+        nums = [int(255.0 / k) for k in range(1, len(self.vectors) + 3)]
         if draw_all_vectors:
             for i, vec in enumerate(self.vectors.values()):
                 m.draw_geo_vector_2d(vec,
@@ -748,7 +749,7 @@ class GeoSetup(object):
     def plot_3d(self, draw_all_points=True, draw_all_vectors=True,
                 cmap_topo="Oranges", contour_color="#708090",
                 contour_lw=0.2, contour_antialiased=True,
-                *args, **kwargs): # pragma: no cover
+                *args, **kwargs):  # pragma: no cover
         """Create a 3D overview map of the current setup
 
         Parameters
@@ -797,21 +798,21 @@ class GeoSetup(object):
             for name, pt in self.points.items():
                 if not any([name == x for x in ["ll", "tr"]]):
                     try:
-                        add_alt = 0 #in m
+                        add_alt = 0  # in m
                         for alt in alts:
                             if abs(alt - pt.altitude) < zr:
                                 add_alt = 3 * zr
                                 print("Add " + str(add_alt))
 
-                        pt.plot_3d(m, add_name = True, dz_text = zr + add_alt)
+                        pt.plot_3d(m, add_name=True, dz_text=zr + add_alt)
                         alts.append(pt.altitude)
 
                     except Exception as e:
                         warn("Point %s could not be drawn: %s"
-                             %(pt.name, repr(e)))
-                        pass
+                             % (pt.name, repr(e)))
+
         if draw_all_vectors:
-            nums = [int(255.0 / k) for k in range(1, len(self.vectors)+3)]
+            nums = [int(255.0 / k) for k in range(1, len(self.vectors) + 3)]
             for i, vec in enumerate(self.vectors.values()):
                 try:
                     m.draw_geo_vector_3d(vec, label=vec.name,
@@ -820,7 +821,6 @@ class GeoSetup(object):
                                          **kwargs)
                 except Exception as e:
                     warn("Vector %s could not be drawn: %s"
-                         %(vec.name, repr(e)))
-                    pass
+                         % (vec.name, repr(e)))
 
         return m

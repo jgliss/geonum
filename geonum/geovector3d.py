@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Geonum is a Python library for geographical calculations in 3D
 # Copyright (C) 2017 Jonas Gliss (jonasgliss@gmail.com)
 #
@@ -15,70 +13,123 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
+import warnings
 
-from LatLon23 import GeoVector
+from LatLon23 import GeoVector, LatLon
+from numpy import (radians, cos, sin, degrees, sqrt, tan, isnan, arctan2)
+
 from geonum.geopoint import GeoPoint
-    
-from numpy import (radians, cos, sin, degrees, sqrt,tan, isnan, arctan2)
+
 
 class GeoVector3D(GeoVector):
-    """A 3 dimensional geo vector object 
+    """A 3-dimensional geo vector object
     
-    3D vector representation for geo numerical calculations, intuitive 
-    usage, i.e.::
-    
-        from geonum import GeoPoint, GeoVector3D
-        p = GeoPoint(10.0, 15.0, name = "random_point") #lat, lon
-        v = GeoVector3D(dx = 15, dy = 100, dz = 300) #dx, dy in km, dz in m
-        
-        new_point = p + v # GeoPoint object
-        
-    
+    3D vector representation for geodesic connections and arithmetics of
+    locations (:class:`geonum.GeoPoint`).
+
     Note
     ----
-    
-        This class inherits and makes use of the functionality of 
-        `GeoVector` objects of the `LatLon` library. Methods and 
-        attributes are partly the same and partly overwritten
-        (note that it is not initiated as :class:`GeoVector`)
- 
+    To create an instnace of :class:`GeoVector3D` use one of the following to
+    input combinations:
+
+        1. dx, dy, dz
+        #. dz, azimuth, dist_hor
+        #. azimuth, dist_hor, elevation
+
+    Multiple input combinations will be processed in the preferred order
+    as given in the list.
+
+
+    Note
+    ----
+    Horitontal displacement components dx (longitude) and dy (latitude) are
+    in units of km, while vertical displacement component dz (altitude) is
+    in units of m.
+
+    Attributes
+    ----------
+    dx : float
+        longitudinal component in units of km
+    dy : float
+        latitudinal component in units of km
+    dz : float
+        altitude component in units of m
+    name : str
+        name of vector
+
+
+    Parameters
+    ----------
+    dx : float, optional
+        longitudinal component in units of km
+    dy : float, optional
+        latitudinal component in units of km
+    dz : float, optional
+        altitude component in units of m
+    azimuth : float, optional
+        azimuth orientation angle in units of decimal degrees, relative to
+        North direction.
+    dist_hor : float, optional
+        horizontal displacement length in input `azimuth` direction.
+    elevation : float, optional
+        elevation angle in decimal degrees (0 corresponds to horizon,
+        90 to zenith)
+    anchor : GeoPoint, optional
+        anchor point of this vector.
+    name : str, optional
+        name of vector, defaults to "undefined".
+
+    Example
+    -------
+
+    >>> from geonum import GeoPoint, GeoVector3D
+    >>> p = GeoPoint(latitude=10.0, longitude=15.0, name="random_point")
+    >>> v = GeoVector3D(dx=15, dy=100, dz=300) #dx, dy in km, dz in m
+    >>> new_point = p + v # GeoPoint object
+    >>> print(new_point)
+    GeoPoint undefined
+    Lat: 10.904041412793307,  Lon: 15.137202747069097, Alt: 300 m
+
     """
-            
-    def __init__(self, dx=None, dy=None, dz=None, azimuth=None, dist_hor=None, 
-                 elevation=None, anchor=None, name="n/d"):
-        """Class initialisation
-        
-        :param float dx: longitudinal length in km
-        :param float dy: latitudinal length in km
-        :param float dz: altitude length in m
-        :param float azimuth: azimuth angle to North direction (corresponds to 
-            heading_initial variable in :class:`GeoVector` object)
-        :param float dist_hor: horizontal displacement of object in km
-        :param float elevation: elevation angle in decimal degrees 
-            (0 corresponds to horizon, 90, to zenith)
-        
-        For initiation use one of the following to input combinations:
-        
-            1. dx, dy, dz
-            #. dz, azimuth, dist_hor
-            #. azimuth, dist_hor, elevation
-            
-        Multiple input combinations will be processed in the preferred order
-        as given in the list
-        
-        """
+
+    def __init__(self, dx=None, dy=None, dz=None, azimuth=None, dist_hor=None,
+                 elevation=None, anchor=None, name=None):
+        if name is None:
+            name = 'undefined'
+
         self.name = name
-        if all(x is not None for x in [dx, dy]): # If only dx and dy are given
-            self.dx = dx
-            self.dy = dy
-        elif all(x is not None for x in [azimuth, dist_hor]): # If only
-            # azimuth and distance are given
+
+        self.dx = None
+        self.dy = None
+        self.dz = None
+
+        self._eval_input(dx,dy,dz,azimuth,dist_hor,elevation)
+
+        # dictionary with private attributes
+        self._priv_attr= {"anchor" : None}
+
+        # call setter for private attribute anchor (this ensures that input
+        # attr anchor is of right type
+        if anchor is not None:
+            try:
+                self.set_anchor(anchor)
+            except TypeError as e:
+                print(f'Failed to set anchor. Reason: {e}')
+
+
+    def _eval_input(self,dx,dy,dz,azimuth,dist_hor,elevation):
+        if any(x is None for x in [dx, dy]): # If only initial_heading and
+            # distance are given
             theta_rad = radians(self._angle_or_heading(azimuth))
             self.dx = dist_hor * cos(theta_rad)
             self.dy = dist_hor * sin(theta_rad)
+        elif azimuth is None and dist_hor is None: # If only dx and dy are given
+            self.dx = dx
+            self.dy = dy
         else:
             raise ValueError('invalid input')
-        #Check input for altitude difference dz
+
+        # Check input for altitude component dz
         if dz is None or isnan(dz): #invalid for dz directly
             if elevation is not None and -90 <= elevation <= 90: #check if instead elevation is valid, then set dz
                 #tan elev = dz/dist_hor
@@ -86,94 +137,102 @@ class GeoVector3D(GeoVector):
             else: #both dz input and elevation are invalid, set dz=0
                 dz = 0.0
         self.dz = dz
-        # dictionary with private attributes
-        self._priv_attr= {"anchor" : None}
-        # call setter for private attribute anchor (this ensures that input 
-        # attr anchor is of right type
-        try:
-            self.set_anchor(anchor)
-        except:
-            pass
-    
-    @property
-    def azimuth(self):
-        """Azimuth angle in dec degrees 
-        
-        Horizontal orientation measured from N direction
-        """
-        return self._geom_hor()[0]
 
     @property
-    def elevation(self):
-        """Elevation angle in decimal degrees
-        
-        Measured from horizon (i.e. 0 -> horizon, 90 -> zenith)
+    def dz_km(self) -> float:
+        """:attr:`dz` converted to units of km
+
+        E.g. used for internal arithmetics.
         """
-        return 90 - self.polar_angle    
+        return self.dz/1000
+
+    @property
+    def azimuth(self) -> float:
+        """Horizontal orientation angle relative to North direction"""
+        return degrees(arctan2(self.dx, self.dy))
+
+    @property
+    def elevation(self) -> float:
+        """Elevation angle in decimal degrees relative to horizon"""
+        return (90-self.polar_angle)
     
     @property
-    def polar_angle(self):
-        """Polar angle in decimal degrees
-        
-        Returns the polar angle in decimal degrees (measured from zenith), 
-        i.e.::
-        
-            90 - self.elevation
-            
-        """
-        return degrees(arctan2(self.dist_hor, self.dz / 1000.))
+    def polar_angle(self) -> float:
+        """Polar angle in decimal degrees relative to zenith"""
+        return degrees(arctan2(self.dist_hor, self.dz_km))
     
     @property    
-    def magnitude(self):
-        """Return magnitude of vector (length)"""
-        return sqrt(self.dist_hor**2 + (self.dz / 1000.)**2)
+    def magnitude(self) -> float:
+        """Magnitude of vector (length) in units of km"""
+        return sqrt(self.dist_hor**2 + self.dz_km**2)
 
     @property
-    def norm(self):
-        """Return magnitude of vector (length)"""
+    def norm(self) -> float:
+        """Norm of vector, wrapper for :meth:`magnitude`"""
         return self.magnitude
         
     @property
-    def dist_hor(self):
+    def dist_hor(self) -> float:
         """Horizontal distance spanned by this vector"""
-        return self._geom_hor()[1]
+        return sqrt(self.dx**2 + self.dy**2)
     
     @property
-    def anchor(self):
-        """Getter method for private attribute anchor"""
+    def anchor(self) -> GeoPoint:
+        """Anchor point of vector"""
         return self._priv_attr["anchor"]
         
     @anchor.setter
     def anchor(self, value):
-        """Setter method of private property anchor
-        
-        See :func:`set_anchor` for input / output specs
-        """     
         self.set_anchor(value)
     
     def set_anchor(self, geo_point):
         """Set anchor of this vector
-        
-        :param GeoPoint geo_point: anchor point of this vector
-        :raises TypeError: if input is not :class:`GeoPoint` object        
+
+        Parameters
+        ----------
+        geo_point : GeoPoint
+            anchor location.
+
+        Raises
+        ------
+        TypeError
+            if input point is not instance of :class:`GeoPoint`.
         """
         if not isinstance(geo_point, GeoPoint):
-            raise TypeError("Could not set anchor: Invalid input type")
+            if isinstance(geo_point, LatLon):
+                geo_point = GeoPoint.from_LatLon(geo_point)
+            else:
+                raise TypeError("Could not set anchor: Invalid input type")
         self._priv_attr["anchor"] = geo_point
            
-    def intersect_hor(self, other):
-        """Determine the horizontal intersection of this vector with other 
-        input vector
-        
-        :param GeoVector3D: other vector
-        
-        .. note::
-        
-            Only works if anchor is defined
+    def intersect_hor(self, other) -> 'GeoVector3D':
+        """Find horizontal intersection of this vector with another vector
+
+        Note
+        ----
+        Only works if anchor point (:attr:`anchor`) is set in both vectors.
+
+        Parameters
+        ----------
+        other : GeoVector3D
+            Other vector for which the intersection is to be determined.
+
+        Raises
+        ------
+        AttributeError
+            if :attr:`anchor` is not set in this vector or input vector
+
+        Returns
+        -------
+        GeoVector3D
+            New vector pointing in direction of this vector but with correct
+            horizontal magnitude to the intersection with the other vector.
+
         """
         if not all([isinstance(x,GeoPoint) for x in [self.anchor, other.anchor]]):
-            raise ValueError("Intersection can not be determined, anchor "
-                " of one of the vectors not set..")
+            raise AttributeError(
+                "Intersection can not be determined, anchor "
+                "of one of the vectors not set..")
         v = other.anchor - self.anchor
         v.dz = 0.0
         other_az = radians((other.azimuth + 360) % 360)
@@ -181,58 +240,40 @@ class GeoVector3D(GeoVector):
         dy = (v.dx - tan(other_az) * v.dy) / (tan(self_az) - tan(other_az))
         dx = tan(self_az) * dy
         return GeoVector3D(dx, dy, dz=0.0)
-        
-    def _geom_hor(self):
-        """Returns horizontal heading and horizontal magnitude"""
-        return (degrees(arctan2(self.dx, self.dy)),
-                sqrt(self.dx**2 + self.dy**2))
-        
-    """Plotting etc..."""
-    def plot(self, map, add_anchor=False, **kwargs):
-        """Plot this vector into existing basemap
-        
-        :param Map map: map object
-        :param bool add_anchor: If true, the anchor point is plotted as well
-        :param kwargs: additional keyword arguments
-        
-        .. note::
-        
-            1. The basemap needs to be set up with Axes3D
-            #. ``self.anchor`` must be set with a :class:`Geopoint` instance
-            
-        """
+
+    def plot(self, map, add_anchor=False, **kwargs): # pragma: no cover
+        """Plot this vector into existing basemap"""
+        warnings.warn(DeprecationWarning(
+            'See https://github.com/jgliss/geonum/issues/4'))
         map.draw_geo_vector_3d(self, **kwargs)
         if add_anchor:
             self.anchor.plot(map, add_name=True, dz_text=self.dz*.1)
-        
-    """Redifining magic methods from base class :class:`GeoVector` object for
-    3D calcs
-    """
+
+    # ToDo: check if __call__ is really needed, a little confusing...
     def __call__(self):
         """Call function
-        
-        :returns:
-            - float azimuth angle
-            - float, horizontal length in km
-            - float, vertical length in m
+
+        Returns
+        -------
+        float
+            azimuth angle in units of decimal degrees wrt to N direction
+        float
+            horizontal length in km
+        float
+            vertical length in m
         """
-        azimuth, dist_hor = self._geom_hor()
-        return azimuth, dist_hor, self.dz
+        return (self.azimuth, self.dist_hor, self.dz)
         
     def __neg__(self):
         """Returns negative of this vector"""
         return GeoVector3D(-self.dx, -self.dy, -self.dz)
     
     def __add__(self, other):
-        """Add another geo vector
-        
-        
-        :param GeoVector3D other: another geo vector  
-        """
+        """Add another geo vector"""
         return GeoVector3D(self.dx + other.dx, self.dy + other.dy,
                            self.dz + other.dz)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """String representation"""
         return ('GeoVector3D {}\n'
                 'Azimuth: {:.2f}°, Elevation: {:.4f}°, Magnitude: {:.2f} km '
@@ -241,10 +282,10 @@ class GeoVector3D(GeoVector):
                         self.magnitude, self.dist_hor))
             
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         return ('Az %s, Elev %s, Mag. %s' 
                 %(self.azimuth, self.elevation, self.magnitude))
     
-    def type(self):
+    def type(self) -> str:
         """Returns object type"""
         return 'GeoVector3D'
