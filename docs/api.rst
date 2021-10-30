@@ -3,29 +3,37 @@ API Reference
 
 Application programming interface of geonum.
 
-GeoPoint
-========
+.. _geopoint:
+
+Specifying locations on Earth
+=============================
 
 .. automodule:: geonum.geopoint
    :members:
    :undoc-members:
 
-GeoVector3D
-===========
+.. _geovector:
+
+Connecting the dots
+===================
 
 .. automodule:: geonum.geovector3d
    :members:
    :undoc-members:
 
-GeoSetup
-========
+.. _geosetup:
+
+Working with geographical domains
+=================================
 
 .. automodule:: geonum.geosetup
    :members:
    :undoc-members:
 
-Elevation profiles
-==================
+.. _elevationprofiles:
+
+Computing elevation profiles
+============================
 
 .. automodule:: geonum.elevationprofile
    :members:
@@ -40,6 +48,8 @@ Line on grid
 .. automodule:: geonum.lineongrid
    :members:
    :undoc-members:
+
+.. _topodata:
 
 Topographic data
 ================
@@ -64,6 +74,8 @@ Low-level access and template classes
 .. automodule:: geonum.topoaccessbase
    :members:
    :undoc-members:
+
+.. _atmosphere:
 
 Atmospheric calculations
 ========================
