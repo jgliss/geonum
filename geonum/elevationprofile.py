@@ -26,12 +26,18 @@ class ElevationProfile(object):
 
     This class can be used to compute elevation profiles for arbitrary
     locations on earth. This is done by using topographic data which is
-    provided (instance of :class:`geonum.TopoData`). Profiles are computed with respect to
-    input location (:attr:`observer`) and the azimuthal direction of the
-    profile is specified via the provided enpoint location (:attr:`endpoint`).
-    The profile is calculated between two :class:`GeoPoint` objects using a
+    provided (instance of :class:`geonum.TopoData`). Profiles are computed with
+    respect to input location (:attr:`observer`) and the azimuthal direction of
+    the profile is specified via the provided endpoint location (
+    :attr:`endpoint`).
+
+    The profile is calculated between the two :class:`GeoPoint` objects using a
     provided topographic data grid which must cover the range spanned by
     both points.
+
+    Note
+    ----
+    For class attributes see properties below.
 
     Parameters
     ----------
@@ -47,6 +53,18 @@ class ElevationProfile(object):
     **kwargs
         additional keyword args passed to :func:`det_profile` (only relevant
         if `calc_on_init` is True)
+
+    Example
+    -------
+    >>> # define start and end location of profile
+    >>> startpoint = GeoPoint(37.73122, 15.1129, name="Scientist")
+    >>> endpoint = GeoPoint(37.751005, 14.993435, name="Etna Summit")
+    >>> # Create profile retrieval engine
+    >>> ep = ElevationProfile(observer=startpoint, endpoint=endpoint)
+    >>> # Retrieve profile (uses default topographic data SRTM)
+    >>> altitudes = ep.det_profile(interpolate=False)
+    >>> # Print retrieved altitude levels along profile
+    >>> print(altitudes)
     """
     def __init__(self, observer, endpoint, topo_data=None,
                  calc_on_init=True, **kwargs):
@@ -251,7 +269,7 @@ class ElevationProfile(object):
         """Altitude range of profile"""
         return self.max - self.min
 
-    def _get_topo(self):
+    def _get_topo(self) -> TopoData:
         """
         Load topographic data between start and end point
 
