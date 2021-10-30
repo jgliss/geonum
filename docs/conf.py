@@ -35,7 +35,7 @@ except ImportError:
 MOCK_MODULES = [
   'mpl_toolkits.basemap'
 ]
-#autodoc_mock_imports = ['mpl_toolkits']
+
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -320,7 +320,13 @@ texinfo_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {
+    'python'    : ('https://docs.python.org/3', None),
+    'numpy'     : ('https://numpy.org/doc/stable', None),
+    'pandas'    : ('https://pandas.pydata.org/docs', None),
+    'scipy'     : ('https://docs.scipy.org/doc/scipy', None),
+    'matplotlib': ('https://matplotlib.org/stable', None)
+    }
 
 #: names of private methods that are supposed to be included in docs
 def skip(app, what, name, obj, skip, options):

@@ -1,43 +1,55 @@
-***
-API
-***
+API Reference
+#############
 
 Application programming interface of geonum.
 
-GeoPoint
-========
+.. _geopoint:
+
+Specifying locations on Earth
+=============================
 
 .. automodule:: geonum.geopoint
    :members:
    :undoc-members:
 
-GeoVector3D
-===========
+.. _geovector:
+
+Connecting the dots
+===================
 
 .. automodule:: geonum.geovector3d
    :members:
    :undoc-members:
 
-GeoSetup
-========
+.. _geosetup:
+
+Working with geographical domains
+=================================
 
 .. automodule:: geonum.geosetup
    :members:
    :undoc-members:
 
-Elevation profiles
-==================
+.. _elevationprofiles:
+
+Computing elevation profiles
+============================
 
 .. automodule:: geonum.elevationprofile
    :members:
    :undoc-members:
 
-Further processing tools
+Further tools
 ========================
 
-.. automodule:: geonum.processing
+Line on grid
+------------
+
+.. automodule:: geonum.lineongrid
    :members:
    :undoc-members:
+
+.. _topodata:
 
 Topographic data
 ================
@@ -63,6 +75,8 @@ Low-level access and template classes
    :members:
    :undoc-members:
 
+.. _atmosphere:
+
 Atmospheric calculations
 ========================
 
@@ -77,22 +91,30 @@ Helper methods
    :members:
    :undoc-members:
 
+Utility functions
+=================
+
+.. automodule:: geonum.utils
+   :members:
+   :undoc-members:
+
+Plotting of maps
+================
+
+.. note::
+
+  The former map plotting routines routines (:mod:`geonum.mapping`)
+  are deprecated as they are based on the basemap library. They
+  will be revised and replaced in parts using cartopy. For details see:
+  https://github.com/jgliss/geonum/issues/4
+
+.. automodule:: geonum.mapping
+   :members:
+   :undoc-members:
+
 Custom exceptions
 =================
 
 .. automodule:: geonum.exceptions
-   :members:
-   :undoc-members:
-
-Plotting
-========
-
-.. note::
-
-  The current plotting routines are deprecated
-  as they are based on the basemap library. They
-  will be revised and replaced in parts using cartopy.
-
-.. automodule:: geonum.mapping
    :members:
    :undoc-members:
