@@ -218,10 +218,6 @@ class Etopo1Access(TopoAccessBase):
     ----------
     loader
         data loader (:class:`netCDF4.Dataset`)
-    local_path : str
-        directory where Etopo1 data files are stored
-    file_name :  str
-        file name of etopo data file
 
     Parameters
     ----------

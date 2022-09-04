@@ -386,10 +386,10 @@ class GeoSetup(object):
         Raises
         ------
         OutOfDomain
-            if :arg:`assert_in_domain` is True and input point is not within
-            current domain
+            if paramerter `assert_in_domain` is True and input point is not within
+            current domain.
         ValueError
-            if :arg:`overwrite_existing` is False and a point with the input n
+            if parameter `overwrite_existing` is False and a point with the input n
             name already exists in this setup.
 
         Returns
@@ -677,24 +677,8 @@ class GeoSetup(object):
     def plot_2d(self, draw_all_points=True, draw_all_vectors=True,
                 draw_topo=True, draw_coastline=True, draw_mapscale=True,
                 draw_legend=True, *args, **kwargs):  # pragma: no cover
-        """Draw overview map of the current setup
-
-        :param bool draw_all_points (True): if true, all points are included
-        :param bool draw_all_vectors (True): if true, all vectors (with anchor)
-            are included
-        :param bool draw_topo (True): include topography into map
-        :param bool draw_coastline (True): include coastline into map
-        :param bool draw_mapscale (True): insert map scale
-        :param bool draw_legend (True): insert a (draggable) legend
-        :param *args: additional non-keyword parameters (passed to `basemap
-            <http://matplotlib.org/basemap/api/basemap_api.html#mpl
-            _toolkits.basemap.Basemap>`_)
-        :param **kwargs: additional keyword parameters (passed to `basemap
-            <http://matplotlib.org/basemap/api/basemap_api.html#mpl
-            _toolkits.basemap.Basemap>`_)
-        :return:
-            - :class:`geonum.mapping.Map` object
-
+        """
+        To be updated
         """
         if not BASEMAP_AVAILABLE:
             raise ImportError("Cannot create overview map: Basemap module "

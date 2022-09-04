@@ -406,7 +406,8 @@ class GeoPoint(LatLon):
 
     def plot_3d(self, map, add_name=False, dz_text=0.0,
                 **kwargs):  # pragma: no cover
-        """Plot this point into existing 3D basemap
+        """
+        Plot this point into existing 3D basemap
 
         map : basemap
             Basemap object (drawn in an Axes3D object)
@@ -415,7 +416,7 @@ class GeoPoint(LatLon):
         dz_text : float
             altitude offset of text (to point location in map)
         **kwargs
-            additional keyword arguments passed to matplotlib plot function
+            additional keyword arguments passed to matplotlib plot function.
         """
         if not "marker" in kwargs:
             kwargs["marker"] = "^"
