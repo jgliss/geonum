@@ -764,7 +764,7 @@ class ElevationProfile(object):
         ax.plot(self.dists, view_elevations, label = "Viewing direction")
         try:
             ax.axvline(dist, ls = "--", label = "Intersection")
-        except: # pragma: no cover
+        except Exception: # pragma: no cover
             pass
         ax.legend(loc="best", fancybox=True, framealpha=0.4)
         return ax
