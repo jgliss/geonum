@@ -127,9 +127,6 @@ def test_ElevationProfile_slope(profile):
     assert isinstance(sl, np.ndarray)
     npt.assert_allclose(np.mean(sl), -0.003, atol=0.001)
 
-def test_ElevationProfile_start_point(profile):
-    assert profile.start_point == P0
-
 def test_ElevationProfile_min(profile1):
     npt.assert_allclose(profile1.min, 166.831, atol=0.01)
 

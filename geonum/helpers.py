@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Geonum is a Python library for geographical calculations in 3D
 # Copyright (C) 2017 Jonas Gliss (jonasgliss@gmail.com)
 #
@@ -16,14 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""
-Helper methods for geonum library
-"""
 import os
+
 import numpy as np
+
 from geonum import TOPO_INFO_FILE, LOCAL_TOPO_DIR
 
 exponent = lambda num: np.int(np.floor(np.log10(np.abs(num))))
+
 
 def all_topodata_search_dirs():
     """Returns a list of all directories that are searched for topography data
@@ -43,6 +41,7 @@ def all_topodata_search_dirs():
                 paths.append(os.path.normpath(p))
     return paths
 
+
 def check_and_add_topodir(local_dir):
     """Check if input directory is registered and if not, register it
 
@@ -57,31 +56,43 @@ def check_and_add_topodir(local_dir):
         raise ValueError(f'{local_dir} does not exist...')
     elif not fp in all_topodata_search_dirs():
         with open(TOPO_INFO_FILE, "a") as f:
-           f.write(f'{fp}\n')
-           print(f'Adding {fp} to file ~/.geonum/LOCAL_TOPO_DATA')
+            f.write(f'{fp}\n')
+            print(f'Adding {fp} to file ~/.geonum/LOCAL_TOPO_DATA')
+
 
 def isnum(val):
     """Checks if input is number (int or float) or and not nan
 
-    :returns: bool, True or False
+    Parameters
+    ----------
+    val
+        input object to be checked
+
+    Returns
+    -------
+    bool
+        whether or not input object `val` is of numerical type
     """
     if isinstance(val, (int, float)) and not np.isnan(val):
         return True
     return False
 
+
+# ToDo: review and move to plot_helpers.py
 def rotate_xtick_labels(ax, deg=30, ha="right"):
     """Rotate xtick labels in matplotlib axes object"""
 
     lbls = ax.get_xticklabels()
     lbls = [lbl.get_text() for lbl in lbls]
-    ax.set_xticklabels(lbls, rotation = 30, ha = "right")
+    ax.set_xticklabels(lbls, rotation=deg, ha=ha)
     return ax
 
+
 def haversine_formula(lon0, lat0, lon1, lat1, radius=None):
-    """Haversine formula
+    """Haversine formula to compute distances on a sphere
 
     Approximate horizontal distance between 2 points assuming a spherical
-    earth
+    earth.
 
     Parameters
     ----------
@@ -116,52 +127,76 @@ def haversine_formula(lon0, lat0, lon1, lat1, radius=None):
 
     return radius * c
 
+
+# ToDo: check whether this is really needed...
 def approximate_connection_vector(lon0, lat0, lon1, lat1, len_lat_km=111.20):
     """Returns approximate connection vector between two points
 
-    :param float lon0: longitude of first point in decimal degrees
-    :param float lat0: latitude of first point in decimal degrees
-    :param float lon1: longitude of second point in decimal degrees
-    :param float lat1: latitude of second point in decimal degrees
+    Note
+    ----
+    Careful: Only approximate, suited for small distances ( < 100km)
 
-    Careful: Only approximative, suited for small distance ( < 100km)
+    Parameters
+    ----------
+    lon0 : float
+        longitude of first point in decimal degrees
+    lat0 : float
+        latitude of first point in decimal degrees
+    lon1 : float
+        longitude of second point in decimal degrees
+    lat1 : float
+        latitude of second point in decimal degrees
+    len_lat_km : float
+        approx. length of 1 degree latitude at the equator in km.
+
+    Returns
+    -------
+    numpy.ndarray
+        2-element array containing (dx, dy) components of connection vector
     """
-
 
     lat = (lat0 + lat1) / 2 * 0.01745
     dx = len_lat_km * np.cos(lat) * (lon1 - lon0)
     dy = len_lat_km * (lat1 - lat0)
-    return np.array((dx,dy))
+    return np.array((dx, dy))
+
 
 def shifted_color_map(vmin, vmax, cmap=None):
     """Shift center of a diverging colormap to value 0
 
-    .. note::
+    Note
+    ----
 
-        This method was found `here <http://stackoverflow.com/questions/
-        7404116/defining-the-midpoint-of-a-colormap-in-matplotlib>`_
-        (last access: 17/01/2017). Thanks to `Paul H <http://stackoverflow.com/
-        users/1552748/paul-h>`_ who provided it.
+    This method was found `here <http://stackoverflow.com/questions/
+    7404116/defining-the-midpoint-of-a-colormap-in-matplotlib>`__
+    (last access: 17/01/2017). Thanks to `Paul H <http://stackoverflow.com/
+    users/1552748/paul-h>`_ who provided it.
 
     Function to offset the "center" of a colormap. Useful for
     data with a negative min and positive max and if you want the
     middle of the colormap's dynamic range to be at zero level
 
-    :param vmin: lower end of data value range
-    :param vmax: upper end of data value range
-    :param cmap: colormap (if None, use default cmap: seismic)
+    Parameters
+    ----------
+    vmin : float
+        lower end of data value range
+    vmax : float
+        upper end of data value range
+    cmap
+        matplotlib colormap to be shifted (if None, use "seismic")
 
-    :return:
-        - shifted colormap
+    Returns
+    -------
+    matplotlib.colors.LinearSegmentedColormap
+        shifted colormap
 
     """
     import matplotlib.cm as colormaps
     import matplotlib.colors as colors
-    #midpoint = 1 - np.abs(im.max())/(np.abs(im.max()) + np.abs(im.min()))
     if cmap is None:
         cmap = colormaps.seismic
 
-    midpoint = 1 - np.abs(vmax)/(np.abs(vmax) + np.abs(vmin))
+    midpoint = 1 - np.abs(vmax) / (np.abs(vmax) + np.abs(vmin))
 
     cdict = {
         'red': [],
@@ -186,8 +221,5 @@ def shifted_color_map(vmin, vmax, cmap=None):
         cdict['green'].append((si, g, g))
         cdict['blue'].append((si, b, b))
         cdict['alpha'].append((si, a, a))
-
-    #newcmap = colors.LinearSegmentedColormap('shiftedcmap', cdict)
-    #register_cmap(cmap=newcmap)
 
     return colors.LinearSegmentedColormap('shiftedcmap', cdict)

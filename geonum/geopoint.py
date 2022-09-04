@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Geonum is a Python library for geographical calculations in 3D
 # Copyright (C) 2017 Jonas Gliss (jonasgliss@gmail.com)
 #
@@ -16,17 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from LatLon23 import LatLon
 import numpy as np
+from LatLon23 import LatLon
 
-from geonum.topodataaccess import TopoDataAccess
-from geonum.topodata import TopoData
 from geonum.exceptions import OutOfDomain
+from geonum.topodata import TopoData
+from geonum.topodataaccess import TopoDataAccess
+
 
 class GeoPoint(LatLon):
     """The Geopoint object represents a location in the atmosphere
 
-    This object is in 3D and includes elevation information.
+    This object is in 3D and includes altitude information.
 
     Attributes
     ----------
@@ -66,6 +65,7 @@ class GeoPoint(LatLon):
         local topography (note that defa)
     """
     _ALTERR_DEFAULT = 1e9
+
     def __init__(self, latitude=0, longitude=0, altitude=None, name=None,
                  topo_access_mode=None, topo_path=None, topo_data=None,
                  auto_topo_access=False):
@@ -74,11 +74,11 @@ class GeoPoint(LatLon):
         LatLon.__init__(self, float(latitude), float(longitude), name)
         if altitude is None:
             altitude = 0
-        elif auto_topo_access: # altitude is not None
+        elif auto_topo_access:  # altitude is not None
             raise ValueError(
                 'either provide altitude or deactivate auto_topo_access'
-                )
-        self.altitude = altitude #altitude in m
+            )
+        self.altitude = altitude  # altitude in m
         self.altitude_err = self._ALTERR_DEFAULT
 
         self.topo_access_mode = topo_access_mode
@@ -93,23 +93,23 @@ class GeoPoint(LatLon):
             self.set_topo_altitude()
 
     @property
-    def longitude(self):
+    def longitude(self) -> float:
         """Longitude coordinate in decimal degrees"""
         return self.lon.decimal_degree
 
     @property
-    def latitude(self):
+    def latitude(self) -> float:
         """Latitude coordinate in decimal degrees"""
         return self.lat.decimal_degree
 
     @property
-    def _topo_access(self):
+    def _topo_access(self) -> TopoDataAccess:
         """Topography data access class"""
         return TopoDataAccess(mode=self.topo_access_mode,
                               local_path=self.local_topo_path)
 
     def offset(self, azimuth, dist_hor, dist_vert=0.0, ellipse=None,
-               **kwargs):
+               **kwargs) -> 'GeoPoint':
         """Returns new GeoPoint at offset position
 
         Parameters
@@ -159,10 +159,10 @@ class GeoPoint(LatLon):
             raise OutOfDomain(
                 f'Cannot assign input TopoData {topo_data} to {self}. '
                 f'The location of {self} are outside the borders of TopoData'
-                )
+            )
         self.topo_data = topo_data
 
-    def range_borders(self, *points):
+    def range_borders(self, *points, extend_fac=0.1):
         """Get geographical borders (lower left, top right) of this point
 
         Additional points can be included as non keyword arguments. The
@@ -175,6 +175,9 @@ class GeoPoint(LatLon):
         ----------
         *points
             additional :class:`GeoPoint` objects to be  considered
+        extend_fac : float
+            domain extension factor wrt to lat / lon span covered by input
+            points, defaults to 0.1 (ca 10% extension)
 
         Returns
         -------
@@ -185,7 +188,7 @@ class GeoPoint(LatLon):
 
         """
         lats, lons = [self.latitude], [self.longitude]
-        #retrieve all latitudes and longitudes
+        # retrieve all latitudes and longitudes
         for p in points:
             if isinstance(p, GeoPoint):
                 lats.append(p.latitude)
@@ -196,12 +199,12 @@ class GeoPoint(LatLon):
          lat_tr, lon_tr) = (np.nanmin(lats), np.nanmin(lons),
                             np.nanmax(lats), np.nanmax(lons))
         pll, ptr = GeoPoint(lat_ll, lon_ll, 0.0), GeoPoint(lat_tr, lon_tr, 0.0)
-        extend_km = (pll - ptr).magnitude * 0.1
+        extend_km = (pll - ptr).magnitude * extend_fac
         if extend_km == 0:
             extend_km = 1
         ll = pll.offset(azimuth=-135, dist_hor=float(extend_km), name="ll")
         tr = ptr.offset(azimuth=45, dist_hor=float(extend_km), name="tr")
-        return  (ll, tr)
+        return (ll, tr)
 
     def get_topo_data(self, geo_point=None, azimuth=None, dist_hor=None,
                       lon1=None, lat1=None):
@@ -287,7 +290,7 @@ class GeoPoint(LatLon):
             return False
         if not (self.topo_data.includes_coordinate(self.latitude,
                                                    self.longitude)
-            and self.topo_data.includes_coordinate(lat1, lon1)):
+                and self.topo_data.includes_coordinate(lat1, lon1)):
             return False
         return True
 
@@ -351,7 +354,7 @@ class GeoPoint(LatLon):
     def set_topo_altitude(self):
         """Set altitude using topographic terrain height at lat / lon position
 
-        The estimatation is done by retrieving a 2x2 grid of topography
+        The estimation is done by retrieving a 2x2 grid of topography
         data enclosing this point. The altitude value is estimated using the
         topo data tile closest to the coordinates of this point. The
         uncertainty is estimated conservatively using min/max difference of
@@ -377,7 +380,7 @@ class GeoPoint(LatLon):
         return (z, z_err)
 
     def plot_2d(self, map, add_name=False, dist_text=0.5, angle_text=-45,
-                **kwargs): # pragma: no cover
+                **kwargs):  # pragma: no cover
         """Plot this point into existing 2D basemap
 
         Parameters
@@ -402,8 +405,9 @@ class GeoPoint(LatLon):
             map.write_point_name_2d(self, dist_text, angle_text)
 
     def plot_3d(self, map, add_name=False, dz_text=0.0,
-                **kwargs): # pragma: no cover
-        """Plot this point into existing 3D basemap
+                **kwargs):  # pragma: no cover
+        """
+        Plot this point into existing 3D basemap
 
         map : basemap
             Basemap object (drawn in an Axes3D object)
@@ -412,26 +416,26 @@ class GeoPoint(LatLon):
         dz_text : float
             altitude offset of text (to point location in map)
         **kwargs
-            additional keyword arguments passed to matplotlib plot function
+            additional keyword arguments passed to matplotlib plot function.
         """
         if not "marker" in kwargs:
             kwargs["marker"] = "^"
         if not any([x in kwargs for x in ["c", "color"]]):
             kwargs["c"] = "lime"
         map.draw_geo_point_3d(self, **kwargs)
-        x0, y0 = list(map(self.lon.decimal_degree, self.lat.decimal_degree))
+        # x0, y0 = list(map(self.lon.decimal_degree, self.lat.decimal_degree))
         if add_name and self.name is not None:
             try:
                 fs = kwargs["fontSize"]
-            except:
+            except Exception:
                 fs = 12
-            #zt=self.altitude*1000. + dz_text
+
             zt = self.altitude + dz_text
             map.draw_text_3d(self.longitude, self.latitude, zt, self.name,
                              color="k", fontsize=fs)
 
-    def _load_topo_data(self, lat0, lon0, lat1, lon1):
-        """Load and update topo data
+    def _load_topo_data(self, lat0, lon0, lat1, lon1) -> TopoData:
+        """Load topo data
 
         Parameters
         ----------
@@ -449,7 +453,6 @@ class GeoPoint(LatLon):
         TopoData
             loaded topographic data
         """
-        print(f"Trying to load topography data for {self}")
         self.topo_data = self._topo_access.get_data(lat0, lon0, lat1, lon1)
         return self.topo_data
 
@@ -471,7 +474,7 @@ class GeoPoint(LatLon):
             endpoint location
         """
         heading, distance = other()
-        heading = (heading + 180) % 360 # Flip heading
+        heading = (heading + 180) % 360  # Flip heading
         p = GeoPoint(self.lat, self.lon, self.altitude)
 
         return p.offset(heading, distance)
@@ -511,14 +514,14 @@ class GeoPoint(LatLon):
             endpoint location
         """
         azimuth, dist_hor, dz = other()
-        azimuth = (azimuth + 180) % 360 # Flip heading
-        p = GeoPoint(self.lat, self.lon, self.altitude) # Copy current position
-        return p.offset(azimuth, dist_hor, -dz) # Offset position by GeoVector
+        azimuth = (azimuth + 180) % 360  # Flip heading
+        p = GeoPoint(self.lat, self.lon, self.altitude)  # Copy current position
+        return p.offset(azimuth, dist_hor, -dz)  # Offset position by GeoVector
 
     def _add_geo_vector_3d(self, other):
         """Add a 3d geo vector object
 
-        arameters
+        Parameters
         ----------
         other : GeoVector3D
             vector to be added to this location
@@ -541,7 +544,7 @@ class GeoPoint(LatLon):
         on = other.name
         if on is None:
             on = 'undefined'
-        name= f'{on}->{self.name}'
+        name = f'{on}->{self.name}'
         return GeoVector3D(dz=0.0, azimuth=heading, dist_hor=distance,
                            anchor=other, name=name)
 
@@ -559,19 +562,24 @@ class GeoPoint(LatLon):
     def __eq__(self, other):
         """Checks equality of this point with another
 
-        :param other: another :class:`GeoPoint` object
+        Parameters
+        ----------
+        other : GeoPoint
+            other location
+
+        Returns
+        -------
+        bool
+            True if other is equal, else False
         """
         if (self.latitude == other.latitude and
-            self.longitude == other.longitude and
-            self.altitude == other.altitude):
+                self.longitude == other.longitude and
+                self.altitude == other.altitude):
             return True
         return False
 
     def __add__(self, other):
-        """Add a geo vector to this point
-
-        :param (GeoVector, GeoVector3D) other: a vector
-        """
+        """Add a geo vector or geo point to this point"""
         object_operator = {'GeoVector': self._add_geo_vector_2d,
                            'GeoVector3D': self._add_geo_vector_3d}
         try:
@@ -585,10 +593,10 @@ class GeoPoint(LatLon):
 
     def __sub__(self, other):
         """Subtraction"""
-        object_operator = {'GeoVector'      :   self._sub_geo_vector_2d,
-                           'GeoVector3D'    :   self._sub_geo_vector_3d,
-                           'LatLon'         :   self._sub_latlon,
-                           'GeoPoint'       :   self._sub_geo_point}
+        object_operator = {'GeoVector': self._sub_geo_vector_2d,
+                           'GeoVector3D': self._sub_geo_vector_3d,
+                           'LatLon': self._sub_latlon,
+                           'GeoPoint': self._sub_geo_point}
         try:
             tp = other.type()
             if not tp in object_operator.keys():
@@ -613,6 +621,18 @@ class GeoPoint(LatLon):
     def type(self):
         """Object type identifier
 
-        :returns: str, the string identifier
+        Returns
+        -------
+        str
+            value='GeoPoint'
         """
         return 'GeoPoint'
+
+    @staticmethod
+    def from_LatLon(coord):
+        if not isinstance(coord, LatLon):
+            raise ValueError('Need LatLon...')
+        return GeoPoint(latitude=coord.lon.decimal_degree,
+                        longitude=coord.lat.decimal_degree,
+                        altitude=0,
+                        auto_topo_access=False)

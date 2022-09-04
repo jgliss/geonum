@@ -29,14 +29,14 @@ from . import helpers
 from . import atmosphere
 from .topodata import TopoData
 from .topodataaccess import TopoDataAccess
-from .topoaccessbase import delete_all_local_srtm_files
-
 
 from .geopoint import GeoPoint
 from .geovector3d import GeoVector3D
 from .geosetup import GeoSetup
 from .elevationprofile import ElevationProfile
-from .processing import LineOnGrid
+from .lineongrid import LineOnGrid
+
+from .utils import delete_local_srtm_files
 
 if BASEMAP_AVAILABLE: # pragma: no cover
     from .mapping import Map
