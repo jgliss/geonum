@@ -98,8 +98,15 @@ Utility functions
    :members:
    :undoc-members:
 
-Plotting of maps
-================
+Plotting
+========
+
+.. automodule:: geonum.plot_helpers
+   :members:
+   :undoc-members:
+
+DEPRECATED: mapping.py
+-----------------------
 
 .. note::
 
