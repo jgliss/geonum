@@ -1,14 +1,9 @@
 Introduction
 ############
 
-geonum is a python library for geographic calculations and provides
-intuitive tools for representing locations on Earth in terms of longitude,
-latitude and altitude and associated arithmetics. For instance, geonum
-provides features for distance or heading retrievals, or to compute
-intersections of different viewing directions (e.g. intersection of a camera
-viewing direction with some topographic feature, such as a mountain in a
-scene). In addition, geonum provides high-level tools to represent
-geographic domains, and to retrieve and process topographic data within them.
+geonum is a python library written in Python 3 for geographic calculations.
+It provides intuitive objects for representing locations on Earth in terms of
+longitude, latitude and altitude, as well as associated arithmetics.
 
 geonum was developed together with the `pyplis <https://pyplis.readthedocs
 .io/en/latest/>`_ library
