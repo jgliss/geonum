@@ -2,5 +2,4 @@ scipy
 matplotlib
 LatLon23
 SRTM.py
-proj>=8.0.0
-cartopy
+cartopy==0.19.0.post1
