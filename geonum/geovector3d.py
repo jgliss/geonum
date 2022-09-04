@@ -81,7 +81,7 @@ class GeoVector3D(GeoVector):
 
     Example
     -------
-    
+
     >>> from geonum import GeoPoint, GeoVector3D
     >>> p = GeoPoint(latitude=10.0, longitude=15.0, name="random_point")
     >>> v = GeoVector3D(dx=15, dy=100, dz=300) #dx, dy in km, dz in m
@@ -91,8 +91,8 @@ class GeoVector3D(GeoVector):
     Lat: 10.904041412793307,  Lon: 15.137202747069097, Alt: 300 m
 
     """
-            
-    def __init__(self, dx=None, dy=None, dz=None, azimuth=None, dist_hor=None, 
+
+    def __init__(self, dx=None, dy=None, dz=None, azimuth=None, dist_hor=None,
                  elevation=None, anchor=None, name=None):
         if name is None:
             name = 'undefined'
@@ -108,7 +108,7 @@ class GeoVector3D(GeoVector):
         # dictionary with private attributes
         self._priv_attr= {"anchor" : None}
 
-        # call setter for private attribute anchor (this ensures that input 
+        # call setter for private attribute anchor (this ensures that input
         # attr anchor is of right type
         if anchor is not None:
             try:

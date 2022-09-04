@@ -5,28 +5,32 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        python-version: [3.7, 3.8, 3.9]
-        os: [ubuntu-latest]
+  build-and-test:
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -l {0}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.8, 3.9]
+        os: [ubuntu-latest, windows-latest]
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+    - name: Set up conda env ${{ matrix.python-version }}
+      uses: conda-incubator/setup-miniconda@v2
       with:
+        mamba-version: "*"
+        environment-file: geonum_env.yml
+        activate-environment: geonum
         python-version: ${{ matrix.python-version }}
-    - uses: s-weigand/setup-conda@v1
+        auto-activate-base: false
     - name: Conda info
-      run: |
-        conda --version
-        which python
+      run: conda info
+    - name: Python version
+      run: which python
     - name: Display current environments
       run: conda info --envs
-    - name: Update environment
-      run: |
-        conda env update -n base -f ./geonum_env.yml
     - name: Install test dependencies
       run: |
         conda install -c conda-forge --file ./test-requirements.txt
