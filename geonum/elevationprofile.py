@@ -751,7 +751,7 @@ class ElevationProfile(object):
         view_elevations : list-like
             elevation levels along line of sight
 
-        dist : float
+        dist : float, optional
             distance to intersect
 
         Returns
@@ -762,9 +762,8 @@ class ElevationProfile(object):
         """
         ax = self.plot()
         ax.plot(self.dists, view_elevations, label = "Viewing direction")
-        try:
+        if dist is not None:
             ax.axvline(dist, ls = "--", label = "Intersection")
-        except Exception: # pragma: no cover
-            pass
+
         ax.legend(loc="best", fancybox=True, framealpha=0.4)
         return ax
