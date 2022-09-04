@@ -20,21 +20,18 @@ from warnings import warn
 
 import numpy as np
 import srtm
-from six import with_metaclass
 
 from geonum import NETCDF_AVAILABLE, LOCAL_TOPO_DIR
 from geonum.exceptions import (TopoAccessError, SRTMNotCoveredError)
 
 
-class TopoAccessBase(with_metaclass(abc.ABCMeta, object)):
+class TopoAccessBase(abc.ABC):
     """Abstract base class for topgraphy file implementations
 
     Defines minimum interface for derived access classes of different
     topographic datasets.
+    
     """
-    # local_path = None
-    # topo_id = None
-
     #: A coordinate for which data should be available
     _TESTLAT = 45
     _TESTLON = 15
