@@ -422,13 +422,13 @@ class GeoPoint(LatLon):
         if not any([x in kwargs for x in ["c", "color"]]):
             kwargs["c"] = "lime"
         map.draw_geo_point_3d(self, **kwargs)
-        x0, y0 = list(map(self.lon.decimal_degree, self.lat.decimal_degree))
+        # x0, y0 = list(map(self.lon.decimal_degree, self.lat.decimal_degree))
         if add_name and self.name is not None:
             try:
                 fs = kwargs["fontSize"]
-            except:
+            except Exception:
                 fs = 12
-            # zt=self.altitude*1000. + dz_text
+
             zt = self.altitude + dz_text
             map.draw_text_3d(self.longitude, self.latitude, zt, self.name,
                              color="k", fontsize=fs)
