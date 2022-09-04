@@ -1,5 +1,4 @@
 import glob
-from os.path import basename
 from traceback import format_exc
 
 paths = sorted(glob.glob('ex*.py'))
