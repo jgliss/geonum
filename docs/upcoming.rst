@@ -10,8 +10,12 @@ for new features, bug fixes, etc that are in the pipeline.
 As this project is developed privately, things may take a while and we
 encourage interested users to contribute to geonum.
 
+.. _contribute:
+
 Contribute
 ##########
+
+We appreciate very much any contribution from users or developers to geonum.
 
 There are many ways to contribute to open source software, here are some
 examples:

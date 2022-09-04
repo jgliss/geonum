@@ -113,7 +113,7 @@ def rotate_xtick_labels(ax, deg=30, ha="right"):
 
 
 def haversine_formula(lon0, lat0, lon1, lat1, radius=None):
-    """Haversine formula
+    """Haversine formula to compute distances on a sphere
 
     Approximate horizontal distance between 2 points assuming a spherical
     earth.
@@ -192,7 +192,7 @@ def shifted_color_map(vmin, vmax, cmap=None):
     ----
 
     This method was found `here <http://stackoverflow.com/questions/
-    7404116/defining-the-midpoint-of-a-colormap-in-matplotlib>`_
+    7404116/defining-the-midpoint-of-a-colormap-in-matplotlib>`__
     (last access: 17/01/2017). Thanks to `Paul H <http://stackoverflow.com/
     users/1552748/paul-h>`_ who provided it.
 

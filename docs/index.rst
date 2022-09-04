@@ -5,7 +5,7 @@
 
 |CI| |docs| |cov| |code-quality|
 
-Welcome to Geonum
+Welcome to geonum
 =================
 
 GitHub: https://github.com/jgliss/geonum
