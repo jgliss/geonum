@@ -20,6 +20,7 @@ jobs:
     - name: Set up conda env ${{ matrix.python-version }}
       uses: conda-incubator/setup-miniconda@v2
       with:
+        mamba-version: "*"
         environment-file: geonum_env.yml
         activate-environment: geonum
         python-version: ${{ matrix.python-version }}
