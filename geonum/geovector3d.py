@@ -118,21 +118,48 @@ class GeoVector3D(GeoVector):
 
 
     def _eval_input(self,dx,dy,dz,azimuth,dist_hor,elevation):
-        if any(x is None for x in [dx, dy]): # If only initial_heading and
-            # distance are given
-            theta_rad = radians(self._angle_or_heading(azimuth))
-            self.dx = dist_hor * cos(theta_rad)
-            self.dy = dist_hor * sin(theta_rad)
-        elif azimuth is None and dist_hor is None: # If only dx and dy are given
-            self.dx = dx
-            self.dy = dy
-        else:
-            raise ValueError('invalid input')
+        """
+        Retrieve dx, dy, dz based on input
 
+        See parameter description regarding allowed input combinations. Note that for the horizontal
+        component, inputs of `dx` and `dy` are preferred over `azimuth` and `elevation` (in case
+        both are wrongly provided).
+
+        Parameters
+        ----------
+        dx : float, optional
+            delta x in units of longitude degrees East.
+            To be combined with `dy`. If None, it is expected that
+            azimuth and dist_hor are provided.
+        dy : float, optional
+            delta y in units of latitude North, to be combined with `dx`.
+            If None, it is expected that azimuth and dist_hor are provided.
+        dz : float, optional
+            delta z in units of m. If None or NaN, it will either be inferred
+            from input `elevation` and `dx` & `dy` or if that's not
+            possible (`elevation` is None), then it will be set to 0 m.
+        azimuth : float, optional
+            horizontal direction of vector in units of radians or degrees
+            (relative to North, or 12 o'clock direction)
+        dist_hor : float, optional
+            magnitude of horizontal component of vector (dx, dy).
+        elevation : float, optional
+            vertical elevation angle in units of degrees. Allowed input range are values between
+            (and excluding) -90 and +90 (zenith).
+        """
+        if dx is None or dy is None:
+            if azimuth is not None and dist_hor is not None:
+                theta_rad = radians(self._angle_or_heading(azimuth))
+                dx = dist_hor * cos(theta_rad)
+                dy = dist_hor * sin(theta_rad)
+            else: # If only dx and dy are given
+                raise ValueError('Please specify either: 1. azimuth and dist_hor, or 2. dx and dy')
+
+        self.dx = dx
+        self.dy = dy
         # Check input for altitude component dz
         if dz is None or isnan(dz): #invalid for dz directly
-            if elevation is not None and -90 <= elevation <= 90: #check if instead elevation is valid, then set dz
-                #tan elev = dz/dist_hor
+            if elevation is not None and -90 < elevation < 90: #check if instead elevation is valid, then set dz
                 dz = tan(radians(elevation))*sqrt(self.dx**2+self.dy**2)*1000
             else: #both dz input and elevation are invalid, set dz=0
                 dz = 0.0
