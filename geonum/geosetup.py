@@ -741,8 +741,8 @@ class GeoSetup(object):
         if draw_legend:
             try:
                 m.legend()
-            except:
-                warn("Failed to draw legend in GeoSetup...")
+            except Exception as e:
+                warn(f"Failed to draw legend in GeoSetup...: {e}")
 
         return m
 
