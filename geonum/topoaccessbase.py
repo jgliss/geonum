@@ -559,7 +559,6 @@ class SRTMAccess(TopoAccessBase):
         # loop over all coordinates and try access the elevation data
         for i in range(len(lats)):
             for j in range(len(lons)):
-                # print "Lat: %s, Lon: %s" % (lats[i], lons[j])
                 vals[i, j] = dat.get_elevation(lats[i], lons[j])
 
         return TopoData(lats, lons, vals, data_id=self.topo_id)
