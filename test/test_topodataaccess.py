@@ -40,7 +40,7 @@ def test_topoaccess_invalid_mode():
         tp.TopoDataAccess('bla')
     except tp.InvalidTopoMode:
         pass
-    except:
+    except Exception:
         all_ok = False
 
     acc = tp.TopoDataAccess()
@@ -48,7 +48,7 @@ def test_topoaccess_invalid_mode():
         acc.get_data(0,0, mode='bla')
     except tp.InvalidTopoMode:
         pass
-    except:
+    except Exception:
         all_ok = False
     assert all_ok
 
