@@ -167,31 +167,10 @@ class TopoAccessBase(abc.ABC):
             idx_lats[1] = len(lats_all) - 1
         elif lats_all[idx_lats[1]] < lat1:
             idx_lats[1] += 1
-        # # make sure that no odd array lengths occur
-        # if not (idx_lats[1] - idx_lats[0] + 1) % 2 == 0:
-        #     # try append index at the end
-        #     if not idx_lats[1] == len(lats_all) - 1:
-        #         idx_lats[1] += 1
-        #     elif not idx_lats[0] == 0:
-        #         idx_lats[0] -= 1
-        #     else:
-        #         raise ValueError("Fatal error, odd length of latitude array")
-        # if not (idx_lons[1] - idx_lons[0] + 1) % 2 == 0:
-        #     # try append index at the end
-        #     if not idx_lons[1] == len(lons_all) - 1:
-        #         idx_lons[1] += 1
-        #     elif not idx_lons[0] == 0:
-        #         idx_lons[0] -= 1
-        #     else:
-        #         raise ValueError("Fatal error, odd length of longitude array")
-        if idx_lats[0] > idx_lats[1]:
-            return (lats_all[idx_lats[1]: idx_lats[0] + 1],
-                    lons_all[idx_lons[0]: idx_lons[1] + 1],
-                    idx_lats, idx_lons)
-        else:
-            return (lats_all[idx_lats[0]: idx_lats[1] + 1],
-                    lons_all[idx_lons[0]: idx_lons[1] + 1],
-                    idx_lats, idx_lons)
+
+        return (lats_all[idx_lats[0]: idx_lats[1] + 1],
+                lons_all[idx_lons[0]: idx_lons[1] + 1],
+                idx_lats, idx_lons)
 
 
 class Etopo1Access(TopoAccessBase):
