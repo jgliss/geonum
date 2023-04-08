@@ -293,7 +293,7 @@ class GeoSetup(object):
             self.load_topo_data()
         return self.topo_data
 
-    def load_topo_data(self, topo_access_mode=None):
+    def load_topo_data(self):
         """Load topography data
 
         Note
@@ -313,8 +313,6 @@ class GeoSetup(object):
         TopoData
             topographic data (is also assigned to :attr:`topo_data`).
         """
-        if topo_access_mode is not None:
-            self.topo_access_mode = topo_access_mode
         if "ll" not in self.points:
             self.set_borders_from_points()
         self.topo_data = self.topo_access.get_data(self.ll.latitude,
