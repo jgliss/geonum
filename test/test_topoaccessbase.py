@@ -86,6 +86,20 @@ def test__init_lons_lats(etopo_acc,lat0,lon0,lat1,lon1,res):
     for i, item in enumerate(res):
         npt.assert_array_equal(result[i], item)
 
+def test_init_Etopo1_invalid_file(tmpdir):
+    file_name = 'invalid.grd'
+    path = tmpdir / file_name
+    with open(path, 'w') as f:
+        f.write('bla')
+
+    assert path.exists()
+
+    acc = mod.Etopo1Access(local_path=tmpdir,
+                           file_name=file_name,
+                           check_access=True,
+                           search_database=False)
+
+
 
 
 

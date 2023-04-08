@@ -214,22 +214,20 @@ class Etopo1Access(TopoAccessBase):
 
     def __init__(self, local_path=None, file_name=None, check_access=False,
                  search_database=True):
-
-        if not NETCDF_AVAILABLE:
+        if file_name is None:
+            file_name = "ETOPO1_Ice_g_gmt4.grd"
+        if not NETCDF_AVAILABLE: # pragma: no cover
             raise ModuleNotFoundError(
                 "Etopo1Access class cannot be initiated. "
                 "Please install netCDF4 library first")
         if local_path is None:
             local_path = LOCAL_TOPO_DIR
         self._local_path = local_path
-        self._file_name = "ETOPO1_Ice_g_gmt4.grd"
+        self._file_name = file_name
 
         from netCDF4 import Dataset
 
         self.loader = Dataset
-
-        if file_name is not None:
-            self.file_name = file_name
 
         if not os.path.exists(self.file_path) and search_database:
             self.search_topo_file_database()
