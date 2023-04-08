@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-"""Test environment for base.py module."""
 import numpy.testing as npt
 import pytest
 from geonum.conftest import skip_srtm, does_not_raise_exception

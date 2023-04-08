@@ -156,6 +156,7 @@ def test_GeoSetup_set_local_topo_path(tmpdir):
     ('bla', None, does_not_raise_exception()),
     ('bla', 'blub', pytest.raises(FileExistsError)),
     ('bla', '/', does_not_raise_exception()),
+    (None, None, does_not_raise_exception()),
 
 ])
 def test_GeoSetup_change_topo_mode(new_mode,local_path,raises):

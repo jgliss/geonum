@@ -27,6 +27,8 @@ __dir__, __version__ = _init_dir_and_version()
 from . import exceptions
 from . import helpers
 from . import atmosphere
+from . import plot_helpers
+
 from .topodata import TopoData
 from .topodataaccess import TopoDataAccess
 

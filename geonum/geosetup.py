@@ -296,20 +296,34 @@ class GeoSetup(object):
     def load_topo_data(self):
         """Load topography data
 
-        .. note::
+        Note
+        ----
 
-            The loaded :class:`TopoData` object will also be set in all
-            :class:`GeoPoint` objects belonging to this setup
+        The loaded :class:`TopoData` object will also be set in all
+        :class:`GeoPoint` objects belonging to this setup
 
+        Parameters
+        ----------
+        topo_access_mode : str, optional
+            topo dataset that is supposed to be used. If None, then
+            :attr:`topo_access_mode` is used.
+
+        Returns
+        -------
+        TopoData
+            topographic data (is also assigned to :attr:`topo_data`).
         """
         if "ll" not in self.points:
             self.set_borders_from_points()
         self.topo_data = self.topo_access.get_data(self.ll.latitude,
                                                    self.ll.longitude,
                                                    self.tr.latitude,
-                                                   self.tr.longitude)
+                                                self.tr.longitude)
         for p in list(self.points.values()):
             p.set_topo_data(self.topo_data)
+
+        return self.topo_data
+
 
     def has_point(self, name):
         """Checks if point with input name exists
@@ -725,8 +739,8 @@ class GeoSetup(object):
         if draw_legend:
             try:
                 m.legend()
-            except:
-                warn("Failed to draw legend in GeoSetup...")
+            except Exception as e:
+                warn(f"Failed to draw legend in GeoSetup...: {e}")
 
         return m
 

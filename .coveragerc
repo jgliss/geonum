@@ -1,5 +1,9 @@
 [run]
 omit =
   geonum/mapping.py
-  geonum/test/*
+  test/*
   geonum/conftest.py
+
+ [report]
+ exclude_lines =
+    pragma: no cover

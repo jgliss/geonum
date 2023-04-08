@@ -3,7 +3,8 @@ channels:
   - conda-forge
 dependencies:
   - python>=3.8
-  - scipy
-  - matplotlib
+  - scipy>=1.6.0
+  - matplotlib>=3.3.0
+  - cartopy>=0.18.0
   - latlon23
   - srtm.py

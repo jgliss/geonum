@@ -25,6 +25,7 @@ GitHub: https://github.com/jgliss/geonum
    intro
    install
    examples
+   auto_examples/index
    api
    upcoming
 

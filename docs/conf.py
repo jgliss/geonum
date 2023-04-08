@@ -16,11 +16,6 @@ import sys
 import os
 import matplotlib
 
-# This was inserted based on this blog: https://github.com/spinus/sphinxcontrib-images/issues/41, after the following build error occured: Could not import extension sphinxcontrib.images (exception: cannot import name make_admonition), apparently due to a compatibility error between an updated version of sphinx (1.6) and the extension sphinxcontrib.images
-from docutils.parsers.rst.directives.admonitions import BaseAdmonition
-from sphinx.util import compat
-compat.make_admonition = BaseAdmonition
-
 matplotlib.use('agg')
 
 with open(os.path.join("..", "VERSION.rst")) as f:
@@ -62,7 +57,8 @@ extensions = [
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
 	'sphinx.ext.graphviz',
-    'sphinxcontrib.napoleon']
+    'sphinxcontrib.napoleon',
+    'sphinx_gallery.gen_gallery']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -343,4 +339,16 @@ autodoc_member_order = 'bysource'
 images_config = {
     'default_image_width' : '300px',
     'default_group'       : 'default'
+}
+
+from sphinx_gallery.sorting import FileNameSortKey
+
+sphinx_gallery_conf = {
+     'examples_dirs': '../examples',   # path to your example scripts
+     'gallery_dirs': 'auto_examples',  # path to where to save gallery generated output
+     'within_subsection_order': FileNameSortKey,
+     'reference_url': {
+         # The module you locally document uses None
+        'sphinx_gallery': None,
+    }
 }
