@@ -36,13 +36,6 @@ class TopoAccessBase(abc.ABC):
     _TESTLAT = 45
     _TESTLON = 15
 
-    def __init__(self, local_path=None, check_access=True):
-        self.local_path = local_path
-        self.topo_id = None
-
-        if check_access:
-            self.check_access()
-
     @abc.abstractmethod
     def get_data(self, lat0, lon0, lat1=None, lon1=None):
         """Declaration of data access method
@@ -67,16 +60,12 @@ class TopoAccessBase(abc.ABC):
         TopoData
             instance of TopoData class
         """
-        pass
+        pass # pragma: no cover
 
     def check_access(self):
         """Check if topography data can be accessed"""
-        from geonum.topodata import TopoData
         try:
-            d = self.get_data(self._TESTLAT, self._TESTLON)
-            if not isinstance(d, TopoData):
-                raise ValueError('Invalid return type, expected instance '
-                                 'of TopoData class, got {}'.format(type(d)))
+            self.get_data(self._TESTLAT, self._TESTLON)
             return True
         except Exception as e:
             print('Could not access topodata: {}'.format(repr(e)))
@@ -144,6 +133,7 @@ class TopoAccessBase(abc.ABC):
 
         if lon0 > lon1:
             lon0, lon1 = lon1, lon0
+        if lat0 > lat1:
             lat0, lat1 = lat1, lat0
 
         # closest indices
@@ -156,48 +146,44 @@ class TopoAccessBase(abc.ABC):
         if idx_lons[0] == 0 and lons_all[0] > lon0:
             warn("Error: Lon0 smaller than range covered by file, using first"
                  " available index in topodata..")
-            lon0 = lons_all[0]
             idx_lons[0] = 0
         elif lons_all[idx_lons[0]] > lon0:
             idx_lons[0] -= 1
         if idx_lons[1] == len(lons_all) - 1 and lons_all[-1] < lon1:
             warn("Error: Lon1 larger than range covered by file, using last"
                  " available index in topodata..")
-            lon1 = lons_all[-1]
             idx_lons[1] = len(lons_all) - 1
         elif lons_all[idx_lons[1]] < lon1:
             idx_lons[1] += 1
         if idx_lats[0] == 0 and lats_all[0] > lat0:
             warn("Error: Lat0 smaller than range covered by file, using first"
                  " available index in topodata..")
-            lat0 = lats_all[0]
             idx_lats[0] = 0
         elif lats_all[idx_lats[0]] > lat0:
             idx_lats[0] -= 1
         if idx_lats[1] == len(lats_all) - 1 and lats_all[-1] < lat1:
             warn("Error: Lat1 larger than range covered by file, using last"
                  " available index in topodata..")
-            lat1 = lats_all[-1]
             idx_lats[1] = len(lats_all) - 1
         elif lats_all[idx_lats[1]] < lat1:
             idx_lats[1] += 1
-        # make sure that no odd array lengths occur
-        if not (idx_lats[1] - idx_lats[0] + 1) % 2 == 0:
-            # try append index at the end
-            if not idx_lats[1] == len(lats_all) - 1:
-                idx_lats[1] += 1
-            elif not idx_lats[0] == 0:
-                idx_lats[0] -= 1
-            else:
-                raise ValueError("Fatal error, odd length of latitude array")
-        if not (idx_lons[1] - idx_lons[0] + 1) % 2 == 0:
-            # try append index at the end
-            if not idx_lons[1] == len(lons_all) - 1:
-                idx_lons[1] += 1
-            elif not idx_lons[0] == 0:
-                idx_lons[0] -= 1
-            else:
-                raise ValueError("Fatal error, odd length of longitude array")
+        # # make sure that no odd array lengths occur
+        # if not (idx_lats[1] - idx_lats[0] + 1) % 2 == 0:
+        #     # try append index at the end
+        #     if not idx_lats[1] == len(lats_all) - 1:
+        #         idx_lats[1] += 1
+        #     elif not idx_lats[0] == 0:
+        #         idx_lats[0] -= 1
+        #     else:
+        #         raise ValueError("Fatal error, odd length of latitude array")
+        # if not (idx_lons[1] - idx_lons[0] + 1) % 2 == 0:
+        #     # try append index at the end
+        #     if not idx_lons[1] == len(lons_all) - 1:
+        #         idx_lons[1] += 1
+        #     elif not idx_lons[0] == 0:
+        #         idx_lons[0] -= 1
+        #     else:
+        #         raise ValueError("Fatal error, odd length of longitude array")
         if idx_lats[0] > idx_lats[1]:
             return (lats_all[idx_lats[1]: idx_lats[0] + 1],
                     lons_all[idx_lons[0]: idx_lons[1] + 1],

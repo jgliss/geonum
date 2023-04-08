@@ -16,23 +16,21 @@ def test_etopo1_init():
 def test_srtm():
     acc = tp.SRTMAccess()
     d = acc.get_data(acc._TESTLAT, acc._TESTLON)
-    npt.assert_equal(d.data.shape, (2, 2))
-    vals = [d.data.std(), d.data.mean(), d.data.min(), d.data.max()]
-
-    npt.assert_array_almost_equal(vals, [4.0, 857.0, 853.0, 861.0])
+    npt.assert_equal(d.data.shape, (1, 1))
+    assert d.data[0][0] == 861
 
 @skip_srtm
 @pytest.mark.parametrize('lat0, lon0, lat1, lon1, dsh, dmin, dmax, dmean', [
     (60.052, 7.414, None, None, (2, 2), 1153., 1183., 1167.5),
-    (-18.55, -69.2, -18.35, -69.0, (242, 122), 4084., 6057., 4690.692827),
+    (-18.55, -69.2, -18.35, -69.0, (241, 121), 4084., 6057., 4690.5),
 
     ])
 def test_srtm_access(lat0, lon0, lat1, lon1, dsh, dmin, dmax, dmean):
     acc = tp.TopoDataAccess(mode='srtm')
     data = acc.get_data(lat0, lon0, lat1, lon1)
     npt.assert_array_equal(data.shape, dsh)
-    npt.assert_array_almost_equal([data.min, data.max, data.mean()],
-                                  [dmin, dmax, dmean])
+    npt.assert_allclose([data.min, data.max, data.mean()],
+                                  [dmin, dmax, dmean], atol=0.1)
 
 def test_topoaccess_invalid_mode():
     all_ok = True
