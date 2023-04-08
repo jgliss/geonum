@@ -331,40 +331,6 @@ class Etopo1Access(TopoAccessBase):
                 return True
         return False
 
-    def set_file_location(self, full_path):
-        """Set the full file path of a topography data file
-
-        Parameters
-        ----------
-        full_path : str
-            full file path of topography file
-
-        Raises
-        ------
-        TopoAccessError
-            if filepath does not exist or if the provided file is not
-            supported by this interface.
-        """
-        if not os.path.exists(full_path):
-            raise TopoAccessError('Input file location %s does not exist'
-                                  .format(full_path))
-        _dir = os.path.dirname(full_path)
-        _f = os.path.basename(full_path)
-        if not _f in self.supported_topo_files:
-            raise TopoAccessError('Invalid topography data file name, please '
-                                  'use either of the supported files from the '
-                                  'Etopo1 data set: {}'
-                                  .format(self.supported_topo_files))
-        self.local_path = _dir
-        self.file_name = _f
-
-        if not os.path.basename(full_path) in self.supported_topo_files:
-            raise TopoAccessError("Invalid topography data file, please use "
-                                  "one of the supported files from the Etopo1 data set\n%s"
-                                  % self.supported_topo_files)
-        self.local_path = os.path.dirname(full_path)
-        self.file_name = os.path.basename(full_path)
-
     def get_data(self, lat0, lon0, lat1=None, lon1=None):
         """Retrieve data from topography file
 
