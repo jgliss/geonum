@@ -20,7 +20,8 @@ from geonum.plot_helpers import plot_topo_contourf
 
 domain = geonum.GeoSetup(id='Etna region (Sicily)',
                          lat_ll=37.5, lat_tr=38.0,
-                         lon_ll=14.8, lon_tr=15.30)
+                         lon_ll=14.8, lon_tr=15.30,
+                         topo_access_mode='srtm')
 
 #%%
 # Add 2 GeoPoints to domain
@@ -49,7 +50,7 @@ domain.add_geo_point(observatory)
 #
 # Load topographic data using SRTM database
 # -----------------------------------------
-topo = domain.load_topo_data(topo_access_mode='srtm')
+topo = domain.load_topo_data()
 
 #%%
 #
