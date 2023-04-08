@@ -93,11 +93,11 @@ def test_init_Etopo1_invalid_file(tmpdir):
         f.write('bla')
 
     assert path.exists()
-
-    acc = mod.Etopo1Access(local_path=tmpdir,
-                           file_name=file_name,
-                           check_access=True,
-                           search_database=False)
+    with pytest.raises(TopoAccessError):
+        mod.Etopo1Access(local_path=tmpdir,
+                               file_name=file_name,
+                               check_access=True,
+                               search_database=False)
 
 
 
