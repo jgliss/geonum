@@ -68,11 +68,6 @@ class TopoData(object):
 
         lats = np.asarray(lats)
         lons = np.asarray(lons)
-        if not lats.ndim == 1:
-            raise ValueError('lats needs to be 1 dimensional')
-        if not lons.ndim == 1:
-            raise ValueError('lons needs to be 1 dimensional')
-
         data = np.asarray(data)
         if not data.shape == (len(lats), len(lons)):
             raise ValueError(
@@ -176,10 +171,12 @@ class TopoData(object):
         ----
         The resolution is determined at the center of this grid
         """
+        if not len(self.lons) > 1 or not len(self.lats) > 1:
+            raise ValueError('Need at least 2x2 sized topofield')
         x_lon, x_lat = int(len(self.lons) / 2), int(len(self.lats) / 2)
         p0 = LatLon(self.lats[x_lat], self.lons[x_lon])
-        r_lon = (p0 - LatLon(self.lats[x_lat], self.lons[x_lon + 1])).magnitude
-        r_lat = (p0 - LatLon(self.lats[x_lat + 1], self.lons[x_lon])).magnitude
+        r_lon = (p0 - LatLon(self.lats[x_lat], self.lons[x_lon-1])).magnitude
+        r_lat = (p0 - LatLon(self.lats[x_lat-1], self.lons[x_lon])).magnitude
         return (r_lat, r_lon)
 
     def mean(self):
@@ -190,7 +187,7 @@ class TopoData(object):
         """Standard deviation of topographic dataset"""
         return np.nanstd(self.data)
 
-    def increase_grid_resolution(self, res=0.2, polyorder=2):
+    def increase_grid_resolution(self, res=0.2, polyorder=2): # pragma: no cover
         """Gaussian pyramide based upscaling of topographic grid
 
         This function checks the current topographic resolution in the center
@@ -280,7 +277,7 @@ class TopoData(object):
         return np.meshgrid(self.longitude, self.latitude)
 
     def plot(self, plot3d=True, draw_coastlines=False,
-             draw_mapscale=False, **kwargs):
+             draw_mapscale=False, **kwargs): # pragma: no cover
         from geonum.mapping import Map
         if not "projection" in kwargs:
             kwargs["projection"] = "lcc"
@@ -312,7 +309,7 @@ class TopoData(object):
                 m.draw_mapscale_auto()
         return m
 
-    def plot_2d(self, ax=None):
+    def plot_2d(self, ax=None): # pragma: no cover
         """Plot 2D basemap of topodata"""
         from geonum.mapping import Map
         latc, lonc = self.center_coordinates
@@ -325,7 +322,7 @@ class TopoData(object):
         m.drawcoastlines()
         return m
 
-    def plot_3d(self, ax=None):
+    def plot_3d(self, ax=None): # pragma: no cover
         """Creates 3D surface plot of data
 
         Parameters
@@ -356,7 +353,7 @@ class TopoData(object):
         return True
 
     def closest_index(self, lat, lon):
-        """Finds closest index to input coordinate
+        """Finds the closest index to input coordinate
 
         Parameters
         ----------
@@ -368,8 +365,8 @@ class TopoData(object):
         Returns
         -------
         tuple
-            2-element tuple containing closest index of lat and lon arrays to
-            to input index
+            2-element tuple containing the closest index of lat and lon
+            arrays to input index
 
         Raises
         ------
@@ -397,17 +394,9 @@ class TopoData(object):
         -------
         float
             altitude at input coordinate
-
-        Raises
-        ------
-        ValueError
-            if retrieved altitude value is NaN
         """
         idx_lat, idx_lon = self.closest_index(lat, lon)
-        dat = self.data[idx_lat, idx_lon]
-        if np.isnan(dat):
-            raise ValueError("Invalid value encountered in topodata...")
-        return dat
+        return self.data[idx_lat, idx_lon]
 
     def __call__(self, lat, lon):
         """Get altitude value at input position"""
