@@ -4,11 +4,9 @@ from setuptools import setup, find_packages
 with open('README.rst') as file:
     readme = file.read()
 
-
-
 setup(
     name        =   'geonum',
-    version     =   os.environ.get('RELEASE_VERSION', 'v0.0.1.dev0'),
+    version     =   os.environ['GITHUB_REF_NAME'],
     author      =   'Jonas Gliss',
     author_email=   'jonasgliss@gmail.com',
     license     =   'GPLv3',
