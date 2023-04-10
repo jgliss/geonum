@@ -4,8 +4,6 @@ on:
     tags:
       - '*'
 
-env:
-  RELEASE_TAG: $GITHUB_REF_NAME
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -20,7 +18,9 @@ jobs:
           run: pip install wheel twine
         - name: Print release version
           run: |
-            echo "Release version is: $RELEASE_TAG"
+            echo "Release version is: $GITHUB_REF_NAME"
+        - name: Create envvar for setup.py
+          run: echo "RELEASE_TAG=$GITHUB_REF_NAME" >> $GITHUB_ENV
         - name: Build package
           run: python setup.py sdist bdist_wheel
         - name: Print content of dist folder
