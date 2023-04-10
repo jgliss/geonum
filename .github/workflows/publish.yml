@@ -22,8 +22,6 @@ jobs:
           run: python setup.py sdist bdist_wheel
         - name: Print content of dist folder
           run: ls dist
-        - name: SUBSET
-          run: ls dist/*${GITHUB_REF_NAME}*
         - name: Publish package
           env:
             TWINE_USERNAME: __token__
