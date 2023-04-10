@@ -17,8 +17,13 @@ jobs:
           run: pip install wheel twine
         - name: Print release version
           run: |
-            echo "Release version: $GITHUB_REF_NAME"
+            echo "Release version is: ${{ env.GITHUB_REF_NAME }}"
         - name: Build package
           run: python setup.py sdist bdist_wheel
         - name: Print content of dist folder
           run: ls dist
+        - name: Publish package
+          env:
+            TWINE_USERNAME: __token__
+            TWINE_PASSWORD: ${{ secrets.TESTPYPI_API_TOKEN }}
+          run: twine upload --repository testpypi dist/*${{ env.GITHUB_REF_NAME }}*
