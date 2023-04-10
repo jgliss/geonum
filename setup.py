@@ -6,7 +6,7 @@ with open('README.rst') as file:
 
 setup(
     name        =   'geonum',
-    version     =   os.environ.get('GITHUB_REF_NAME', 'v0.0.1-TEST-DONOTUSE'),
+    version     =   os.environ.get('RELEASE_TAG', 'v0.0.0.dev0'),
     author      =   'Jonas Gliss',
     author_email=   'jonasgliss@gmail.com',
     license     =   'GPLv3',
