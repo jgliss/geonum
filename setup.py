@@ -1,15 +1,14 @@
+import os
 from setuptools import setup, find_packages
 
 with open('README.rst') as file:
     readme = file.read()
 
-with open("VERSION.rst") as f:
-    version = f.readline()
-    f.close()
+
 
 setup(
     name        =   'geonum',
-    version     =   version,
+    version     =   os.environ.get('RELEASE_VERSION', 'v0.0.1.dev0'),
     author      =   'Jonas Gliss',
     author_email=   'jonasgliss@gmail.com',
     license     =   'GPLv3',

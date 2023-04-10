@@ -3,8 +3,6 @@ on:
   push:
     tags:
       - '*'
-    branches:
-      - 'add-release-action'
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -17,9 +15,15 @@ jobs:
             python-version: 3.9
         - name: Install dependencies
           run: pip install wheel twine
-        - name: Set env
+        - name: Set release version as ENVVAR
           run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-        - name: Test
+        - name: Print release version
           run: |
             echo $RELEASE_VERSION
-            echo ${{ env.RELEASE_VERSION }}
+            python -c "import os; print(os.environ['RELEASE_VERSION'])"
+        - name: Print GITHUB_REF_NAME
+          run: echo "GITHUB_REF_NAME: $GITHUB_REF_NAME"
+        - name: Build package
+          run: python setup.py sdist bdist_wheel
+        - name: Print content of dist folder
+          run: ls dist
