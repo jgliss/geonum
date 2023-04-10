@@ -22,10 +22,10 @@ jobs:
           run: python setup.py sdist bdist_wheel
         - name: Print content of dist folder
           run: ls dist
+        - name: Check package
+          run: twine check dist/*
         - name: Publish package
           env:
             TWINE_USERNAME: __token__
             TWINE_PASSWORD: ${{ secrets.TESTPYPI_API_TOKEN }}
-          run: |
-            twine check dist/*
-            twine upload --repository testpypi dist/*${GITHUB_REF_NAME}*
+          run: twine upload --repository testpypi dist/*
