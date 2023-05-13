@@ -1,0 +1,14 @@
+name: Github Release
+on: push
+
+jobs:
+  release_github:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+
+        - name: Fetch and print last release
+          run: |
+            export LAST_RELEASE=$(git describe --tags --abbrev=0)
+            echo "${LAST_RELEASE}"
