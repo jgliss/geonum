@@ -8,11 +8,8 @@ jobs:
         - name: Checkout code
           uses: actions/checkout@v3
 
-        - name: Fetch tags
-          run: git fetch --tags
-
-        - name: List tags
-          run: git tag --list
-          
-        - name: Fetch and print last release
-          run: git describe --tags --abbrev=0
+        - name: Get the latest release tag
+          id: latest-release
+          run: |
+            LATEST_RELEASE=$(curl -s "https://api.github.com/repos/${{ github.repository }}/releases/latest" | jq -r '.tag_name')
+            echo "${LATEST_RELEASE}"
