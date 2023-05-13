@@ -7,6 +7,12 @@ jobs:
     steps:
         - name: Checkout code
           uses: actions/checkout@v3
+
+        - name: Fetch tags
+          run: git fetch --tags
+
+        - name: List tags
+          run: git tag --list
           
         - name: Fetch and print last release
           run: git describe --tags --abbrev=0
