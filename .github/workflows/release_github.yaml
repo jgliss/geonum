@@ -10,5 +10,4 @@ jobs:
 
         - name:
         - name: Fetch and print last release
-          run: |
-            git describe --tags --abbrev=0
+          run: git describe --tags --abbrev=0
