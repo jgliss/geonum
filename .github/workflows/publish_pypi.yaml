@@ -43,9 +43,6 @@ jobs:
             TWINE_PASSWORD: ${{ secrets.TESTPYPI_API_TOKEN }}
           run: twine upload --repository testpypi dist/*
 
-        - name: CRASH
-          run: exit 1
-
   build_and_publish_pypi:
     runs-on: ubuntu-latest
     needs: build_and_publish_test_pypi
