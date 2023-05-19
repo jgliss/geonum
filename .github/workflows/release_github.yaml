@@ -13,3 +13,6 @@ jobs:
           run: |
             LATEST_RELEASE=$(curl -s "https://api.github.com/repos/${{ github.repository }}/releases/latest" | jq -r '.tag_name')
             echo "${LATEST_RELEASE}"
+
+        - name: Print current REF
+          run: echo "Release version is $GITHUB_REF_NAME"

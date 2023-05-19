@@ -22,8 +22,7 @@ jobs:
              pip install wheel twine
 
         - name: Print release version
-          run: |
-            echo "Release version is: $GITHUB_REF_NAME"
+          run: echo "Release version is $GITHUB_REF_NAME"
 
         - name: Create envvar for setup.py
           run: echo "RELEASE_TAG=$GITHUB_REF_NAME" >> $GITHUB_ENV
