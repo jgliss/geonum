@@ -15,4 +15,4 @@ jobs:
             echo "${LATEST_RELEASE}"
 
         - name: Print current REF
-          run: echo "Release version is $GITHUB_REF_NAME"
+          run: echo "${GITHUB_REF_NAME}"
