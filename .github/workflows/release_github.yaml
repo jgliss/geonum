@@ -13,7 +13,7 @@ jobs:
 
       - name: Create Release Draft
         id: create_release
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6
         with:
           github-token: ${{ env.GH_TOKEN }}
           script: |
@@ -27,7 +27,7 @@ jobs:
 
       - name: Get Previous Release
         id: get_previous_release
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6
         with:
           github-token: ${{ env.GH_TOKEN }}
           script: |
@@ -40,7 +40,7 @@ jobs:
 
       - name: Generate Release Notes
         id: generate_release_notes
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6
         with:
           github-token: ${{ env.GH_TOKEN }}
           script: |
@@ -58,7 +58,7 @@ jobs:
 
       - name: Update Release Draft
         id: update_release_draft
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6
         with:
           github-token: ${{ env.GH_TOKEN }}
           script: |
