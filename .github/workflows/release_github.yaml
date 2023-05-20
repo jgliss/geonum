@@ -1,9 +1,6 @@
 name: Github Release
 on: push
 
-env:
-  GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -23,8 +20,8 @@ jobs:
                 owner: context.repo.owner,
                 generate_release_notes: true,
                 repo: context.repo.repo,
-                tag_name: context.ref,
-                name: context.ref,
+                tag_name: v1.5.0.dev11,
+                name: TEST,
                 draft: true
               });
               console.log(response.data);
