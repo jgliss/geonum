@@ -26,6 +26,9 @@ jobs:
       - name: Print current REF
         run: echo "${GITHUB_REF_NAME}"
 
+      - name: Get commit branch
+        run: echo "${GITHUB_REF#refs/heads/}"
+        
       - name: Make draft release
         run: |
           curl -L \
@@ -36,7 +39,7 @@ jobs:
             https://api.github.com/repos/${{ github.repository }}/releases \
             -d '{
               "tag_name":"v1.5.0",
-              "target_commitish":${GITHUB_REF#refs/heads/},
+              "target_commitish":${COMMIT_BRANCH},
               "name":"TEST RELEASE",
               "body":"Description of the release",
               "draft":true,
