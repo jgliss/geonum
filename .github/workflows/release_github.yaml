@@ -1,4 +1,5 @@
 name: Github Release
+run-name: ${{ github.actor }} is running this
 on: push
 
 jobs:
