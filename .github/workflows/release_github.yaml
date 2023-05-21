@@ -22,6 +22,7 @@ jobs:
           echo "COMMIT_BRANCH=$COMMIT_BRANCH" >> $GITHUB_ENV
 
       - name: Make draft release
+        id: make_release
         run: |
           curl -L \
             -X POST \
@@ -33,11 +34,12 @@ jobs:
               "tag_name":"v1.5.0",
               "name":"TEST RELEASE",
               "body":"Description of the release",
-              "draft":true,
+              "draft":false,
               "prerelease":false,
               "generate_release_notes":false}'
 
-      - name: Add release notes
+      - name: Create release notes
+        id: release_notes
         run: |
           curl -L \
             -X POST \
@@ -48,3 +50,8 @@ jobs:
             -d '{
               "tag_name":"v1.5.0",
               "previous_tag_name":"v1.4.4"}'
+
+      - name: Update release notes
+        needs: [make_release, release_notes]
+        id: update_release_notes
+
