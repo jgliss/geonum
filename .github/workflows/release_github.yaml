@@ -18,7 +18,7 @@ jobs:
             https://api.github.com/repos/${{ github.repository }}/releases/latest\
             | jq -r '.tag_name')
           echo "${LATEST_RELEASE}"
-
+          echo "LATEST_RELEASE=$LATEST_RELEASE" >> $GITHUB_ENV
       - name: Get the latest release tag again
         run: |
           LATEST_RELEASE=$(curl -s "https://api.github.com/repos/${{ github.repository }}/releases/latest" | jq -r '.tag_name')
@@ -45,7 +45,7 @@ jobs:
       - name: Create release notes
         id: release_notes
         run: |
-          curl -L \
+          RELEASE_NOTES = $(curl -L \
             -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"\
@@ -53,4 +53,7 @@ jobs:
             https://api.github.com/repos/${{ github.repository }}/releases/generate-notes \
             -d '{
               "tag_name":"v1.5.0",
-              "previous_tag_name":"v1.4.4"}'
+              "previous_tag_name":"v1.4.4"}'\
+            | jq -r '.body')
+          
+          echo ${RELEASE_NOTES}
