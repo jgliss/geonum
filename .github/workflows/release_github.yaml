@@ -30,11 +30,4 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"\
             -H "X-GitHub-Api-Version: 2022-11-28" \
             https://api.github.com/repos/${{ github.repository }}/releases \
-            -d '{
-              "tag_name":"v1.5.0",
-              "target_commitish":${COMMIT_BRANCH},
-              "name":"TEST RELEASE",
-              "body":"Description of the release",
-              "draft":true,
-              "prerelease":false,
-              "generate_release_notes":false}'
+            -d '{"tag_name":"v1.5.0","target_commitish":${COMMIT_BRANCH},"name":"TEST RELEASE","body":"Description of the release","draft":true,"prerelease":false,"generate_release_notes":false}'
