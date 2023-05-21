@@ -15,16 +15,15 @@ jobs:
           echo "${LATEST_RELEASE}"
           echo "LATEST_RELEASE=$LATEST_RELEASE" >> $GITHUB_ENV
 
-      - name: Print current REF
-        run: echo "${GITHUB_REF_NAME}"
-
       - name: Get commit branch
         run: |
           COMMIT_BRANCH="${GITHUB_REF#refs/heads/}"
           echo "${COMMIT_BRANCH}"
+          echo "COMMIT_BRANCH=$COMMIT_BRANCH" >> $GITHUB_ENV
 
       - name: Make draft release
         run: |
+          echo ${COMMIT_BRANCH}
           curl -L \
             -X POST \
             -H "Accept: application/vnd.github+json" \
