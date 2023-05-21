@@ -50,8 +50,3 @@ jobs:
             -d '{
               "tag_name":"v1.5.0",
               "previous_tag_name":"v1.4.4"}'
-
-      - name: Update release notes
-        needs: [make_release, release_notes]
-        id: update_release_notes
-
