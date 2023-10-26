@@ -1,0 +1,45 @@
+[build-system]
+requires = [
+  "setuptools >= 40.9.0",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "geonum"
+version = "1.5.0dev1"
+authors = [{name = "Jonas Gliss", email = "jonasgliss@gmail.com"}]
+description = "Toolbox for 3D geonumerical calculations and atmospheric composition"
+readme = "README.rst"
+license = {text = "GPLv3+"}
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Education",
+
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+
+    "Programming Language :: Python :: 3",
+]
+requires-python = ">=3.9"
+
+dependencies = [
+    "scipy",
+    "matplotlib",
+    "LatLon23",
+    "SRTM.py",
+    "cartopy",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "netcdf4",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/jgliss/geonum"
+"Documentation" = "https://geonum.readthedocs.io/en/latest/"
+
+[tool.setuptools.packages.find]
+where = ["geonum"]
