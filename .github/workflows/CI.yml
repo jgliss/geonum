@@ -9,7 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     defaults:
       run:
-        shell: bash -l {0}
+        shell: bash -l {0} # https://github.com/conda-incubator/setup-miniconda#important
     strategy:
       fail-fast: false
       matrix:
@@ -38,7 +38,7 @@ jobs:
       run: python ./setup.py install
     - name: Run pytest
       run: pytest test --cov=geonum/ --cov-report xml
-    - name: Upload coverage to Codecov (Python 3.9, Ubuntu)
+    - name: Upload coverage to Codecov
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9'
       uses: codecov/codecov-action@v1
       with:
