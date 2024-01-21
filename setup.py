@@ -16,9 +16,6 @@ setup(
     url         =   'https://github.com/jgliss/geonum',
     package_dir =   {'geonum'     :   'geonum'},
     packages    =   find_packages(exclude=['contrib', 'docs', 'tests*']),
-    include_package_data    =   True,
-    package_data=   {'geonum'     :   ['local_topo_data/*.rst',
-                                       'local_topo_data/*.txt']},
     classifiers=[
         # How mature is this project? Common values are
         #   3 - Alpha
