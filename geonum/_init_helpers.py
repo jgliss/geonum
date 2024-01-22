@@ -4,16 +4,16 @@ def _check_requirements():
     NETCDF_AVAILABLE = True
     try:
         from mpl_toolkits.basemap import Basemap
-    except:
+    except ModuleNotFoundError:
         BASEMAP_AVAILABLE = False
 
     try:
         from cv2 import pyrUp
-    except: # pragma: no cover
+    except ModuleNotFoundError: # pragma: no cover
         CV2_AVAILABLE = False
     try:
         from netCDF4 import Dataset
-    except: # pragma: no cover
+    except ModuleNotFoundError: # pragma: no cover
         NETCDF_AVAILABLE = False
 
     return (BASEMAP_AVAILABLE,
@@ -40,6 +40,11 @@ def _init_local_topodir():
 
 def _init_dir_and_version():
     import os
-    from pkg_resources import get_distribution
-    return (os.path.abspath(os.path.dirname(__file__)),
-            get_distribution('geonum').version)
+    path = os.path.abspath(os.path.dirname(__file__))
+    try:
+        import importlib.metadata
+        version = importlib.metadata.version("geonum")
+    except ModuleNotFoundError:
+        from pkg_resources import get_distribution
+        version = get_distribution('geonum').version
+    return (path, version)

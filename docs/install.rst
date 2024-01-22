@@ -25,8 +25,7 @@ Alternatively, you may install via pip or from source as described in the follow
 Via pip
 -------
 
-This will install the latest released version of geonum **without** its
-depencencies.
+This will install the latest released version of geonum.
 
 .. note::
 
@@ -37,8 +36,6 @@ depencencies.
 
 	pip install geonum
 
-If you install via pip, you need to install all dependencies manually. For
-details see Sect. :ref:`dependencies`.
 
 Install from source (into a conda environment)
 ----------------------------------------------
@@ -59,7 +56,7 @@ installed, preserving the conda environment.
 Alternatively, if you plan to apply local changes to the geonum source code,
 you may install in editable mode (i.e. setuptools "develop mode")::
 
-	pip install --no-deps -e .
+	pip install --no-deps -e .[test]
 
 You may also download and extract (or clone) the
 `GitHub repo <https://github.com/jgliss/geonum>`__ to install the very
