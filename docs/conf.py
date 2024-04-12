@@ -53,7 +53,7 @@ extensions = [
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
 	'sphinx.ext.graphviz',
-    'sphinxcontrib.napoleon',
+    'sphinx.ext.napoleon',
     'sphinx_gallery.gen_gallery']
 
 # Add any paths that contain templates here, relative to this directory.
@@ -90,7 +90,7 @@ release = LIB_VERSION
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -342,9 +342,5 @@ from sphinx_gallery.sorting import FileNameSortKey
 sphinx_gallery_conf = {
      'examples_dirs': '../examples',   # path to your example scripts
      'gallery_dirs': 'auto_examples',  # path to where to save gallery generated output
-     'within_subsection_order': FileNameSortKey,
-     'reference_url': {
-         # The module you locally document uses None
-        'sphinx_gallery': None,
-    }
+     'within_subsection_order': FileNameSortKey
 }
