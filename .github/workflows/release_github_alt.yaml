@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Create release tag
-        run: echo "RELEASE_TAG=v1.5.0test10" >> $GITHUB_ENV
+        run: echo "RELEASE_TAG=v1.5.0test11" >> $GITHUB_ENV
 
       - name: Display release tag
         run: echo "RELEASE_TAG=${{ env.RELEASE_TAG }}"
@@ -27,8 +27,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ env.RELEASE_TAG }}
+          previous_tag: ${{ env.PREVIOUS_RELEASE_TAG }}
         run: |
           gh release create "$tag" \
               --repo="$GITHUB_REPOSITORY" \
               --title="${GITHUB_REPOSITORY#*/} ${tag#v}" \
-              --generate-notes
+              --generate-notes \
+              --notes-start-tag=$previous_tag
