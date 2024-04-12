@@ -1,0 +1,21 @@
+name: Create Github Release
+on: push
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Create release tag
+        run: |
+          echo "RELEASE_TAG=v1.5.0test10" >> $GITHUB_ENV
+          echo "RELEASE_TAG=${{ env.RELEASE_TAG }}"
+
+      - name: Get the previous release tag
+        run: |
+          PREVIOUS_RELEASE_TAG=$(curl -s "https://api.github.com/repos/${{ github.repository }}/releases/latest" | jq -r '.tag_name')
+          echo "Previous release tag: ${PREVIOUS_RELEASE_TAG}"
+          echo "PREVIOUS_RELEASE_TAG=$PREVIOUS_RELEASE_TAG" >> $GITHUB_ENV
+
