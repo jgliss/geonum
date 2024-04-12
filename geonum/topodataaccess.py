@@ -47,7 +47,6 @@ class TopoDataAccess(object):
     :class:`SRTMAccess`) should be based on (or follow the API of) template
     base class :class:`TopoAccessBase`.
 
-
     Attributes
     ----------
     mode : str
