@@ -1,4 +1,0 @@
-include geonum/local_topo_data/*.txt
-include geonum/local_topo_data/*.rst
-include VERSION.rst
-include LICENSE

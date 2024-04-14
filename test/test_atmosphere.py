@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Geonum is a Python library for geographical calculations in 3D
 # Copyright (C) 2017 Jonas Gliss (jonasgliss@gmail.com)
 #
@@ -20,6 +18,7 @@
 Module for atmospheric calculations relevant for geonum
 """
 import pytest
+import numpy as np
 import numpy.testing as npt
 from geonum import atmosphere as atm
 
@@ -79,6 +78,10 @@ def test__g_acc(phi,alt,should_be):
     (0, 1000, 9.471702),
     (45, 1000, 9.497733), #45deg
     (90, 1000, 9.523879), #90deg
+
+    (np.array([45,90]),np.array([0,1000]),
+     np.array([[9.80616, 9.83207964],
+               [9.49773256, 9.5238791]]))
     ])
 def test_g(lat,alt,should_be):
     val = atm.g(lat,alt)
@@ -216,10 +219,13 @@ def test_air_number_density(alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,
     val = atm.air_number_density(alt,temp,ref_p,ref_temp,ref_alt,lapse_rate,mol_mass,lat)
     npt.assert_allclose(val, should_be, rtol=1e-7)
 
-# ToDo: add more tests for the functions below (so far only default input is tested)
-def test_refr_idx_300ppm_co2():
-    val = atm.refr_idx_300ppm_co2()
-    should_be=1.000291554210872
+@pytest.mark.parametrize('lbda_mu,should_be', [
+    (0.3, 1.000291554210872),
+    (0.2, 1.000324)
+    ])
+def test_refr_idx_300ppm_co2(lbda_mu,should_be):
+    val = atm.refr_idx_300ppm_co2(lbda_mu)
+
     npt.assert_allclose(val, should_be, rtol=1e-7)
 
 def test_refr_idx():
@@ -268,6 +274,3 @@ def test_sigma_rayleigh(lbda_mu,co2_ppm,should_be):
 def test_rayleigh_vol_sc_coeff(alt,lbda_mu,co2_ppm,should_be):
     val = atm.rayleigh_vol_sc_coeff(alt,lbda_mu,co2_ppm)
     npt.assert_allclose(val, should_be, rtol=1e-5)
-if __name__ == '__main__':
-    import sys
-    pytest.main(sys.argv)

@@ -13,74 +13,33 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
+from ._init_helpers import _check_requirements, _init_local_topodir, \
+    _init_dir_and_version
 
-def check_requirements():
-    BASEMAP_AVAILABLE = True
-    CV2_AVAILABLE = True
-    NETCDF_AVAILABLE = True
-    try:
-        from mpl_toolkits.basemap import Basemap
-    except:
-        BASEMAP_AVAILABLE = False
-
-    try:
-        from cv2 import pyrUp
-    except:
-        CV2_AVAILABLE = False
-    try:
-        from netCDF4 import Dataset
-    except:
-        NETCDF_AVAILABLE = False
-
-    return (BASEMAP_AVAILABLE,
-            CV2_AVAILABLE,
-            NETCDF_AVAILABLE)
-
-def init_local_topodir():
-    import os
-    home = os.path.expanduser('~')
-    LOCAL_TOPO_DIR = os.path.join(home, '.geonum')
-    if not os.path.exists(LOCAL_TOPO_DIR):
-        os.mkdir(LOCAL_TOPO_DIR)
-    TOPO_INFO_FILE = os.path.join(LOCAL_TOPO_DIR,  "LOCAL_TOPO_PATHS")
-    if not os.path.exists(TOPO_INFO_FILE):
-        with open(TOPO_INFO_FILE,'w') as f:
-            f.write(f'{LOCAL_TOPO_DIR}\n')
-    return (LOCAL_TOPO_DIR, TOPO_INFO_FILE)
-
-try:
-    LOCAL_TOPO_DIR, TOPO_INFO_FILE = init_local_topodir()
-except Exception as e:
-    print('Failed to create local topo directory for geonum '
-          f'{LOCAL_TOPO_DIR}')
-    LOCAL_TOPO_DIR, TOPO_INFO_FILE =  None, None
+LOCAL_TOPO_DIR, TOPO_INFO_FILE = _init_local_topodir()
 
 (BASEMAP_AVAILABLE,
  CV2_AVAILABLE,
- NETCDF_AVAILABLE) = check_requirements()
+ NETCDF_AVAILABLE) = _check_requirements()
 
-def init_dir_and_version():
-    import os
-    from pkg_resources import get_distribution
-    return (os.path.abspath(os.path.dirname(__file__)),
-            get_distribution('geonum').version)
-
-__dir__, __version__ = init_dir_and_version()
+__dir__, __version__ = _init_dir_and_version()
 
 from . import exceptions
 from . import helpers
 from . import atmosphere
+from . import plot_helpers
+
 from .topodata import TopoData
 from .topodataaccess import TopoDataAccess
-from .topoaccessbase import delete_all_local_srtm_files
-
 
 from .geopoint import GeoPoint
 from .geovector3d import GeoVector3D
 from .geosetup import GeoSetup
 from .elevationprofile import ElevationProfile
-from .processing import LineOnGrid
+from .lineongrid import LineOnGrid
 
-if BASEMAP_AVAILABLE:
+from .utils import delete_local_srtm_files
+
+if BASEMAP_AVAILABLE: # pragma: no cover
     from .mapping import Map
 

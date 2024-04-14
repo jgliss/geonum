@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import matplotlib
+matplotlib.use('Agg')
 import pytest
 from contextlib import contextmanager
 from geonum import NETCDF_AVAILABLE
@@ -32,6 +34,3 @@ skip_netcdf4 = pytest.mark.skipif(NETCDF_AVAILABLE==False,
 @contextmanager
 def does_not_raise_exception():
     yield
-
-if __name__ == '__main__':
-    print(srtm_works())

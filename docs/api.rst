@@ -1,54 +1,60 @@
-***
-API
-***
+API Reference
+#############
 
 Application programming interface of geonum.
 
-Base classes
-============
+.. _geopoint:
 
-GeoPoint
---------
+Specifying locations on Earth
+=============================
 
 .. automodule:: geonum.geopoint
    :members:
    :undoc-members:
 
-GeoVector3D
------------
+.. _geovector:
+
+Connecting the dots
+===================
 
 .. automodule:: geonum.geovector3d
    :members:
    :undoc-members:
 
-Analysis and processing
-=======================
+.. _geosetup:
 
-GeoSetup class
---------------
+Working with geographical domains
+=================================
 
 .. automodule:: geonum.geosetup
    :members:
    :undoc-members:
 
-ElevationProfile class
-----------------------
+.. _elevationprofiles:
+
+Computing elevation profiles
+============================
 
 .. automodule:: geonum.elevationprofile
    :members:
    :undoc-members:
 
-Further processing tools
-------------------------
+Further tools
+========================
 
-.. automodule:: geonum.processing
+Line on grid
+------------
+
+.. automodule:: geonum.lineongrid
    :members:
    :undoc-members:
 
-Topographic data (access, import and processing)
-================================================
+.. _topodata:
 
-Access of topographic data
+Topographic data
+================
+
+Access to topographic data
 --------------------------
 
 .. automodule:: geonum.topodataaccess
@@ -69,6 +75,8 @@ Low-level access and template classes
    :members:
    :undoc-members:
 
+.. _atmosphere:
+
 Atmospheric calculations
 ========================
 
@@ -83,20 +91,37 @@ Helper methods
    :members:
    :undoc-members:
 
+Utility functions
+=================
+
+.. automodule:: geonum.utils
+   :members:
+   :undoc-members:
+
+Plotting
+========
+
+.. automodule:: geonum.plot_helpers
+   :members:
+   :undoc-members:
+
+DEPRECATED: mapping.py
+-----------------------
+
+.. note::
+
+  The former map plotting routines routines (:mod:`geonum.mapping`)
+  are deprecated as they are based on the basemap library. They
+  will be revised and replaced in parts using cartopy. For details see:
+  https://github.com/jgliss/geonum/issues/4
+
+.. automodule:: geonum.mapping
+   :members:
+   :undoc-members:
+
 Custom exceptions
 =================
 
 .. automodule:: geonum.exceptions
-   :members:
-   :undoc-members:
-
-Plotting (creating 2D and 3D Basemaps)
-======================================
-
-.. note::
-
-  The `geonum.mapping <https://github.com/jgliss/geonum/blob/master/geonum/mapping.py>`__ cannot be compiled by RTD since mpl_toolkits.basemap needed to be mocked out in order for the compile process to work at all. No fix found yet...(apologies for any inconveniences).
-
-.. automodule:: geonum.mapping
    :members:
    :undoc-members:

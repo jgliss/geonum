@@ -53,23 +53,46 @@ class TopoData(object):
         numpy array with longitude coordinates of the topographic dataset.
         Accessible via :attr:`longitude`.
     data : ndarray
-        2D numpy array containing elevation values.
+        2D numpy array containing elevation values, first index denotes
+        latitude dimension, 2nd index denotes longitude dimension.
     data_id : str
         ID of this data set.
     repl_nan_minval : bool
-        coordinates containing NaN values are replaced with the minimum
-        altitude in the range.
+        if True, then coordinates containing NaN values are replaced with the
+        minimum altitude in `data`.
     """
-    def __init__(self, lats, lons, data, data_id="", repl_nan_minval=False):
-        self.data_id = data_id #: ID of topodata file
+    def __init__(self, lats, lons, data, data_id=None, repl_nan_minval=False):
+        if data_id is None:
+            data_id = 'undefined'
+        self.data_id = data_id
 
-        self.lats = lats #
-        self.lons = lons #asarray(lons)
+        lats = np.asarray(lats)
+        lons = np.asarray(lons)
+        data = np.asarray(data)
+        if not data.shape == (len(lats), len(lons)):
+            raise ValueError(
+                'shape mismatch between input lats and lons and data...'
+                )
+
+        self.lats = lats
+        self.lons = lons
+        self.data = data
+
 
         if repl_nan_minval:
             self.replace_nans()
 
-        self.data = data
+    def __str__(self):
+        return (
+            f'geonum.TopoData (data_id: {self.data_id})\n'
+            f'Dimensions: {self.dims}, shape: {self.shape}\n'
+            f'latitude range: {self.lat0} - {self.lat1}\n'
+            f'longitude range: {self.lon0} - {self.lon1}\n'
+            f'data: {type(self.data)}\n{self.data}'
+            )
+
+    def __repr__(self):
+        return (f'geonum.TopoData (data_id: {self.data_id}, shape: {self.shape})\n')
 
     @property
     def latitude(self):
@@ -78,8 +101,15 @@ class TopoData(object):
 
     @property
     def longitude(self):
-        """Wrapper for :attr:`lats`"""
-        return self.lats
+        """Wrapper for :attr:`lons`"""
+        return self.lons
+
+    @property
+    def dims(self):
+        """
+        list: List of dimension names
+        """
+        return ['latitude', 'longitude']
 
     def replace_nans(self, fillval=None):
         """Replace NaNs in topographic data with a fill value
@@ -141,10 +171,12 @@ class TopoData(object):
         ----
         The resolution is determined at the center of this grid
         """
+        if not len(self.lons) > 1 or not len(self.lats) > 1:
+            raise ValueError('Need at least 2x2 sized topofield')
         x_lon, x_lat = int(len(self.lons) / 2), int(len(self.lats) / 2)
         p0 = LatLon(self.lats[x_lat], self.lons[x_lon])
-        r_lon = (p0 - LatLon(self.lats[x_lat], self.lons[x_lon + 1])).magnitude
-        r_lat = (p0 - LatLon(self.lats[x_lat + 1], self.lons[x_lon])).magnitude
+        r_lon = (p0 - LatLon(self.lats[x_lat], self.lons[x_lon-1])).magnitude
+        r_lat = (p0 - LatLon(self.lats[x_lat-1], self.lons[x_lon])).magnitude
         return (r_lat, r_lon)
 
     def mean(self):
@@ -155,7 +187,7 @@ class TopoData(object):
         """Standard deviation of topographic dataset"""
         return np.nanstd(self.data)
 
-    def increase_grid_resolution(self, res=0.2, polyorder=2):
+    def increase_grid_resolution(self, res=0.2, polyorder=2): # pragma: no cover
         """Gaussian pyramide based upscaling of topographic grid
 
         This function checks the current topographic resolution in the center
@@ -232,8 +264,20 @@ class TopoData(object):
         return (self.lats[0] + self.delta_lat / 2.,
                 self.lons[0] + self.delta_lon / 2.)
 
+    def init_mesh(self):
+        """
+        Init X,Y meshgrid from latitudes and longitudes for map plots
+
+        Returns
+        -------
+        list
+            meshgrid
+
+        """
+        return np.meshgrid(self.longitude, self.latitude)
+
     def plot(self, plot3d=True, draw_coastlines=False,
-             draw_mapscale=False, **kwargs):
+             draw_mapscale=False, **kwargs): # pragma: no cover
         from geonum.mapping import Map
         if not "projection" in kwargs:
             kwargs["projection"] = "lcc"
@@ -265,7 +309,7 @@ class TopoData(object):
                 m.draw_mapscale_auto()
         return m
 
-    def plot_2d(self, ax=None):
+    def plot_2d(self, ax=None): # pragma: no cover
         """Plot 2D basemap of topodata"""
         from geonum.mapping import Map
         latc, lonc = self.center_coordinates
@@ -278,7 +322,7 @@ class TopoData(object):
         m.drawcoastlines()
         return m
 
-    def plot_3d(self, ax=None):
+    def plot_3d(self, ax=None): # pragma: no cover
         """Creates 3D surface plot of data
 
         Parameters
@@ -309,7 +353,7 @@ class TopoData(object):
         return True
 
     def closest_index(self, lat, lon):
-        """Finds closest index to input coordinate
+        """Finds the closest index to input coordinate
 
         Parameters
         ----------
@@ -321,8 +365,8 @@ class TopoData(object):
         Returns
         -------
         tuple
-            2-element tuple containing closest index of lat and lon arrays to
-            to input index
+            2-element tuple containing the closest index of lat and lon
+            arrays to input index
 
         Raises
         ------
@@ -350,17 +394,9 @@ class TopoData(object):
         -------
         float
             altitude at input coordinate
-
-        Raises
-        ------
-        ValueError
-            if retrieved altitude value is NaN
         """
         idx_lat, idx_lon = self.closest_index(lat, lon)
-        dat = self.data[idx_lat, idx_lon]
-        if np.isnan(dat):
-            raise ValueError("Invalid value encountered in topodata...")
-        return dat
+        return self.data[idx_lat, idx_lon]
 
     def __call__(self, lat, lon):
         """Get altitude value at input position"""

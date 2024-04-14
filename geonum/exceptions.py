@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Geonum is a Python library for geographical calculations in 3D
 # Copyright (C) 2017 Jonas Gliss (jonasgliss@gmail.com)
 #
@@ -16,12 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""Custom exceptions of geonum"""
+class InvalidTopoMode(IOError):
+    pass
+
+class IntersectNotFound(ValueError):
+    pass
+
+class OutOfDomain(ValueError):
+    pass
+
 class SRTMNotCoveredError(ValueError):
     pass
 
 class TopoAccessError(IOError):
-    pass
-
-class InvalidTopoMode(IOError):
     pass

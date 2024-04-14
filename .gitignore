@@ -88,9 +88,6 @@ ENV/
 # Rope project settings
 .ropeproject
 
-# Topography data files
-geonum/local_topo_data/*.grd
-
 # _private stuff
 _private
 
@@ -98,3 +95,6 @@ _private
 .idea
 
 .pytest_cache
+
+docs/auto_examples
+docs/sg_execution_times.rst
