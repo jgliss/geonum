@@ -88,9 +88,6 @@ ENV/
 # Rope project settings
 .ropeproject
 
-# Topography data files
-geonum/local_topo_data/*.grd
-
 # _private stuff
 _private
 

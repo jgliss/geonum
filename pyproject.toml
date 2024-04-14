@@ -45,4 +45,4 @@ test = [
 packages = ["geonum"]
 
 [tool.setuptools.dynamic]
-version = {file=["VERSION.rst"]}
+version = {file=["VERSION"]}
