@@ -15,8 +15,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Create release tag
-        run: echo "RELEASE_TAG=v1.5.0test11" >> $GITHUB_ENV
+      - name: Get release tag
+        run: echo "RELEASE_TAG=${{ github.ref }}" >> $GITHUB_ENV
 
       - name: Display release tag
         run: echo "RELEASE_TAG=${{ env.RELEASE_TAG }}"
