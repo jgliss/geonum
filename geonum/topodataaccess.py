@@ -47,7 +47,6 @@ class TopoDataAccess(object):
     :class:`SRTMAccess`) should be based on (or follow the API of) template
     base class :class:`TopoAccessBase`.
 
-
     Attributes
     ----------
     mode : str
@@ -64,8 +63,8 @@ class TopoDataAccess(object):
         local path to etopo data (only relevant for etopo1 mode)
     """
     #: supported access modes (topographic datasets)
-    REGISTERED = dict(srtm      = SRTMAccess,
-                      etopo1    = Etopo1Access)
+    REGISTERED = dict(srtm = SRTMAccess,
+                      etopo1 = Etopo1Access)
     DEFAULT_MODE = 'srtm'
     def __init__(self, mode=None, local_path=None):
         if mode is None:
