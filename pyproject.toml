@@ -26,7 +26,7 @@ dynamic = ["version"]
 dependencies = [
     "numpy",
     "scipy",
-    "matplotlib-base",
+    "matplotlib",
     "LatLon23",
     "SRTM.py",
     "cartopy",
