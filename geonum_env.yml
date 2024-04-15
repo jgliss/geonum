@@ -11,4 +11,4 @@ dependencies:
   - srtm.py>=0.3
   - netcdf4 # optional
   - pytest # for tests
-  - pytest-cov
+  - pytest-cov # for test coverage check
