@@ -1,5 +1,0 @@
-scipy
-matplotlib
-LatLon23
-SRTM.py
-cartopy

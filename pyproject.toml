@@ -24,8 +24,9 @@ requires-python = ">=3.8"
 dynamic = ["version"]
 
 dependencies = [
+    "numpy",
     "scipy",
-    "matplotlib",
+    "matplotlib-base",
     "LatLon23",
     "SRTM.py",
     "cartopy",
