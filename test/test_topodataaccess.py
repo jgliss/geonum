@@ -2,7 +2,7 @@
 """Test environment for base.py module."""
 import pytest
 import numpy.testing as npt
-from geonum.conftest import skip_srtm, skip_netcdf4
+from test.conftest import skip_srtm, skip_netcdf4
 import geonum.topodataaccess as mod
 
 @pytest.fixture

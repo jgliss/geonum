@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from geonum.conftest import does_not_raise_exception
+from test.conftest import does_not_raise_exception
 from LatLon23 import LatLon, GeoVector
 from geonum.geopoint import GeoPoint
 from geonum.geovector3d import GeoVector3D
