@@ -1,7 +1,5 @@
 [build-system]
-requires = [
-  "setuptools >= 40.9.0",
-]
+requires = ["setuptools>=64", "setuptools_scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -19,6 +17,7 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
 
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
 ]
 requires-python = ">=3.9"
 dynamic = ["version"]
@@ -45,5 +44,4 @@ test = [
 [tool.setuptools]
 packages = ["geonum"]
 
-[tool.setuptools.dynamic]
-version = {file=["VERSION"]}
+[tool.setuptools_scm]
