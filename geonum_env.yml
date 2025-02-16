@@ -2,7 +2,7 @@ name: geonum
 channels:
   - conda-forge
 dependencies:
-  - python>=3.8
+  - python>=3.10
   - numpy>=1.26
   - scipy>=1.13
   - matplotlib-base>=3.8
