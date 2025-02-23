@@ -22,6 +22,8 @@ build:
     - libproj-dev
     - proj-data
     - proj-bin
+  commands:
+    - git fetch --unshallow
 
 # Optionally set the version of Python and requirements required to build your docs
 python:
@@ -29,6 +31,3 @@ python:
     - requirements: docs/requirements.txt
     - method: pip
       path: .
-
-commands:
-  - git fetch --unshallow
