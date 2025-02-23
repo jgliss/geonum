@@ -22,7 +22,7 @@ Access and handling of topographic data
 import pytest
 import numpy as np
 import numpy.testing as npt
-from geonum.conftest import does_not_raise_exception
+from test.conftest import does_not_raise_exception
 from geonum.exceptions import TopoAccessError
 from geonum import LOCAL_TOPO_DIR
 from geonum import topoaccessbase as mod

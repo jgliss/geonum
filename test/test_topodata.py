@@ -10,7 +10,7 @@ import numpy as np
 import numpy.testing as npt
 
 from geonum import topodata as td
-from geonum.conftest import does_not_raise_exception
+from test.conftest import does_not_raise_exception
 arr = np.array([[647., 647.], [651., 651.]])
 lats = np.array([48., 48.00083333])
 lons = np.array([11., 11.00083333])

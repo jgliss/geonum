@@ -3,10 +3,10 @@ import pytest
 import numpy.testing as npt
 from numpy import ndarray
 
-from geonum.conftest import does_not_raise_exception
+from test.conftest import does_not_raise_exception
 from geonum import GeoPoint, GeoVector3D, TopoDataAccess, TopoData
 from geonum import geosetup as mod
-from geonum.conftest import skip_srtm
+from test.conftest import skip_srtm
 from geonum.exceptions import OutOfDomain
 
 @pytest.mark.parametrize(

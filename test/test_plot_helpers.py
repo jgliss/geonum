@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 
 from geonum import plot_helpers as mod
-from geonum.conftest import does_not_raise_exception
+from test.conftest import does_not_raise_exception
 
 
 @pytest.mark.parametrize('projection', [
