@@ -22,13 +22,6 @@ build:
     - libproj-dev
     - proj-data
     - proj-bin
-  jobs:
-    post_install:
-      - pip install setuptools_scm
-      - python -c "import setuptools_scm; print(setuptools_scm.get_version())" > version.txt
-      - export GEONUM_VERSION=$(cat version.txt)
-      - echo "GEONUM_VERSION=$GEONUM_VERSION"
-      - rm version.txt
 
 # Optionally set the version of Python and requirements required to build your docs
 python:
