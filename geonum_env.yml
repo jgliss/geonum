@@ -1,4 +1,4 @@
-name: geonum
+name: geonum-dev
 channels:
   - conda-forge
 dependencies:
