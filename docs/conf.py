@@ -15,15 +15,8 @@ import matplotlib
 matplotlib.use('agg')
 import sys
 import os
-import setuptools_scm
-import traceback
 
-try:
-    _version = setuptools_scm.get_version()
-except Exception as e:
-    print(f"Failed to retrieve version using setuptools_scm.get_version().")
-    traceback.print_exc()
-    _version = "unknown"
+_version = os.environ.get("GEONUM_VERSION", "0.0.0")
 
 from unittest.mock import MagicMock as Mock
 

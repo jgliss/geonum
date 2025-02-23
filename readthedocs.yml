@@ -23,7 +23,7 @@ build:
     - proj-data
     - proj-bin
   jobs:
-    pre_build:
+    pre_install:
       - python -c "import setuptools_scm; print(setuptools_scm.get_version())" > version.txt
       - export GEONUM_VERSION=$(cat version.txt)
       - echo "GEONUM_VERSION=$GEONUM_VERSION"
