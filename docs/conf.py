@@ -15,8 +15,10 @@
 import sys
 import os
 import matplotlib
-
+print("BLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 LIB_VERSION = os.environ.get("RELEASE_TAG", "")
+print(f"LIB_VERSION: {LIB_VERSION}")
+
 matplotlib.use('agg')
 try:
     from unittest.mock import MagicMock as Mock
