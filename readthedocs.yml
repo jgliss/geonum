@@ -22,9 +22,6 @@ build:
     - libproj-dev
     - proj-data
     - proj-bin
-  jobs:
-    post_checkout:
-      - git fetch --unshallow
 
 # Optionally set the version of Python and requirements required to build your docs
 python:
