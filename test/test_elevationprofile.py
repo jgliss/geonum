@@ -1,6 +1,6 @@
 import numpy.testing as npt
 import pytest
-from geonum.conftest import skip_srtm, does_not_raise_exception
+from test.conftest import skip_srtm, does_not_raise_exception
 import numpy as np
 from geonum.exceptions import IntersectNotFound
 from geonum import GeoPoint, ElevationProfile, TopoData
