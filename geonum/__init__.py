@@ -13,8 +13,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-from ._init_helpers import _check_requirements, _init_local_topodir, \
-    _init_dir_and_version
+from pathlib import Path as _Path
+from importlib import metadata
+from ._init_helpers import _check_requirements, _init_local_topodir
 
 LOCAL_TOPO_DIR, TOPO_INFO_FILE = _init_local_topodir()
 
@@ -22,7 +23,8 @@ LOCAL_TOPO_DIR, TOPO_INFO_FILE = _init_local_topodir()
  CV2_AVAILABLE,
  NETCDF_AVAILABLE) = _check_requirements()
 
-__dir__, __version__ = _init_dir_and_version()
+__dir__ = str(_Path(__file__).parent)
+__version__ = metadata.version(__package__)
 
 from . import exceptions
 from . import helpers

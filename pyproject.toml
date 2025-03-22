@@ -7,10 +7,10 @@ name = "geonum"
 authors = [{name = "Jonas Gliss", email = "jonasgliss@gmail.com"}]
 description = "Toolbox for 3D geonumerical calculations and atmospheric composition"
 readme = "README.rst"
-license = {text = "GPLv3+"}
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
-
     "Intended Audience :: Science/Research",
     "Intended Audience :: Education",
     "Programming Language :: Python :: 3.9",
