@@ -24,7 +24,7 @@ LOCAL_TOPO_DIR, TOPO_INFO_FILE = _init_local_topodir()
  NETCDF_AVAILABLE) = _check_requirements()
 
 __dir__ = str(_Path(__file__).parent)
-__version__ = metadata.version(__package__)
+__version__ = metadata.version("geonum")
 
 from . import exceptions
 from . import helpers
