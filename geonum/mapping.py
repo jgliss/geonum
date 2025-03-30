@@ -23,10 +23,11 @@ except:
     basemap_avail = False
 
 import numpy as np
+from geonum.plot_helpers import shifted_color_map
 from geonum.topodataaccess import TopoDataAccess
 from geonum.topodata import TopoData
 from geonum.exceptions import TopoAccessError
-from geonum.helpers import haversine_formula, shifted_color_map, order_of_magnitude
+from geonum.helpers import haversine_formula, order_of_magnitude
 
 from geonum import CV2_AVAILABLE
 import warnings

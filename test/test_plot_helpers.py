@@ -1,4 +1,5 @@
 import cartopy
+from matplotlib.colors import LinearSegmentedColormap
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
@@ -54,3 +55,11 @@ def test_rotate_xtick_labels(deg, ha):
     for label in updated_ax.get_xticklabels():
         assert label.get_rotation() == deg
         assert label.get_ha() == ha
+
+@pytest.mark.parametrize('vmin, vmax, cmap, test_values, expected_colors', [
+    (-10, 10, None, [-10, 0, 10], [(1.0, 0.0, 0.0, 1.0), (0.5, 0.5, 0.5, 1.0), (0.0, 0.0, 1.0, 1.0)]),  # Default cmap
+    (-5, 15, plt.cm.coolwarm, [-5, 5, 15], [plt.cm.coolwarm(0.0), plt.cm.coolwarm(0.5), plt.cm.coolwarm(1.0)]),  # Custom cmap
+])
+def test_shifted_color_map_colors(vmin, vmax, cmap, test_values, expected_colors):
+    shifted_cmap = mod.shifted_color_map(vmin, vmax, cmap)
+    assert isinstance(shifted_cmap, LinearSegmentedColormap)

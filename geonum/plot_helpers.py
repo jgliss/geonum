@@ -236,3 +236,67 @@ def rotate_xtick_labels(ax, deg=30, ha="right"):
     lbls = [lbl.get_text() for lbl in lbls]
     ax.set_xticklabels(lbls, rotation=deg, ha=ha)
     return ax
+
+
+def shifted_color_map(vmin, vmax, cmap=None):
+    """Shift center of a diverging colormap to value 0
+
+    Note
+    ----
+
+    This method was found `here <http://stackoverflow.com/questions/
+    7404116/defining-the-midpoint-of-a-colormap-in-matplotlib>`__
+    (last access: 17/01/2017). Thanks to `Paul H <http://stackoverflow.com/
+    users/1552748/paul-h>`_ who provided it.
+
+    Function to offset the "center" of a colormap. Useful for
+    data with a negative min and positive max and if you want the
+    middle of the colormap's dynamic range to be at zero level
+
+    Parameters
+    ----------
+    vmin : float
+        lower end of data value range
+    vmax : float
+        upper end of data value range
+    cmap
+        matplotlib colormap to be shifted (if None, use "seismic")
+
+    Returns
+    -------
+    matplotlib.colors.LinearSegmentedColormap
+        shifted colormap
+
+    """
+    import matplotlib.cm as colormaps
+    import matplotlib.colors as colors
+    if cmap is None:
+        cmap = colormaps.seismic
+
+    midpoint = 1 - np.abs(vmax) / (np.abs(vmax) + np.abs(vmin))
+
+    cdict = {
+        'red': [],
+        'green': [],
+        'blue': [],
+        'alpha': []
+    }
+
+    # regular index to compute the colors
+    reg_index = np.linspace(0, 1, 257)
+
+    # shifted index to match the data
+    shift_index = np.hstack([
+        np.linspace(0.0, midpoint, 128, endpoint=False),
+        np.linspace(midpoint, 1.0, 129, endpoint=True)
+    ])
+
+    for ri, si in zip(reg_index, shift_index):
+        r, g, b, a = cmap(ri)
+
+        cdict['red'].append((si, r, r))
+        cdict['green'].append((si, g, g))
+        cdict['blue'].append((si, b, b))
+        cdict['alpha'].append((si, a, a))
+
+    return colors.LinearSegmentedColormap('shiftedcmap', cdict)
