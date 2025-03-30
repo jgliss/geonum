@@ -140,40 +140,6 @@ def haversine_formula(lon0, lat0, lon1, lat1, radius=None):
 
     return radius * c
 
-
-# ToDo: check whether this is really needed...
-def approximate_connection_vector(lon0, lat0, lon1, lat1, len_lat_km=111.20):
-    """Returns approximate connection vector between two points
-
-    Note
-    ----
-    Careful: Only approximate, suited for small distances ( < 100km)
-
-    Parameters
-    ----------
-    lon0 : float
-        longitude of first point in decimal degrees
-    lat0 : float
-        latitude of first point in decimal degrees
-    lon1 : float
-        longitude of second point in decimal degrees
-    lat1 : float
-        latitude of second point in decimal degrees
-    len_lat_km : float
-        approx. length of 1 degree latitude at the equator in km.
-
-    Returns
-    -------
-    numpy.ndarray
-        2-element array containing (dx, dy) components of connection vector
-    """
-
-    lat = (lat0 + lat1) / 2 * 0.01745
-    dx = len_lat_km * np.cos(lat) * (lon1 - lon0)
-    dy = len_lat_km * (lat1 - lat0)
-    return np.array((dx, dy))
-
-
 def shifted_color_map(vmin, vmax, cmap=None):
     """Shift center of a diverging colormap to value 0
 
