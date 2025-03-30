@@ -121,6 +121,12 @@ html_static_path = ['_static']
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'geonumdoc'
 
+html_context = {
+    "docs_version": _version
+}
+
+templates_path = ["_templates"]
+
 # -- Options for LaTeX output ---------------------------------------------
 
 # Grouping the document tree into LaTeX files. List of tuples
