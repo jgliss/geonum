@@ -12,11 +12,12 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 import matplotlib
+import setuptools_scm
 matplotlib.use('agg')
 import sys
 import os
 
-_version = os.environ.get("GEONUM_VERSION", "0.0.0")
+_version = setuptools_scm.get_version("..", relative_to=__file__)
 
 from unittest.mock import MagicMock as Mock
 
