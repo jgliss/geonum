@@ -18,6 +18,12 @@ def test_all_topodata_search_dirs():
     for dirloc in all_dirs:
         assert os.path.exists(dirloc)
 
+def test_all_topodata_search_dirs_CASE_FILENOTFOUNDERROR(monkeypatch):
+    monkeypatch.setattr(h, "LOCAL_TOPO_DIR", None)
+    with pytest.raises(FileNotFoundError):
+        h.all_topodata_search_dirs()
+    
+
 def test_check_and_add_topodir():
     tmp_file = os.path.join(LOCAL_TOPO_DIR, 'TMP.file')
     topofile_tmp = shutil.copyfile(TOPO_INFO_FILE, tmp_file)
@@ -59,10 +65,5 @@ def test_isnum(val,expectation):
 def test_haversine_formula(lon0,lat0,lon1,lat1,radius,value):
     val = h.haversine_formula(lon0, lat0, lon1, lat1, radius)
     npt.assert_allclose(val, value, rtol=1e-5)
-
-
-if __name__ == "__main__":
-    import sys
-    pytest.main(sys.argv)
 
 

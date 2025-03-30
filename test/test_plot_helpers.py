@@ -1,10 +1,14 @@
 import cartopy
+from matplotlib.colors import LinearSegmentedColormap
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
 from geonum import plot_helpers as mod
 from test.conftest import does_not_raise_exception
 
+# Use a non-rendering backend for matplotlib
+plt.switch_backend('Agg')
 
 @pytest.mark.parametrize('projection', [
     None, cartopy.crs.TransverseMercator(), cartopy.crs.PlateCarree(),
@@ -34,3 +38,28 @@ def test_set_map_ticks(ax, xticks, yticks, xres, yres, raises):
         yt = ax.get_yticks()
         np.testing.assert_allclose(xt, xres)
         np.testing.assert_allclose(yt, yres)
+
+
+@pytest.mark.parametrize('deg,ha', [
+    (45, "center"), (90, "left"), (30, "right")
+])
+def test_rotate_xtick_labels(deg, ha):
+    _, ax = plt.subplots(1,1) 
+    ax.set_xticks(range(5))
+    ax.set_xticklabels([f"Label {i}" for i in range(5)])
+
+    # Call the function to rotate xtick labels
+    updated_ax = mod.rotate_xtick_labels(ax, deg=deg, ha=ha)
+
+    # Verify the rotation and horizontal alignment
+    for label in updated_ax.get_xticklabels():
+        assert label.get_rotation() == deg
+        assert label.get_ha() == ha
+
+@pytest.mark.parametrize('vmin, vmax, cmap, test_values, expected_colors', [
+    (-10, 10, None, [-10, 0, 10], [(1.0, 0.0, 0.0, 1.0), (0.5, 0.5, 0.5, 1.0), (0.0, 0.0, 1.0, 1.0)]),  # Default cmap
+    (-5, 15, plt.cm.coolwarm, [-5, 5, 15], [plt.cm.coolwarm(0.0), plt.cm.coolwarm(0.5), plt.cm.coolwarm(1.0)]),  # Custom cmap
+])
+def test_shifted_color_map_colors(vmin, vmax, cmap, test_values, expected_colors):
+    shifted_cmap = mod.shifted_color_map(vmin, vmax, cmap)
+    assert isinstance(shifted_cmap, LinearSegmentedColormap)

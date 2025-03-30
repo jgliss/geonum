@@ -62,7 +62,7 @@ class GeoPoint(LatLon):
         save time, e.g. for altitude access)
     auto_topo_access : bool
         if True, try set :attr:`altitude`and :attr:`altitude_err` based on
-        local topography (note that defa)
+        local topography
     """
     _ALTERR_DEFAULT = 1e9
 
@@ -74,9 +74,11 @@ class GeoPoint(LatLon):
         LatLon.__init__(self, float(latitude), float(longitude), name)
         if altitude is None:
             altitude = 0
-        elif auto_topo_access:  # altitude is not None
+        elif auto_topo_access and not np.isnan(altitude):  # altitude is not None
             raise ValueError(
-                'either provide altitude or deactivate auto_topo_access'
+                "Conflict in input parameters, altitude value is provided and "
+                "auto_topo_access is set to True, please either remove the former "
+                "or deactivate the latter"
             )
         self.altitude = altitude  # altitude in m
         self.altitude_err = self._ALTERR_DEFAULT

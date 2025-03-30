@@ -47,3 +47,4 @@ test = [
 packages = ["geonum"]
 
 [tool.setuptools_scm]
+write_to = "geonum/_version.py"

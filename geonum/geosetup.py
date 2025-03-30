@@ -27,10 +27,6 @@ from geonum.geovector3d import GeoVector3D
 from geonum.topodata import TopoData
 from geonum.topodataaccess import TopoDataAccess
 
-if BASEMAP_AVAILABLE:  # pragma: no cover
-    from geonum.mapping import Map
-
-
 class GeoSetup(object):
     """The GeoSetup class represents a collection of GeoPoints and vectors
 
@@ -670,9 +666,9 @@ class GeoSetup(object):
     def create_map(self, *args, **kwargs):  # pragma: no cover
         """Create a Basemap object for this regime"""
         if not BASEMAP_AVAILABLE:
-            raise ImportError("Cannot create map: "
-                              "Basemap library is not available")
+            raise ImportError("Cannot create map: Basemap library is not available")
 
+        from geonum.mapping import Map
         if not isinstance(self.topo_data, TopoData):
             self.load_topo_data()
         if not "projection" in kwargs and self.magnitude < 150:

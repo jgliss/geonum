@@ -23,10 +23,11 @@ except:
     basemap_avail = False
 
 import numpy as np
+from geonum.plot_helpers import shifted_color_map
 from geonum.topodataaccess import TopoDataAccess
 from geonum.topodata import TopoData
 from geonum.exceptions import TopoAccessError
-from geonum.helpers import haversine_formula, shifted_color_map, order_of_magnitude
+from geonum.helpers import haversine_formula, order_of_magnitude
 
 from geonum import CV2_AVAILABLE
 import warnings
@@ -322,10 +323,6 @@ class Map(Basemap):
                 self.set_ticks_topo_colorbar(start_alt, stop_alt, step)
         except Exception as e:
             raise
-            msg=("Could not draw topography in high res, using default "
-                 "etopo() instead...")
-            print(msg + repr(e))
-            self.etopo()
 
     def draw_topo_3d(self, num_ticks=4, cmap="Oranges", alpha=0.5,
                      contour_color="#708090", contour_antialiased=True,
@@ -415,10 +412,7 @@ class Map(Basemap):
             kwargs["length"] = l
         if l < 40:
             str_format = '%.1f'
-# =============================================================================
-#         if not "fontsize" in kwargs:
-#             kwargs["fontsize"] = 8
-# =============================================================================
+
         if not "lon0" in kwargs:
             kwargs["lon0"] = lon_center
             kwargs["lat0"] = lat_center
@@ -563,8 +557,7 @@ class Map(Basemap):
             Anchor must be set in the :class:`GeoVector3D` object
         """
         if not vec.type() == "GeoVector3D":
-            raise AttributeError("Wrong input, need :class:`GeoVector3D` "
-                                                                "object")
+            raise AttributeError("Wrong input, need :class:`GeoVector3D` object")
         elif not vec.anchor.type() == "GeoPoint":
             raise AttributeError("Vector anchor not set or wrong type..")
 
@@ -573,8 +566,6 @@ class Map(Basemap):
 
         a = vec.anchor
         pf = a + vec
-        x0, y0 = self(a.longitude, a.latitude)
-        x1, y1 = self(pf.longitude, pf.latitude)
         return self.draw_line_2d(vec.name, a.latitude, a.longitude,
                                  pf.latitude, pf.longitude, **kwargs)
 
@@ -734,8 +725,9 @@ class Map(Basemap):
         :returns: line object
         """
         from pyproj.exceptions import GeodError
+        domain_size_km = self._len_diag() 
         try:
-            line = self.drawgreatcircle(lon0, lat0, lon1, lat1, **kwargs)
+            line = self.drawgreatcircle(lon0, lat0, lon1, lat1, del_s=domain_size_km/20, **kwargs)
             self.lines[line_id] = line
             return line
         except GeodError:
