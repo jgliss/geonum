@@ -125,8 +125,6 @@ html_context = {
     "docs_version": _version
 }
 
-templates_path = ["_templates"]
-
 # -- Options for LaTeX output ---------------------------------------------
 
 # Grouping the document tree into LaTeX files. List of tuples
