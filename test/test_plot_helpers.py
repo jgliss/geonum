@@ -1,10 +1,13 @@
 import cartopy
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
 from geonum import plot_helpers as mod
 from test.conftest import does_not_raise_exception
 
+# Use a non-rendering backend for matplotlib
+plt.switch_backend('Agg')
 
 @pytest.mark.parametrize('projection', [
     None, cartopy.crs.TransverseMercator(), cartopy.crs.PlateCarree(),
@@ -34,3 +37,20 @@ def test_set_map_ticks(ax, xticks, yticks, xres, yres, raises):
         yt = ax.get_yticks()
         np.testing.assert_allclose(xt, xres)
         np.testing.assert_allclose(yt, yres)
+
+
+@pytest.mark.parametrize('deg,ha', [
+    (45, "center"), (90, "left"), (30, "right")
+])
+def test_rotate_xtick_labels(deg, ha):
+    _, ax = plt.subplots(1,1) 
+    ax.set_xticks(range(5))
+    ax.set_xticklabels([f"Label {i}" for i in range(5)])
+
+    # Call the function to rotate xtick labels
+    updated_ax = mod.rotate_xtick_labels(ax, deg=deg, ha=ha)
+
+    # Verify the rotation and horizontal alignment
+    for label in updated_ax.get_xticklabels():
+        assert label.get_rotation() == deg
+        assert label.get_ha() == ha

@@ -99,3 +99,4 @@ _private
 docs/auto_examples
 docs/sg_execution_times.rst
 geonum/_version.py
+.vscode

@@ -227,3 +227,12 @@ def plot_geovector3d_into_map(ax, vec, **kwargs):
     ax.plot([start.longitude, end.longitude],
             [start.latitude, end.latitude], **kwargs)
     return ax
+
+
+def rotate_xtick_labels(ax, deg=30, ha="right"):
+    """Rotate xtick labels in matplotlib axes object"""
+
+    lbls = ax.get_xticklabels()
+    lbls = [lbl.get_text() for lbl in lbls]
+    ax.set_xticklabels(lbls, rotation=deg, ha=ha)
+    return ax

@@ -101,17 +101,6 @@ def isnum(val):
         return True
     return False
 
-
-# ToDo: review and move to plot_helpers.py
-def rotate_xtick_labels(ax, deg=30, ha="right"):
-    """Rotate xtick labels in matplotlib axes object"""
-
-    lbls = ax.get_xticklabels()
-    lbls = [lbl.get_text() for lbl in lbls]
-    ax.set_xticklabels(lbls, rotation=deg, ha=ha)
-    return ax
-
-
 def haversine_formula(lon0, lat0, lon1, lat1, radius=None):
     """Haversine formula to compute distances on a sphere
 
