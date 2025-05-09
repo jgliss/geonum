@@ -22,7 +22,6 @@ _version = setuptools_scm.get_version("..", relative_to=__file__)
 if _version == "0.0.0":
     raise ValueError("something is off retrieving the correct geonum version using setuptools_scm.get_version")
 
-print("BLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 print(_version)
 
 from unittest.mock import MagicMock as Mock
